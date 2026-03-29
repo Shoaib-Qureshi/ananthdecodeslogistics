@@ -1,0 +1,4 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    Redirect 301 "/old-link" "/old-link"
+</IfModule>

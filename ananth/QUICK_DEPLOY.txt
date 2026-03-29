@@ -1,0 +1,89 @@
+╔═══════════════════════════════════════════════════════════════╗
+║          QUICK DEPLOYMENT REFERENCE CARD                      ║
+╚═══════════════════════════════════════════════════════════════╝
+
+FILES TO UPLOAD:
+├── laravel-deploy.tar.gz (18MB)
+└── database_backup.sql (309KB)
+
+═══════════════════════════════════════════════════════════════
+
+UPLOAD VIA FILEZILLA/WINSCP:
+  Protocol: SFTP
+  Port: 22
+  Destination: /home/u644731106/
+
+═══════════════════════════════════════════════════════════════
+
+SSH COMMANDS (Copy & Paste in PuTTY):
+
+# 1. Navigate and backup
+cd /home/u644731106/
+[ -d "public_html" ] && mv public_html public_html_backup
+
+# 2. Extract files
+mkdir -p laravel-app
+cd laravel-app
+tar -xzf ../laravel-deploy.tar.gz
+
+# 3. Install dependencies
+composer install --optimize-autoloader --no-dev
+
+# 4. Set permissions
+chmod -R 755 storage bootstrap/cache
+chmod 644 .env
+
+# 5. Setup public directory
+cd /home/u644731106/
+cp -r laravel-app/public/* public_html/ || ln -s laravel-app/public public_html
+
+# 6. Import database
+mysql -u u644731106_ananthuser -p'Q4pR:;>iX/^8j#A&9c8d+O' u644731106_ananth < database_backup.sql
+
+# 7. Clear and cache
+cd laravel-app
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+php artisan config:cache
+php artisan route:cache
+
+═══════════════════════════════════════════════════════════════
+
+UPDATE .env FILE:
+  nano /home/u644731106/laravel-app/.env
+
+  Change:
+    APP_ENV=production
+    APP_DEBUG=false
+    DB_HOST=localhost
+    APP_URL=https://www.ananthdecodeslogistics.com
+
+  Save: Ctrl+O, Exit: Ctrl+X
+
+═══════════════════════════════════════════════════════════════
+
+UPDATE public_html/index.php:
+  nano /home/u644731106/public_html/index.php
+
+  Change paths to:
+    require __DIR__.'/../laravel-app/vendor/autoload.php';
+    $app = require_once __DIR__.'/../laravel-app/bootstrap/app.php';
+
+═══════════════════════════════════════════════════════════════
+
+VERIFY:
+  ✓ Homepage loads
+  ✓ Blog pages work (no 404)
+  ✓ About page displays correctly
+  ✓ Admin panel accessible
+
+═══════════════════════════════════════════════════════════════
+
+TROUBLESHOOTING:
+  View logs: tail -f /home/u644731106/laravel-app/storage/logs/laravel.log
+  Reset cache: php artisan config:clear && php artisan cache:clear
+  Fix permissions: chmod -R 755 storage bootstrap/cache
+
+═══════════════════════════════════════════════════════════════

@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(php --version)",
+      "Bash(composer --version)",
+      "Bash(npm --version)",
+      "Bash(mysql --version)",
+      "Bash(php.exe --version)",
+      "Bash(composer.bat --version)",
+      "Bash(node.exe --version)",
+      "Bash(npm.cmd --version)",
+      "Bash(mysql.exe --version)",
+      "Bash(mysql -u root -e \"SELECT 1;\")",
+      "Bash(/c/laragon/bin/mysql/mysql-8.4.3-winx64/bin/mysql.exe -u root -e \"SELECT 1;\")",
+      "Bash(/c/laragon/bin/mysql/mysql-8.4.3-winx64/bin/mysql.exe -u root -e \"CREATE DATABASE IF NOT EXISTS ananth_local CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(/c/laragon/bin/mysql/mysql-8.4.3-winx64/bin/mysql.exe -u root ananth_local)",
+      "Bash(npm install:*)",
+      "Bash(/c/laragon/bin/mysql/mysql-8.4.3-winx64/bin/mysql.exe -u root ananth_local -e \"DESCRIBE users;\")",
+      "Bash(/c/laragon/bin/mysql/mysql-8.4.3-winx64/bin/mysql.exe -u root ananth_local -e \"SELECT id, name, email, user_role FROM users;\")",
+      "Bash(/c/laragon/bin/mysql/mysql-8.4.3-winx64/bin/mysql.exe -u root ananth_local -e \"SELECT id, name, email, user_role, updated_at FROM users WHERE email=''admin@example.com'';\")",
+      "Bash(php artisan:*)",
+      "Bash(python skills/ui-ux-pro-max/scripts/search.py \"logistics knowledge platform contributor dashboard professional modern\" --design-system -p \"ADL Contributors\")",
+      "Bash(python \".claude/skills/ui-ux-pro-max/scripts/search.py\" \"logistics contributor platform professional modern SaaS dashboard\" --design-system -p \"ADL Contributors\")"
+    ]
+  }
+}
