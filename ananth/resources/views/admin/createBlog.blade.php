@@ -85,6 +85,45 @@
                                     <option value="private">Hidden</option>
                                 </select>
                             </div>
+                            <div class="col-md-12">
+                                <hr>
+                                <h4>SEO Meta Title</h4>
+                                <input name="meta_title" type="text" placeholder="Optional SEO title">
+                            </div>
+                            <div class="col-md-12">
+                                <h4>SEO Meta Description</h4>
+                                <textarea name="meta_description" rows="3" placeholder="Optional SEO meta description"></textarea>
+                            </div>
+                            <div class="col-md-12">
+                                <h4>SEO Keywords</h4>
+                                <textarea name="meta_keywords" rows="2" placeholder="keyword 1, keyword 2, keyword 3"></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <h4>Canonical URL</h4>
+                                <input name="canonical_url" type="text" placeholder="https://example.com/blog/post">
+                            </div>
+                            <div class="col-md-4">
+                                <h4>OG Image Path</h4>
+                                <input name="og_image" type="text" placeholder="media/custom-og-image.webp">
+                            </div>
+                            <div class="col-md-2">
+                                <h4>Robots Index</h4>
+                                <select name="robots_index">
+                                    <option value="1" selected>Index</option>
+                                    <option value="0">No Index</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <h4>Robots Follow</h4>
+                                <select name="robots_follow">
+                                    <option value="1" selected>Follow</option>
+                                    <option value="0">No Follow</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <h4>Schema JSON-LD</h4>
+                                <textarea name="schema_json_ld" rows="6" placeholder='{"@context":"https://schema.org"}'></textarea>
+                            </div>
                         </div>
                         <button type="submit">Publish Post</button>
                     </form>

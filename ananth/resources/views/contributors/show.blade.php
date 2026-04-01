@@ -1,7 +1,7 @@
 @extends('layouts.front')
 @section('title', $post->title . ' - Ananth Decodes Logistics')
 @section('description', Str::limit(strip_tags($post->body), 160))
-@section('img', $post->featured_image ? asset('storage/posts/' . $post->featured_image) : asset('img/site-banner.jpg'))
+@section('img', $post->featured_image_url)
 @section('url', route('contributors.show', $post->slug))
 
 @section('content')
@@ -53,11 +53,7 @@
             </div>
             <div class="col-lg-6">
                 <div class="headingBanner">
-                    @if($post->featured_image)
-                        <img src="{{ asset('storage/posts/' . $post->featured_image) }}" alt="{{ $post->title }}">
-                    @else
-                        <img src="{{ asset('img/site/anantha-logistics.webp') }}" alt="{{ $post->title }}">
-                    @endif
+                    <img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}">
                 </div>
             </div>
         </div>
@@ -139,9 +135,7 @@
                             @foreach($related as $rel)
                             <div class="col-md-4 mb-4">
                                 <div class="postCard articleRelatedCard" style="height:100%;">
-                                    @if($rel->featured_image)
-                                        <img src="{{ asset('storage/posts/' . $rel->featured_image) }}" alt="{{ $rel->title }}">
-                                    @endif
+                                    <img src="{{ $rel->featured_image_url }}" alt="{{ $rel->title }}">
                                     <h3><a href="{{ route('contributors.show', $rel->slug) }}">{{ $rel->title }}</a></h3>
                                 </div>
                             </div>

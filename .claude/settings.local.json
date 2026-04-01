@@ -21,7 +21,11 @@
       "Bash(/c/laragon/bin/mysql/mysql-8.4.3-winx64/bin/mysql.exe -u root ananth_local -e \"SELECT id, name, email, user_role, updated_at FROM users WHERE email=''admin@example.com'';\")",
       "Bash(php artisan:*)",
       "Bash(python skills/ui-ux-pro-max/scripts/search.py \"logistics knowledge platform contributor dashboard professional modern\" --design-system -p \"ADL Contributors\")",
-      "Bash(python \".claude/skills/ui-ux-pro-max/scripts/search.py\" \"logistics contributor platform professional modern SaaS dashboard\" --design-system -p \"ADL Contributors\")"
+      "Bash(python \".claude/skills/ui-ux-pro-max/scripts/search.py\" \"logistics contributor platform professional modern SaaS dashboard\" --design-system -p \"ADL Contributors\")",
+      "Bash(net start:*)",
+      "Bash(sc query:*)",
+      "Bash(powershell -Command \"Get-Service | Where-Object {$_Name -like ''*mysql*'' -or $_DisplayName -like ''*mysql*''} | Select-Object Name, DisplayName, Status\")",
+      "Bash(powershell.exe -Command \"Get-Service | Where-Object { $_.Name -like ''*mysql*'' -or $_.DisplayName -like ''*mysql*'' } | Select-Object Name, DisplayName, Status | Format-List\")"
     ]
   }
 }

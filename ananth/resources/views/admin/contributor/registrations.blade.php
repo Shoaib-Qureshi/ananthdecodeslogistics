@@ -34,7 +34,6 @@
             <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
         @endif
 
-        {{-- Status Tabs --}}
         <div class="d-flex gap-3 mb-4 border-bottom pb-2">
             @foreach(['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected'] as $key => $label)
                 <a href="?status={{ $key }}" class="status-tab text-decoration-none text-secondary pb-2 {{ $status === $key ? 'active' : '' }}">
@@ -50,6 +49,8 @@
                         <th class="px-4 py-3">Name</th>
                         <th class="py-3">Email</th>
                         <th class="py-3">Designation</th>
+                        <th class="py-3">Plan</th>
+                        <th class="py-3">Payment</th>
                         <th class="py-3">Reason</th>
                         <th class="py-3">Applied</th>
                         <th class="py-3">Status</th>
@@ -62,6 +63,8 @@
                         <td class="px-4 py-3 fw-semibold">{{ $reg->name }}</td>
                         <td class="py-3 text-muted" style="font-size:.875rem;">{{ $reg->email }}</td>
                         <td class="py-3 text-muted" style="font-size:.875rem;">{{ $reg->designation ?? '—' }}</td>
+                        <td class="py-3 text-muted" style="font-size:.82rem;">{{ $reg->contributor_plan ?? 'free' }}</td>
+                        <td class="py-3 text-muted" style="font-size:.82rem;">{{ $reg->payment_status ?? 'unpaid' }}</td>
                         <td class="py-3" style="max-width:200px;">
                             <span style="font-size:.8rem;color:#475569;">{{ Str::limit($reg->reason_for_joining, 80) }}</span>
                             @if(strlen($reg->reason_for_joining ?? '') > 80)
@@ -97,7 +100,6 @@
                         </td>
                     </tr>
 
-                    {{-- Reason Modal --}}
                     @if(strlen($reg->reason_for_joining ?? '') > 80)
                     <div class="modal fade" id="reasonModal{{ $reg->id }}" tabindex="-1">
                         <div class="modal-dialog">
@@ -110,7 +112,7 @@
                     @endif
 
                     @empty
-                    <tr><td colspan="7" class="text-center py-5 text-muted">No {{ $status }} registrations found.</td></tr>
+                    <tr><td colspan="9" class="text-center py-5 text-muted">No {{ $status }} registrations found.</td></tr>
                     @endforelse
                 </tbody>
             </table>

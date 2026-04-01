@@ -80,11 +80,7 @@
             @forelse($posts as $post)
                 <div class="col-lg-4 col-md-6 mt-4">
                     <div class="postCard">
-                        @if($post->featured_image)
-                            <img src="{{ asset('storage/posts/' . $post->featured_image) }}" alt="{{ $post->title }}">
-                        @else
-                            <img src="{{ asset('img/site/anantha-logistics.webp') }}" alt="{{ $post->title }}">
-                        @endif
+                        <img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}">
 
                         <h3>
                             <a href="{{ route('contributors.show', $post->slug) }}" title="{{ $post->title }}">

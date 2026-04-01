@@ -30,6 +30,14 @@ class PageContentController extends Controller
             'sections.*.button_link' => 'nullable|string',
             'sections.*.stat_number' => 'nullable|string',
             'sections.*.stat_label' => 'nullable|string',
+            'sections.*.meta_title' => 'nullable|string|max:255',
+            'sections.*.meta_description' => 'nullable|string|max:500',
+            'sections.*.meta_keywords' => 'nullable|string|max:1000',
+            'sections.*.canonical_url' => 'nullable|string|max:255',
+            'sections.*.og_image' => 'nullable|string|max:255',
+            'sections.*.robots_index' => 'nullable|in:0,1',
+            'sections.*.robots_follow' => 'nullable|in:0,1',
+            'sections.*.schema_json_ld' => 'nullable|string',
         ]);
 
         try {
@@ -87,6 +95,14 @@ class PageContentController extends Controller
             'sections.*.heading' => 'nullable|string',
             'sections.*.subheading' => 'nullable|string',
             'sections.*.content' => 'nullable|string',
+            'sections.*.meta_title' => 'nullable|string|max:255',
+            'sections.*.meta_description' => 'nullable|string|max:500',
+            'sections.*.meta_keywords' => 'nullable|string|max:1000',
+            'sections.*.canonical_url' => 'nullable|string|max:255',
+            'sections.*.og_image' => 'nullable|string|max:255',
+            'sections.*.robots_index' => 'nullable|in:0,1',
+            'sections.*.robots_follow' => 'nullable|in:0,1',
+            'sections.*.schema_json_ld' => 'nullable|string',
         ]);
 
         foreach ($validated['sections'] as $sectionData) {

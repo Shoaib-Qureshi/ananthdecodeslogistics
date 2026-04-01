@@ -10,6 +10,8 @@ class ContributorPost extends Model
 {
     use HasFactory;
 
+    public const DEFAULT_FEATURED_IMAGE = 'img/thumbnail/Default_Contributor_img.webp';
+
     protected $table = 'contributor_posts';
 
     protected $fillable = [
@@ -19,13 +21,26 @@ class ContributorPost extends Model
         'slug',
         'body',
         'featured_image',
+        'is_featured',
+        'feature_source_plan',
         'status',
         'rejection_reason',
         'published_at',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'canonical_url',
+        'og_image',
+        'robots_index',
+        'robots_follow',
+        'schema_json_ld',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'is_featured' => 'boolean',
+        'robots_index' => 'boolean',
+        'robots_follow' => 'boolean',
     ];
 
     public function author()
@@ -74,5 +89,12 @@ class ContributorPost extends Model
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
+    }
+
+    public function getFeaturedImageUrlAttribute(): string
+    {
+        return $this->featured_image
+            ? asset('storage/posts/' . $this->featured_image)
+            : asset(self::DEFAULT_FEATURED_IMAGE);
     }
 }

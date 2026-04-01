@@ -128,6 +128,9 @@ Route::post('password/reset', function(\Illuminate\Http\Request $request) {
 // ─── Contributor Registration (public) ───────────────────────────────────
 Route::get('write-for-us', [ContributorRegistrationController::class, 'showForm'])->name('contributor.register');
 Route::post('write-for-us', [ContributorRegistrationController::class, 'submit'])->name('contributor.register.submit');
+Route::get('contributor/payment/success', [ContributorRegistrationController::class, 'paymentSuccess'])->name('contributor.payment.success');
+Route::get('contributor/payment/cancel', [ContributorRegistrationController::class, 'paymentCancel'])->name('contributor.payment.cancel');
+Route::post('stripe/webhook', [ContributorRegistrationController::class, 'stripeWebhook'])->name('stripe.webhook');
 
 // ─── Guest Auth ───────────────────────────────────────────────────────────
 Route::get('contributor-login', [GuestAuthController::class, 'showLogin'])->name('contributor.login');

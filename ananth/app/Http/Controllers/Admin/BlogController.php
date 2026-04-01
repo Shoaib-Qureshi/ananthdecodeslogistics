@@ -38,6 +38,14 @@ class BlogController extends Controller
             'content' => 'required|string',
             'status' => 'required|in:0,1',
             'visibility' => 'required|in:0,1,public,private',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:1000',
+            'canonical_url' => 'nullable|string|max:255',
+            'og_image' => 'nullable|string|max:255',
+            'robots_index' => 'nullable|in:0,1',
+            'robots_follow' => 'nullable|in:0,1',
+            'schema_json_ld' => 'nullable|string',
         ]);
 
         $post = new Blogs();
@@ -46,6 +54,14 @@ class BlogController extends Controller
         $post->title = $request->title;
         $post->slug = Str::slug($request->input('title'));
         $post->content = $request->content;
+        $post->meta_title = $request->meta_title;
+        $post->meta_description = $request->meta_description;
+        $post->meta_keywords = $request->meta_keywords;
+        $post->canonical_url = $request->canonical_url;
+        $post->og_image = $request->og_image;
+        $post->robots_index = $request->input('robots_index', 1);
+        $post->robots_follow = $request->input('robots_follow', 1);
+        $post->schema_json_ld = $request->schema_json_ld;
         $post->status = $request->status;
         // Convert string values to integers: public=1 (visible), private=0 (hidden)
         $post->visibility = ($request->visibility === 'public' || $request->visibility == 1) ? 1 : 0;
@@ -140,10 +156,34 @@ class BlogController extends Controller
 
     public function updateBlog(Request $request, $id)
     {
-        $update_blog = Blogs::find($request->id);
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'category_id' => 'required|exists:blog_category,id',
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255',
+            'content' => 'required|string',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:1000',
+            'canonical_url' => 'nullable|string|max:255',
+            'og_image' => 'nullable|string|max:255',
+            'robots_index' => 'nullable|in:0,1',
+            'robots_follow' => 'nullable|in:0,1',
+            'schema_json_ld' => 'nullable|string',
+        ]);
+
+        $update_blog = Blogs::findOrFail($id);
         $update_blog->user_id = $request->user_id;
         $update_blog->content = $request->content;
         $update_blog->title = $request->title;
+        $update_blog->meta_title = $request->meta_title;
+        $update_blog->meta_description = $request->meta_description;
+        $update_blog->meta_keywords = $request->meta_keywords;
+        $update_blog->canonical_url = $request->canonical_url;
+        $update_blog->og_image = $request->og_image;
+        $update_blog->robots_index = $request->input('robots_index', 1);
+        $update_blog->robots_follow = $request->input('robots_follow', 1);
+        $update_blog->schema_json_ld = $request->schema_json_ld;
         $update_blog->status = $request->status ?? $update_blog->status;
         // Convert string values to integers: public=1 (visible), private=0 (hidden)
         if ($request->has('visibility')) {

@@ -184,6 +184,61 @@
                             </div>
                         </div>
 
+                        <div class="section-divider mb-4">
+                            <h4 class="section-title">Home Page SEO</h4>
+                            <input type="hidden" name="sections[4][section_key]" value="page_meta">
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5>Meta Title</h5>
+                                    <input name="sections[4][meta_title]" type="text"
+                                           value="{{ $sections['page_meta']->meta_title ?? '' }}"
+                                           placeholder="Optional homepage SEO title">
+                                </div>
+                                <div class="col-md-12">
+                                    <h5>Meta Description</h5>
+                                    <textarea name="sections[4][meta_description]" rows="4"
+                                              placeholder="Optional homepage SEO meta description">{{ $sections['page_meta']->meta_description ?? '' }}</textarea>
+                                </div>
+                                <div class="col-md-12">
+                                    <h5>Meta Keywords</h5>
+                                    <textarea name="sections[4][meta_keywords]" rows="2"
+                                              placeholder="keyword 1, keyword 2, keyword 3">{{ $sections['page_meta']->meta_keywords ?? '' }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Canonical URL</h5>
+                                    <input name="sections[4][canonical_url]" type="text"
+                                           value="{{ $sections['page_meta']->canonical_url ?? url('/') }}"
+                                           placeholder="https://example.com/">
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>OG Image Path</h5>
+                                    <input name="sections[4][og_image]" type="text"
+                                           value="{{ $sections['page_meta']->og_image ?? '' }}"
+                                           placeholder="img/site/seo-home.webp">
+                                </div>
+                                <div class="col-md-3">
+                                    <h5>Robots Index</h5>
+                                    <select name="sections[4][robots_index]">
+                                        <option value="1" {{ ($sections['page_meta']->robots_index ?? 1) == 1 ? 'selected' : '' }}>Index</option>
+                                        <option value="0" {{ ($sections['page_meta']->robots_index ?? 1) == 0 ? 'selected' : '' }}>No Index</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <h5>Robots Follow</h5>
+                                    <select name="sections[4][robots_follow]">
+                                        <option value="1" {{ ($sections['page_meta']->robots_follow ?? 1) == 1 ? 'selected' : '' }}>Follow</option>
+                                        <option value="0" {{ ($sections['page_meta']->robots_follow ?? 1) == 0 ? 'selected' : '' }}>No Follow</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <h5>Schema JSON-LD</h5>
+                                    <textarea name="sections[4][schema_json_ld]" rows="6"
+                                              placeholder='{"@context":"https://schema.org"}'>{{ $sections['page_meta']->schema_json_ld ?? '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="submit">Update Home Page Content</button>
                     </form>
                 </div>

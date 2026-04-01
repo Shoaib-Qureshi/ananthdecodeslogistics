@@ -113,5 +113,38 @@
         </div>
     </section>
 
+    @if($featuredContributorPosts->count())
+    <section class="bothPadding newsSection">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-8">
+                    <div class="newsHeading">
+                        <h3>Featured <span>Contributor Posts</span></h3>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="newsButton text-end">
+                        <a href="{{ route('contributors.index') }}">
+                            <button class="siteBtn viewBtn">View All</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                @foreach ($featuredContributorPosts as $item)
+                    <div class="col-lg-4 col-md-6 mt-4">
+                        <div class="postCard">
+                            <img src="{{ $item->featured_image_url }}" alt="{{ $item->title }}">
+                            <h3><a title="{{ $item->title }}" href="{{ route('contributors.show', $item->slug) }}">{{ $item->title }}</a></h3>
+                            <p>{{ strip_tags(Str::limit($item->body, 100)) }}</p>
+                            <span>{{ $item->author->name }}{{ $item->author->designation ? ' • ' . $item->author->designation : '' }}</span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
 
 @endsection

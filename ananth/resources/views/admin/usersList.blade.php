@@ -40,6 +40,9 @@
                                 <th scope="col">ID</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Designation</th>
+                                <th scope="col">Plan</th>
+                                <th scope="col">Payment</th>
+                                <th scope="col">Status</th>
                                 <th scope="col">Intro</th>
                                 <th scope="col">Edit</th>
                                 <th scope="col">Delete</th>
@@ -54,7 +57,9 @@
                                                 href="{{ asset('author/' . $item->username) }}/">{{ $item->name }}</a>
                                         </td>
                                         <td>{{ $item->designation }}</td>
-
+                                        <td>{{ $item->contributor_plan ?? '—' }}</td>
+                                        <td>{{ $item->payment_status ?? '—' }}</td>
+                                        <td>{{ $item->status ?? '—' }}</td>
                                         <td>{{ $item->intro }}</td>
                                         <td><a class="link-primary"
                                                 href="{{ asset('admin/edit/user/' . $item->id) }}/">Edit</a></td>

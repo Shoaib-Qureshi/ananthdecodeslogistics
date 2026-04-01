@@ -15,6 +15,7 @@ class ContributorBlogController extends Controller
     {
         $posts = ContributorPost::with(['author', 'category'])
             ->published()
+            ->orderByDesc('is_featured')
             ->latest('published_at')
             ->paginate(10);
 
@@ -58,7 +59,15 @@ class ContributorBlogController extends Controller
             ->take(3)
             ->get();
 
-        return view('contributors.show', compact('post', 'related', 'htmlContent', 'tableOfContents', 'readingTime'));
+        return view('contributors.show', compact('post', 'related', 'htmlContent', 'tableOfContents', 'readingTime'))->with('seo', [
+            'title' => $post->meta_title ?: $post->title,
+            'description' => $post->meta_description ?: Str::limit($plainText, 155),
+            'keywords' => $post->meta_keywords,
+            'canonical' => $post->canonical_url ?: route('contributors.show', $post->slug),
+            'image' => $this->publicAssetUrl($post->og_image, $post->featured_image_url),
+            'robots' => $this->robotsContent((bool) ($post->robots_index ?? true), (bool) ($post->robots_follow ?? true)),
+            'schema' => $post->schema_json_ld,
+        ]);
     }
 
     // /blog — Ananthakrishnan's admin posts only (delegates to existing logic)
@@ -112,6 +121,30 @@ class ContributorBlogController extends Controller
             ->take(3)
             ->get();
 
-        return view('blog.show', compact('post', 'related', 'htmlContent', 'tableOfContents', 'readingTime'));
+        return view('blog.show', compact('post', 'related', 'htmlContent', 'tableOfContents', 'readingTime'))->with('seo', [
+            'title' => $post->meta_title ?: $post->title,
+            'description' => $post->meta_description ?: Str::limit($plainText, 155),
+            'keywords' => $post->meta_keywords,
+            'canonical' => $post->canonical_url ?: route('blog.show', $post->slug),
+            'image' => $this->publicAssetUrl($post->og_image ?: ($post->thumbnail ? 'media/' . $post->thumbnail : null), asset('img/site-banner.jpg')),
+            'robots' => $this->robotsContent((bool) ($post->robots_index ?? true), (bool) ($post->robots_follow ?? true)),
+            'schema' => $post->schema_json_ld,
+        ]);
+    }
+
+    private function publicAssetUrl(?string $path, string $fallback): string
+    {
+        if (!$path) {
+            return $fallback;
+        }
+
+        return Str::startsWith($path, ['http://', 'https://'])
+            ? $path
+            : asset($path);
+    }
+
+    private function robotsContent(bool $index, bool $follow): string
+    {
+        return ($index ? 'index' : 'noindex') . ',' . ($follow ? 'follow' : 'nofollow');
     }
 }

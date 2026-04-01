@@ -14,6 +14,14 @@ class AboutPage extends Model
         'heading',
         'subheading',
         'content',
-        'image'
+        'image',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'canonical_url',
+        'og_image',
+        'robots_index',
+        'robots_follow',
+        'schema_json_ld',
     ];
 }

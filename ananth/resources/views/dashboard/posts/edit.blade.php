@@ -108,6 +108,13 @@
                     </div>
                     <div class="col-sm-6">
                         <label class="form-label">Featured Image</label>
+                        @if(!$post->featured_image)
+                            <div class="mb-2" style="position:relative;">
+                                <img src="{{ $post->featured_image_url }}"
+                                     style="width:100%;height:90px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0;">
+                                <small class="d-block text-muted mt-1" style="font-size:.75rem;">Default contributor image will be used unless you upload one below</small>
+                            </div>
+                        @endif
                         @if($post->featured_image)
                             <div class="mb-2" style="position:relative;">
                                 <img src="{{ asset('storage/posts/' . $post->featured_image) }}"

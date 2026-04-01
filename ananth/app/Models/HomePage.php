@@ -18,6 +18,14 @@ class HomePage extends Model
         'button_text',
         'button_link',
         'stat_number',
-        'stat_label'
+        'stat_label',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'canonical_url',
+        'og_image',
+        'robots_index',
+        'robots_follow',
+        'schema_json_ld',
     ];
 }

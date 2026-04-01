@@ -51,6 +51,14 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
+                                <h4>Contributor Plan</h4>
+                                <select name="contributor_plan">
+                                    <option value="free" selected>Free</option>
+                                    <option value="paid_standard">$50 Paid</option>
+                                    <option value="paid_featured">$100 Featured</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
                                 <h4>Profile Picture</h4>
                                 <input name="profile_pic" type="file" required>
                             </div>

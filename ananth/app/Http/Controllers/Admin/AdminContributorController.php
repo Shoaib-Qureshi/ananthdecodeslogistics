@@ -35,7 +35,11 @@ class AdminContributorController extends Controller
     public function approveRegistration(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $user->update(['status' => 'approved']);
+        $user->update([
+            'status' => 'approved',
+            'contributor_plan' => $user->contributor_plan ?: 'free',
+            'payment_status' => $user->payment_status ?: 'unpaid',
+        ]);
 
         Password::sendResetLink(['email' => $user->email]);
 
@@ -99,6 +103,15 @@ class AdminContributorController extends Controller
             'status'           => 'required|in:pending,published,rejected',
             'featured_image'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
             'rejection_reason' => 'nullable|string|max:1000',
+            'is_featured'      => 'nullable|in:0,1',
+            'meta_title'       => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords'    => 'nullable|string|max:1000',
+            'canonical_url'    => 'nullable|string|max:255',
+            'og_image'         => 'nullable|string|max:255',
+            'robots_index'     => 'nullable|in:0,1',
+            'robots_follow'    => 'nullable|in:0,1',
+            'schema_json_ld'   => 'nullable|string',
         ]);
 
         $category = $this->contributorCategory();
@@ -123,9 +136,19 @@ class AdminContributorController extends Controller
             'body'             => $request->body,
             'category_id'      => $category->id,
             'featured_image'   => $imagePath,
+            'is_featured'      => $request->boolean('is_featured'),
+            'feature_source_plan' => $request->boolean('is_featured') ? ($post->author->contributor_plan ?: 'free') : null,
             'status'           => $status,
             'published_at'     => $status === 'published' ? ($post->published_at ?? now()) : null,
             'rejection_reason' => $status === 'rejected' ? $request->rejection_reason : null,
+            'meta_title'       => $request->meta_title,
+            'meta_description' => $request->meta_description,
+            'meta_keywords'    => $request->meta_keywords,
+            'canonical_url'    => $request->canonical_url,
+            'og_image'         => $request->og_image,
+            'robots_index'     => $request->input('robots_index', 1),
+            'robots_follow'    => $request->input('robots_follow', 1),
+            'schema_json_ld'   => $request->schema_json_ld,
         ]);
 
         return redirect()->route('admin.contributor.posts', ['status' => $status])->with('success', "Post \"{$post->title}\" updated.");
@@ -137,6 +160,8 @@ class AdminContributorController extends Controller
         $post->update([
             'status'       => 'published',
             'published_at' => now(),
+            'is_featured'  => $post->is_featured || $post->author->hasFeaturedContributorPlan(),
+            'feature_source_plan' => ($post->is_featured || $post->author->hasFeaturedContributorPlan()) ? ($post->author->contributor_plan ?: 'free') : null,
         ]);
 
         try {

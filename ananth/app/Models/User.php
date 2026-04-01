@@ -18,6 +18,10 @@ class User extends Authenticatable
         'password',
         'user_role',
         'status',
+        'contributor_plan',
+        'payment_status',
+        'stripe_customer_id',
+        'activated_at',
         'designation',
         'intro',
         'profile_pic',
@@ -36,6 +40,11 @@ class User extends Authenticatable
         return $this->hasMany(ContributorPost::class, 'user_id');
     }
 
+    public function contributorPayments()
+    {
+        return $this->hasMany(ContributorPayment::class);
+    }
+
     public function isAdmin()
     {
         return $this->user_role === 'admin';
@@ -51,6 +60,11 @@ class User extends Authenticatable
         return $this->status === 'approved';
     }
 
+    public function hasFeaturedContributorPlan()
+    {
+        return $this->contributor_plan === 'paid_featured';
+    }
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -58,5 +72,6 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'activated_at' => 'datetime',
     ];
 }

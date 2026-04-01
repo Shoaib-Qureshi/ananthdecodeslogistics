@@ -84,8 +84,58 @@
         background: linear-gradient(to right, transparent, #e2e8f0, transparent);
         margin: 2.5rem 0;
     }
+    .plan-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .plan-card {
+        position: relative;
+        border: 1.5px solid #dbe7f6;
+        border-radius: 14px;
+        padding: 1.15rem;
+        background: #f8fbff;
+        cursor: pointer;
+        transition: border-color .18s, box-shadow .18s, transform .18s;
+    }
+    .plan-card:hover {
+        border-color: #93c5fd;
+        transform: translateY(-2px);
+    }
+    .plan-card input {
+        position: absolute;
+        opacity: 0;
+        inset: 0;
+        cursor: pointer;
+    }
+    .plan-card.is-selected {
+        border-color: #3882fa;
+        box-shadow: 0 0 0 3px rgba(56,130,250,.12);
+        background: #eff6ff;
+    }
+    .plan-card strong {
+        display: block;
+        color: #181a3f;
+        font-size: .98rem;
+        margin-bottom: .35rem;
+    }
+    .plan-card .price {
+        display: block;
+        color: #3882fa;
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: .5rem;
+    }
+    .plan-card p {
+        font-size: .82rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.6;
+    }
     @media(max-width: 768px) {
         .form-card { padding: 1.5rem; }
+        .plan-grid { grid-template-columns: 1fr; }
     }
 </style>
 @endsection
@@ -184,10 +234,29 @@
 
                 <div class="form-card">
                     <h5 style="font-weight:700;color:#181a3f;margin-bottom:.4rem;">Ready to Contribute?</h5>
-                    <p style="font-size:.875rem;color:#636363;margin-bottom:1.75rem;">Fill in the form below with your details and the topics you want to write about. We'll review your application within 48 hours.</p>
+                    <p style="font-size:.875rem;color:#636363;margin-bottom:1.75rem;">Choose a contributor plan, then fill in your details. Paid plans activate your contributor account after successful payment.</p>
 
                     <form method="POST" action="{{ route('contributor.register.submit') }}">
                         @csrf
+
+                        <div class="mb-4">
+                            <label class="form-label">Choose Your Contributor Plan <span class="text-danger">*</span></label>
+                            <div class="plan-grid" id="planGrid">
+                                <label class="plan-card {{ old('plan', 'paid_standard') === 'paid_standard' ? 'is-selected' : '' }}">
+                                    <input type="radio" name="plan" value="paid_standard" {{ old('plan', 'paid_standard') === 'paid_standard' ? 'checked' : '' }}>
+                                    <strong>Paid Contributor</strong>
+                                    <span class="price">$50</span>
+                                    <p>One-time payment. Your contributor account is activated after Stripe payment so you can start posting.</p>
+                                </label>
+                                <label class="plan-card {{ old('plan') === 'paid_featured' ? 'is-selected' : '' }}">
+                                    <input type="radio" name="plan" value="paid_featured" {{ old('plan') === 'paid_featured' ? 'checked' : '' }}>
+                                    <strong>Featured Contributor</strong>
+                                    <span class="price">$100</span>
+                                    <p>One-time payment. Includes contributor access plus homepage featured placement for eligible contributor posts.</p>
+                                </label>
+                            </div>
+                            @error('plan')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
 
                         <div class="row g-3 mb-3">
                             <div class="col-sm-6">
@@ -225,9 +294,9 @@
                             @error('reason_for_joining')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
-                        <button type="submit" class="btn-submit">
+                        <button type="submit" class="btn-submit" id="planSubmitBtn">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11z"/></svg>
-                            Submit Application
+                            <span>Submit Application</span>
                         </button>
                     </form>
                 </div>
@@ -246,4 +315,32 @@
 
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const planCards = document.querySelectorAll('.plan-card');
+    const submitLabel = document.querySelector('#planSubmitBtn span');
+
+    function syncPlanCards() {
+        let selectedPlan = 'paid_standard';
+        planCards.forEach(card => {
+            const input = card.querySelector('input[type="radio"]');
+            const isSelected = input.checked;
+            card.classList.toggle('is-selected', isSelected);
+            if (isSelected) {
+                selectedPlan = input.value;
+            }
+        });
+
+        submitLabel.textContent = 'Continue to Payment';
+    }
+
+    planCards.forEach(card => {
+        card.addEventListener('click', function () {
+            const input = this.querySelector('input[type="radio"]');
+            input.checked = true;
+            syncPlanCards();
+        });
+    });
+
+    syncPlanCards();
+</script>
 @endsection

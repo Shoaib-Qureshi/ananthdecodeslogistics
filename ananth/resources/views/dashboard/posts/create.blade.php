@@ -90,6 +90,10 @@
                     </div>
                     <div class="col-sm-6">
                         <label class="form-label">Featured Image</label>
+                        <div id="defaultImgPreview" style="margin:.35rem 0 .5rem;">
+                            <img src="{{ asset('img/thumbnail/Default_Contributor_img.webp') }}" style="width:100%;max-height:140px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0;">
+                            <small class="d-block text-muted mt-1" style="font-size:.75rem;">This default contributor image will be used if you do not upload one.</small>
+                        </div>
                         <input type="file" name="featured_image"
                                class="form-control @error('featured_image') is-invalid @enderror"
                                accept="image/jpeg,image/png,image/webp"
@@ -192,9 +196,16 @@
     function previewImage(input) {
         const preview = document.getElementById('imgPreview');
         const img = document.getElementById('previewImg');
+        const defaultPreview = document.getElementById('defaultImgPreview');
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            reader.onload = e => { img.src = e.target.result; preview.style.display = 'block'; };
+            reader.onload = e => {
+                img.src = e.target.result;
+                preview.style.display = 'block';
+                if (defaultPreview) {
+                    defaultPreview.style.display = 'none';
+                }
+            };
             reader.readAsDataURL(input.files[0]);
         }
     }

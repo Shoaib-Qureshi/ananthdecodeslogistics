@@ -70,7 +70,16 @@ class ArticleController extends Controller
             'htmlContent' => $htmlContent,
             'tableOfContents' => $tableOfContents,
             'author' => $author,
-            'founderProfile' => $founderProfile
+            'founderProfile' => $founderProfile,
+            'seo' => [
+                'title' => $article->meta_title ?: $article->title,
+                'description' => $article->meta_description ?: Str::limit($plainText, 155),
+                'keywords' => $article->meta_keywords,
+                'canonical' => $article->canonical_url ?: url($article->slug),
+                'image' => $this->publicAssetUrl($article->og_image ?: ($article->thumbnail ? 'media/' . $article->thumbnail : null), asset('img/site-banner.jpg')),
+                'robots' => $this->robotsContent((bool) ($article->robots_index ?? true), (bool) ($article->robots_follow ?? true)),
+                'schema' => $article->schema_json_ld,
+            ],
         ]);
     }
 
@@ -151,5 +160,21 @@ class ArticleController extends Controller
         return view('reviews.reviewPage', [
             'bookDetail' => $bookDetail
         ]);
+    }
+
+    private function publicAssetUrl(?string $path, string $fallback): string
+    {
+        if (!$path) {
+            return $fallback;
+        }
+
+        return Str::startsWith($path, ['http://', 'https://'])
+            ? $path
+            : asset($path);
+    }
+
+    private function robotsContent(bool $index, bool $follow): string
+    {
+        return ($index ? 'index' : 'noindex') . ',' . ($follow ? 'follow' : 'nofollow');
     }
 }

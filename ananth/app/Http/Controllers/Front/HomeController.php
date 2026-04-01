@@ -9,9 +9,11 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Blogs;
 use App\Models\BlogCategories;
+use App\Models\ContributorPost;
 use App\Models\Contact;
 use App\Models\TeamMember;
 use App\Models\HomePage;
@@ -52,11 +54,28 @@ class HomeController extends Controller
                 ->get();
         }
         $homeContent = HomePage::all()->keyBy('section_key');
+        $featuredContributorPosts = ContributorPost::with(['author', 'category'])
+            ->published()
+            ->where('is_featured', true)
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+        $pageMeta = $homeContent->get('page_meta');
 
         return view('front.homePage', [
             'latest' => $latest,
             'featured' => $featured,
-            'homeContent' => $homeContent
+            'homeContent' => $homeContent,
+            'featuredContributorPosts' => $featuredContributorPosts,
+            'seo' => [
+                'title' => $pageMeta->meta_title ?? 'Ananth Decodes Logistics',
+                'description' => $pageMeta->meta_description ?? 'Ananthakrishnan J is a seasoned executive and strategic leader with over 25 years of distinguished experience in transport, logistics, and integrated facility management.',
+                'keywords' => $pageMeta->meta_keywords ?? null,
+                'canonical' => $pageMeta->canonical_url ?? url('/'),
+                'image' => $this->publicAssetUrl($pageMeta->og_image ?? null, asset('img/site-banner.jpg')),
+                'robots' => $this->robotsContent($pageMeta->robots_index ?? true, $pageMeta->robots_follow ?? true),
+                'schema' => $pageMeta->schema_json_ld ?? null,
+            ],
         ]);
     }
 
@@ -85,11 +104,21 @@ class HomeController extends Controller
         $members = TeamMember::orderBy('position', 'asc')->get();
         $aboutContent = AboutPage::all()->keyBy('section_key');
         $milestones = Milestone::where('status', 1)->orderBy('position', 'asc')->get();
+        $pageMeta = $aboutContent->get('page_meta');
 
         return view('front.aboutUs', [
             'members' => $members,
             'aboutContent' => $aboutContent,
-            'milestones' => $milestones
+            'milestones' => $milestones,
+            'seo' => [
+                'title' => $pageMeta->meta_title ?? 'About Us — Ananth Decodes Logistics',
+                'description' => $pageMeta->meta_description ?? 'Learn more about Ananth Decodes Logistics, our founder, and our strategic vision in logistics and transport.',
+                'keywords' => $pageMeta->meta_keywords ?? null,
+                'canonical' => $pageMeta->canonical_url ?? url('about-us'),
+                'image' => $this->publicAssetUrl($pageMeta->og_image ?? null, asset('img/site-banner.jpg')),
+                'robots' => $this->robotsContent($pageMeta->robots_index ?? true, $pageMeta->robots_follow ?? true),
+                'schema' => $pageMeta->schema_json_ld ?? null,
+            ],
         ]);
     }
 
@@ -130,5 +159,21 @@ class HomeController extends Controller
     public function writeForUs()
     {
         return view('front.writeForUs');
+    }
+
+    private function publicAssetUrl(?string $path, string $fallback): string
+    {
+        if (!$path) {
+            return $fallback;
+        }
+
+        return Str::startsWith($path, ['http://', 'https://'])
+            ? $path
+            : asset($path);
+    }
+
+    private function robotsContent(bool $index, bool $follow): string
+    {
+        return ($index ? 'index' : 'noindex') . ',' . ($follow ? 'follow' : 'nofollow');
     }
 }

@@ -47,6 +47,7 @@
                         <th class="px-4 py-3">Title</th>
                         <th class="py-3">Author</th>
                         <th class="py-3">Category</th>
+                        <th class="py-3">Featured</th>
                         <th class="py-3">Submitted</th>
                         <th class="py-3">Status</th>
                         <th class="py-3" style="min-width:240px;">Actions</th>
@@ -66,6 +67,7 @@
                             <span class="text-muted" style="font-size:.78rem;">{{ $post->author->designation ?? '' }}</span>
                         </td>
                         <td class="py-3 text-muted" style="font-size:.875rem;">{{ $post->category?->category_name ?? $post->category?->name ?? '—' }}</td>
+                        <td class="py-3 text-muted" style="font-size:.82rem;">{{ $post->is_featured ? 'Yes' : 'No' }}</td>
                         <td class="py-3 text-muted" style="font-size:.82rem;">{{ $post->created_at->format('d M Y') }}</td>
                         <td class="py-3">
                             <span class="sp badge-{{ $post->status }}">{{ ucfirst($post->status) }}</span>
@@ -126,9 +128,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
                                 <div class="modal-body">
-                                    @if($post->featured_image)
-                                        <img src="{{ asset('storage/posts/' . $post->featured_image) }}" class="img-fluid rounded mb-3" style="max-height:200px;">
-                                    @endif
+                                    <img src="{{ $post->featured_image_url }}" class="img-fluid rounded mb-3" style="max-height:200px;">
                                     <div class="preview-body">{!! $post->body !!}</div>
                                     <div class="mt-3 text-muted" style="font-size:.82rem;">
                                         By <strong>{{ $post->author->name }}</strong> · {{ $post->author->designation ?? '' }} · {{ $post->created_at->format('d M Y') }}
@@ -139,7 +139,7 @@
                     </div>
 
                     @empty
-                    <tr><td colspan="6" class="text-center py-5 text-muted">No {{ $status }} posts found.</td></tr>
+                    <tr><td colspan="7" class="text-center py-5 text-muted">No {{ $status }} posts found.</td></tr>
                     @endforelse
                 </tbody>
             </table>

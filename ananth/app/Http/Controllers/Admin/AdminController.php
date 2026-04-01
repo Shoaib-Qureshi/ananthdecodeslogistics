@@ -120,6 +120,7 @@ class AdminController extends Controller
             'designation' => 'required',
             'profile_pic' => 'required',
             'account_type' => 'required|in:author,contributor',
+            'contributor_plan' => 'nullable|in:free,paid_standard,paid_featured',
         ]);
 
         $baseUsername = Str::slug($request->input('name'));
@@ -132,6 +133,11 @@ class AdminController extends Controller
         $user->password = Hash::make("345hysdygYGTYg5!237");
         $user->user_role = $request->account_type === 'contributor' ? 'guest' : 'author';
         $user->status = $request->account_type === 'contributor' ? 'approved' : null;
+        $user->contributor_plan = $request->account_type === 'contributor' ? ($request->contributor_plan ?: 'free') : null;
+        $user->payment_status = $request->account_type === 'contributor'
+            ? (($request->contributor_plan === 'free' || !$request->contributor_plan) ? 'unpaid' : 'paid')
+            : null;
+        $user->activated_at = $request->account_type === 'contributor' ? now() : null;
         $user->designation = $request->designation;
         $user->insta = $request->insta;
         $user->linkedin = $request->linkedin;
@@ -174,6 +180,7 @@ class AdminController extends Controller
             'designation' => 'required',
             'profile_pic' => 'nullable',
             'account_type' => 'required|in:author,contributor',
+            'contributor_plan' => 'nullable|in:free,paid_standard,paid_featured',
         ]);
 
         $updateUser = User::find($id);
@@ -184,6 +191,11 @@ class AdminController extends Controller
         // $updateUser->password = $request->password;
         $updateUser->user_role = $request->account_type === 'contributor' ? 'guest' : 'author';
         $updateUser->status = $request->account_type === 'contributor' ? 'approved' : $updateUser->status;
+        $updateUser->contributor_plan = $request->account_type === 'contributor' ? ($request->contributor_plan ?: 'free') : null;
+        $updateUser->payment_status = $request->account_type === 'contributor'
+            ? (($request->contributor_plan === 'free' || !$request->contributor_plan) ? 'unpaid' : 'paid')
+            : null;
+        $updateUser->activated_at = $request->account_type === 'contributor' ? ($updateUser->activated_at ?? now()) : null;
         $updateUser->designation = $request->designation;
         $updateUser->insta = $request->insta;
         $updateUser->linkedin = $request->linkedin;

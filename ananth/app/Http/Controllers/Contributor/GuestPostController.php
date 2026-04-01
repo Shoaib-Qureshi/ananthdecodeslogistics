@@ -57,6 +57,8 @@ class GuestPostController extends Controller
             $imagePath = $filename;
         }
 
+        $user = Auth::user();
+
         $post = ContributorPost::create([
             'user_id'        => Auth::id(),
             'category_id'    => $category->id,
@@ -64,6 +66,8 @@ class GuestPostController extends Controller
             'slug'           => $slug,
             'body'           => $request->body,
             'featured_image' => $imagePath,
+            'is_featured'    => $user && $user->hasFeaturedContributorPlan(),
+            'feature_source_plan' => $user && $user->hasFeaturedContributorPlan() ? $user->contributor_plan : null,
             'status'         => 'pending',
         ]);
 
@@ -87,6 +91,7 @@ class GuestPostController extends Controller
     public function update(Request $request, $id)
     {
         $post = ContributorPost::where('user_id', Auth::id())->findOrFail($id);
+        $user = Auth::user();
 
         $request->validate([
             'title'          => 'required|string|max:255',
@@ -115,6 +120,8 @@ class GuestPostController extends Controller
             'body'           => $request->body,
             'category_id'    => $category->id,
             'featured_image' => $imagePath,
+            'is_featured'    => $user && $user->hasFeaturedContributorPlan(),
+            'feature_source_plan' => $user && $user->hasFeaturedContributorPlan() ? $user->contributor_plan : null,
             'status'         => 'pending',
             'published_at'   => null,
             'rejection_reason' => null,
