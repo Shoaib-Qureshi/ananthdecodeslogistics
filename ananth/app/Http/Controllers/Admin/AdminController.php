@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\HandlesUserProfileUpdates;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -17,9 +18,13 @@ use App\Models\BlogCategories;
 use App\Models\ContributorPost;
 use App\Models\Contact;
 use App\Models\TeamMember;
+use App\Support\ContributorPlans;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
+    use HandlesUserProfileUpdates;
+
     public function showAdminLogin()
     {
         if(Auth::user() && Auth::user()->user_role == 'admin'){
@@ -97,7 +102,23 @@ class AdminController extends Controller
 
     public function addUser()
     {
-        return view('admin.addUser');
+        return view('admin.addUser', [
+            'contributorPlans' => ContributorPlans::adminSelectablePlans(),
+        ]);
+    }
+
+    public function editProfile()
+    {
+        return view('admin.profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $this->updateProfileFromRequest($request, Auth::user());
+
+        return redirect()->route('admin.profile.edit')->with('message', 'Profile updated successfully.');
     }
 
     function generateUniqueUsername($baseUsername)
@@ -120,11 +141,12 @@ class AdminController extends Controller
             'designation' => 'required',
             'profile_pic' => 'required',
             'account_type' => 'required|in:author,contributor',
-            'contributor_plan' => 'nullable|in:free,paid_standard,paid_featured',
+            'contributor_plan' => ['nullable', Rule::in(ContributorPlans::adminSelectableCodes())],
         ]);
 
         $baseUsername = Str::slug($request->input('name'));
         $uniqueUsername = $this->generateUniqueUsername($baseUsername);
+        $selectedPlan = ContributorPlans::normalize($request->contributor_plan, ContributorPlans::FREE);
 
         $user = new User();
         $user->name = $request->name;
@@ -133,9 +155,9 @@ class AdminController extends Controller
         $user->password = Hash::make("345hysdygYGTYg5!237");
         $user->user_role = $request->account_type === 'contributor' ? 'guest' : 'author';
         $user->status = $request->account_type === 'contributor' ? 'approved' : null;
-        $user->contributor_plan = $request->account_type === 'contributor' ? ($request->contributor_plan ?: 'free') : null;
+        $user->contributor_plan = $request->account_type === 'contributor' ? $selectedPlan : null;
         $user->payment_status = $request->account_type === 'contributor'
-            ? (($request->contributor_plan === 'free' || !$request->contributor_plan) ? 'unpaid' : 'paid')
+            ? ($selectedPlan === ContributorPlans::FREE ? 'complimentary' : 'paid')
             : null;
         $user->activated_at = $request->account_type === 'contributor' ? now() : null;
         $user->designation = $request->designation;
@@ -169,7 +191,8 @@ class AdminController extends Controller
     {
         $editUser = User::find($id);
         return view('admin.editUser', [
-            'editUser' => $editUser
+            'editUser' => $editUser,
+            'contributorPlans' => ContributorPlans::adminSelectablePlans(),
         ]);
     }
 
@@ -180,22 +203,26 @@ class AdminController extends Controller
             'designation' => 'required',
             'profile_pic' => 'nullable',
             'account_type' => 'required|in:author,contributor',
-            'contributor_plan' => 'nullable|in:free,paid_standard,paid_featured',
+            'contributor_plan' => ['nullable', Rule::in(ContributorPlans::adminSelectableCodes())],
         ]);
 
         $updateUser = User::find($id);
         $wasContributor = $updateUser->user_role === 'guest';
+        $previousPlan = $updateUser->contributorPlanCode();
+        $selectedPlan = ContributorPlans::normalize($request->contributor_plan, ContributorPlans::FREE);
         $updateUser->name = $request->name;
         // $updateUser->username = $request->username;  
         // $updateUser->email = $request->email;      
         // $updateUser->password = $request->password;
         $updateUser->user_role = $request->account_type === 'contributor' ? 'guest' : 'author';
         $updateUser->status = $request->account_type === 'contributor' ? 'approved' : $updateUser->status;
-        $updateUser->contributor_plan = $request->account_type === 'contributor' ? ($request->contributor_plan ?: 'free') : null;
+        $updateUser->contributor_plan = $request->account_type === 'contributor' ? $selectedPlan : null;
         $updateUser->payment_status = $request->account_type === 'contributor'
-            ? (($request->contributor_plan === 'free' || !$request->contributor_plan) ? 'unpaid' : 'paid')
+            ? ($selectedPlan === ContributorPlans::FREE ? 'complimentary' : 'paid')
             : null;
-        $updateUser->activated_at = $request->account_type === 'contributor' ? ($updateUser->activated_at ?? now()) : null;
+        $updateUser->activated_at = $request->account_type === 'contributor'
+            ? (($wasContributor && $previousPlan === $selectedPlan && $updateUser->activated_at) ? $updateUser->activated_at : now())
+            : null;
         $updateUser->designation = $request->designation;
         $updateUser->insta = $request->insta;
         $updateUser->linkedin = $request->linkedin;

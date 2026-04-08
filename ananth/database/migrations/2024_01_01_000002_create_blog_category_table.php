@@ -8,6 +8,10 @@ class CreateBlogCategoryTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('blog_category')) {
+            return;
+        }
+
         Schema::create('blog_category', function (Blueprint $table) {
             $table->id();
             $table->string('name');

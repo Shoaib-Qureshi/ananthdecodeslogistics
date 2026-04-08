@@ -9,6 +9,10 @@ class AddExpectedFieldsToBlogCategoryTable extends Migration
 {
     public function up()
     {
+        if (!Schema::hasTable('blog_category')) {
+            return;
+        }
+
         Schema::table('blog_category', function (Blueprint $table) {
             if (!Schema::hasColumn('blog_category', 'category_name')) {
                 $table->string('category_name')->nullable()->after('id');
@@ -33,12 +37,22 @@ class AddExpectedFieldsToBlogCategoryTable extends Migration
 
     public function down()
     {
+        if (!Schema::hasTable('blog_category')) {
+            return;
+        }
+
         Schema::table('blog_category', function (Blueprint $table) {
+            $columns = [];
+
             if (Schema::hasColumn('blog_category', 'category_name')) {
-                $table->dropColumn('category_name');
+                $columns[] = 'category_name';
             }
             if (Schema::hasColumn('blog_category', 'category_slug')) {
-                $table->dropColumn('category_slug');
+                $columns[] = 'category_slug';
+            }
+
+            if ($columns) {
+                $table->dropColumn($columns);
             }
         });
     }

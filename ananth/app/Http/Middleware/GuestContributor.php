@@ -20,9 +20,9 @@ class GuestContributor
 
         if (Auth::check() && Auth::user()->user_role === 'guest' && Auth::user()->status !== 'approved') {
             Auth::logout();
-            return redirect('/contributor-login')->with('error', 'Your account is pending approval or has been rejected.');
+            return redirect()->route('contributor.login')->with('error', 'Your account is pending approval or has been rejected.');
         }
 
-        return redirect('/contributor-login')->with('error', 'Please log in to access your dashboard.');
+        return redirect()->route('contributor.login')->with('error', 'Please log in to access your dashboard.');
     }
 }

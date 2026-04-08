@@ -8,15 +8,27 @@ class AddPositionToExecutiveCommitteeTable extends Migration
 {
     public function up()
     {
+        if (!Schema::hasTable('executive_committee')) {
+            return;
+        }
+
         Schema::table('executive_committee', function (Blueprint $table) {
-            $table->integer('position')->default(0)->after('display_order');
+            if (!Schema::hasColumn('executive_committee', 'position')) {
+                $table->integer('position')->default(0)->after('display_order');
+            }
         });
     }
 
     public function down()
     {
+        if (!Schema::hasTable('executive_committee')) {
+            return;
+        }
+
         Schema::table('executive_committee', function (Blueprint $table) {
-            $table->dropColumn('position');
+            if (Schema::hasColumn('executive_committee', 'position')) {
+                $table->dropColumn('position');
+            }
         });
     }
 }

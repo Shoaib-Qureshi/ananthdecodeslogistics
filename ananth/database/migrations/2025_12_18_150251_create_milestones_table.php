@@ -13,6 +13,10 @@ class CreateMilestonesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('milestones')) {
+            return;
+        }
+
         Schema::create('milestones', function (Blueprint $table) {
             $table->id();
             $table->string('year');

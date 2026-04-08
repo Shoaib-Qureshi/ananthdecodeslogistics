@@ -7,7 +7,6 @@
                     <p>Logistics leader sharing insights on strategy, innovation, and sustainable growth</p>
 
                     <ul>
-                        <li><a href="https://www.instagram.com/janaananthakrishnan/"><i class='bx bxl-instagram-alt'></i></a></li>
                         <li><a href="https://www.linkedin.com/in/ananthakrishnan-janardhanan/"><i class='bx bxl-linkedin'></i></a></li>
                         <li><a href="https://x.com/Anantha80112802/">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14">
@@ -36,7 +35,7 @@
                                 <li><a href="/">Home</a></li>
                                 <li><a href="/about-us/">About Us</a></li>
                                 <li><a href="/blog/">Blog</a></li>
-                                <li><a href="/contributors/">Contributors Blog</a></li>
+                                <li><a href="{{ route('contributors.index') }}">The Expert Desk</a></li>
                                 <li><a href="/board-insights/">Board Insights</a></li>
                                 <li><a href="/book-review/">Book Reviews</a></li>
                                 <li><a href="/contact-us/">Contact Us</a></li>
@@ -50,7 +49,9 @@
                                 <li><a href="/privacy-policy/">Privacy Policy</a></li>
                                 <li><a href="/terms-and-conditions/">Terms & Conditions</a></li>
                                 <li><a href="/disclaimer/">Disclaimer</a></li>
-                                <li><a href="/write-for-us/">Write For Us</a></li>
+                                <li><a href="{{ route('write-for-us') }}">Write for Us</a></li>
+                                <li><a href="{{ route('contributor.register') }}">Apply to The Expert Desk</a></li>
+                                <li><a href="{{ route('contributor.login') }}">The Expert Desk Login</a></li>
                             </ul>
                         </div>
                     </div>

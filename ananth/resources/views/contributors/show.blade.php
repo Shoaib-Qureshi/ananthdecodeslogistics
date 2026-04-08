@@ -32,7 +32,7 @@
                 <div class="headingMain">
                     <span class="contributor-badge">
                         <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-                        Guest Contributor
+                        The Expert Desk
                     </span>
                     @if($post->category)
                         <span class="topicName">{{ $post->category->category_name ?? $post->category->name }}</span>
@@ -82,6 +82,11 @@
                     {!! $htmlContent !!}
                 </div>
 
+                @include('partials.article-faq', [
+                    'faqItems' => ($post->has_faqs ?? false) ? ($post->faqs ?? []) : [],
+                    'sectionId' => 'contributor-faqs',
+                ])
+
                 <div class="overviewCard authorCard">
                     <div class="founderImg">
                         @if($post->author->profile_pic)
@@ -130,7 +135,7 @@
 
                 @if($related->isNotEmpty())
                     <div class="articleRelatedSection">
-                        <h3>Read More</h3>
+                        <h3>More from The Expert Desk</h3>
                         <div class="row">
                             @foreach($related as $rel)
                             <div class="col-md-4 mb-4">

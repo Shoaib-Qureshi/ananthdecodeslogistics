@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\HandlesFaqs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -19,6 +20,8 @@ use App\Models\BookReview;
 
 class BlogController extends Controller
 {
+    use HandlesFaqs;
+
     public function createBlog()
     {
         $users = User::all();
@@ -46,7 +49,13 @@ class BlogController extends Controller
             'robots_index' => 'nullable|in:0,1',
             'robots_follow' => 'nullable|in:0,1',
             'schema_json_ld' => 'nullable|string',
+            'has_faqs' => 'nullable|boolean',
+            'faq_items' => 'nullable|array|max:20',
+            'faq_items.*.question' => 'nullable|string|max:255',
+            'faq_items.*.answer' => 'nullable|string|max:5000',
         ]);
+
+        $faqPayload = $this->resolveFaqPayload($request);
 
         $post = new Blogs();
         $post->user_id = $request->user_id ?? Auth::id();
@@ -62,6 +71,8 @@ class BlogController extends Controller
         $post->robots_index = $request->input('robots_index', 1);
         $post->robots_follow = $request->input('robots_follow', 1);
         $post->schema_json_ld = $request->schema_json_ld;
+        $post->has_faqs = $faqPayload['has_faqs'];
+        $post->faqs = $faqPayload['faqs'];
         $post->status = $request->status;
         // Convert string values to integers: public=1 (visible), private=0 (hidden)
         $post->visibility = ($request->visibility === 'public' || $request->visibility == 1) ? 1 : 0;
@@ -170,7 +181,13 @@ class BlogController extends Controller
             'robots_index' => 'nullable|in:0,1',
             'robots_follow' => 'nullable|in:0,1',
             'schema_json_ld' => 'nullable|string',
+            'has_faqs' => 'nullable|boolean',
+            'faq_items' => 'nullable|array|max:20',
+            'faq_items.*.question' => 'nullable|string|max:255',
+            'faq_items.*.answer' => 'nullable|string|max:5000',
         ]);
+
+        $faqPayload = $this->resolveFaqPayload($request);
 
         $update_blog = Blogs::findOrFail($id);
         $update_blog->user_id = $request->user_id;
@@ -184,6 +201,8 @@ class BlogController extends Controller
         $update_blog->robots_index = $request->input('robots_index', 1);
         $update_blog->robots_follow = $request->input('robots_follow', 1);
         $update_blog->schema_json_ld = $request->schema_json_ld;
+        $update_blog->has_faqs = $faqPayload['has_faqs'];
+        $update_blog->faqs = $faqPayload['faqs'];
         $update_blog->status = $request->status ?? $update_blog->status;
         // Convert string values to integers: public=1 (visible), private=0 (hidden)
         if ($request->has('visibility')) {

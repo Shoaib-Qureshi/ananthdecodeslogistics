@@ -63,7 +63,7 @@
                         <td class="px-4 py-3 fw-semibold">{{ $reg->name }}</td>
                         <td class="py-3 text-muted" style="font-size:.875rem;">{{ $reg->email }}</td>
                         <td class="py-3 text-muted" style="font-size:.875rem;">{{ $reg->designation ?? '—' }}</td>
-                        <td class="py-3 text-muted" style="font-size:.82rem;">{{ $reg->contributor_plan ?? 'free' }}</td>
+                        <td class="py-3 text-muted" style="font-size:.82rem;">{{ \App\Support\ContributorPlans::label($reg->contributor_plan ?? 'free', true) }}</td>
                         <td class="py-3 text-muted" style="font-size:.82rem;">{{ $reg->payment_status ?? 'unpaid' }}</td>
                         <td class="py-3" style="max-width:200px;">
                             <span style="font-size:.8rem;color:#475569;">{{ Str::limit($reg->reason_for_joining, 80) }}</span>

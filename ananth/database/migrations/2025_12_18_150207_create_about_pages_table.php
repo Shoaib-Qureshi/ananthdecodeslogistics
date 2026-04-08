@@ -13,6 +13,10 @@ class CreateAboutPagesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('about_pages')) {
+            return;
+        }
+
         Schema::create('about_pages', function (Blueprint $table) {
             $table->id();
             $table->string('section_key')->unique();

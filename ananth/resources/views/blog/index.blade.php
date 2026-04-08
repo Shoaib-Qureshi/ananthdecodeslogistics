@@ -7,6 +7,38 @@
 @section('styles')
 <style>
     header { position: sticky; top: 0; background-color: var(--white) !important; }
+    .postCard {
+        display: flex;
+        flex-direction: column;
+    }
+    .postCard p {
+        margin-bottom: 14px;
+    }
+    .postCard .post-date {
+        margin-bottom: 7px;
+    }
+    .post-readmore {
+        margin-top: auto;
+        margin-bottom: 6px;
+        padding-top: 10px;
+        position: relative;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        align-self: flex-start;
+        padding: .55rem 1rem;
+        border-radius: 999px;
+        background: #edf2ff;
+        color: var(--dark-blue);
+        font-size: .88rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background .2s ease, color .2s ease;
+    }
+    .post-readmore:hover {
+        background: var(--primary-color);
+        color: var(--white);
+    }
     .blog-hero-copy {
         color: #555;
         max-width: 560px;
@@ -82,9 +114,10 @@
                         @else
                             <img src="{{ asset('img/site-banner.jpg') }}" alt="{{ $post->title }}">
                         @endif
+                        <span class="post-date">{{ $post->created_at->format('d M Y') }}</span>
                         <h3><a href="{{ route('blog.show', $post->slug) }}" title="{{ $post->title }}">{{ $post->title }}</a></h3>
                         <p>{{ Str::limit(strip_tags($post->content), 120) }}</p>
-                        <span>{{ $post->created_at->format('d M Y') }}</span>
+                        <a class="post-readmore" href="{{ route('blog.show', $post->slug) }}">Read More</a>
                     </div>
                 </div>
             @empty

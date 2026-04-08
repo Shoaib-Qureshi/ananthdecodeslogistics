@@ -8,6 +8,10 @@ class CreateContributorPaymentsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('contributor_payments')) {
+            return;
+        }
+
         Schema::create('contributor_payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();

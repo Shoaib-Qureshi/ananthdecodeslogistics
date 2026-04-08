@@ -101,6 +101,13 @@
                                 <h4>Content</h4>
                                 <textarea name="content" id="ckeditor">{{ $editBlog->content }}</textarea>
                             </div>
+                            <div class="col-md-12">
+                                @include('partials.faq-editor', [
+                                    'instance' => 'admin-blog-edit',
+                                    'faqEnabled' => old('has_faqs', $editBlog->has_faqs ?? false),
+                                    'faqItems' => old('faq_items', $editBlog->faqs ?? []),
+                                ])
+                            </div>
                             <div class="col-md-4">
                                 <h4>Status</h4>
                                 <select name="status">

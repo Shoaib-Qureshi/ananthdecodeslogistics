@@ -218,11 +218,11 @@
                     <img src="/img/site/ananth-inverted0logo.svg" alt="Ananth Decodes Logistics" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
                     <span style="display:none;color:#fff;font-weight:700;font-size:1.1rem;">Ananth Decodes Logistics</span>
                 </a>
-                <span class="brand-badge">Contributor Portal</span>
+                <span class="brand-badge">The Expert Desk</span>
             </div>
 
             <div class="auth-title">Set your password</div>
-            <div class="auth-sub">Create your password to access your contributor dashboard and start posting.</div>
+            <div class="auth-sub">Create your password to access your Expert Desk dashboard and start posting.</div>
 
             @if($errors->any())
                 <div class="alert-custom danger">
@@ -263,7 +263,7 @@
         </div>
 
         <div class="footer-links">
-            <a href="{{ route('contributor.login') }}">Back to login</a>
+            <a href="{{ route('contributor.login') }}">Back to The Expert Desk login</a>
             <span>.</span>
             <a href="/">Back to site</a>
         </div>

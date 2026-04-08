@@ -119,6 +119,14 @@
                 <div class="form-text mt-2" style="font-size:.77rem;">Minimum 100 characters. Every submission goes through admin approval before it appears live.</div>
             </div>
 
+            <div class="form-section">
+                @include('partials.faq-editor', [
+                    'instance' => 'contributor-post-create',
+                    'faqEnabled' => old('has_faqs', false),
+                    'faqItems' => old('faq_items', []),
+                ])
+            </div>
+
             {{-- Actions --}}
             <div class="d-flex gap-3">
                 <button type="submit" class="btn-write px-4 py-2" style="font-size:.9rem;">

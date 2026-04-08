@@ -119,7 +119,7 @@
             <div class="row align-items-center">
                 <div class="col-8">
                     <div class="newsHeading">
-                        <h3>Featured <span>Contributor Posts</span></h3>
+                        <h3>Featured <span>Expert Desk Posts</span></h3>
                     </div>
                 </div>
                 <div class="col-4">

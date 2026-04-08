@@ -8,6 +8,10 @@ class CreateContactTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('contact')) {
+            return;
+        }
+
         Schema::create('contact', function (Blueprint $table) {
             $table->id();
             $table->string('name');

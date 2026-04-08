@@ -53,9 +53,11 @@
                             <div class="col-md-6">
                                 <h4>Contributor Plan</h4>
                                 <select name="contributor_plan">
-                                    <option value="free" selected>Free</option>
-                                    <option value="paid_standard">$50 Paid</option>
-                                    <option value="paid_featured">$100 Featured</option>
+                                    @foreach($contributorPlans as $plan)
+                                        <option value="{{ $plan['code'] }}" {{ $plan['code'] === \App\Support\ContributorPlans::FREE ? 'selected' : '' }}>
+                                            {{ $plan['admin_name'] }}{{ $plan['price_usd'] > 0 ? ' - ' . $plan['price_label'] : '' }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-6">

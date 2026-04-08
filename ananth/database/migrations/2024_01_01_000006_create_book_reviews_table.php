@@ -8,6 +8,10 @@ class CreateBookReviewsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('book_reviews')) {
+            return;
+        }
+
         Schema::create('book_reviews', function (Blueprint $table) {
             $table->id();
             $table->string('name');

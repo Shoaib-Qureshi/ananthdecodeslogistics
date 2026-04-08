@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Contributor Dashboard') — ADL</title>
+    <title>@yield('title', 'The Expert Desk Dashboard') — ADL</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
@@ -320,7 +320,7 @@
                  onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
             <span class="brand-fallback" style="display:none;">Ananth Decodes</span>
         </a>
-        <span class="brand-badge">Contributor Portal</span>
+        <span class="brand-badge">The Expert Desk</span>
     </div>
 
     <nav class="sidebar-nav">
@@ -337,9 +337,20 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('dashboard.posts.create') }}" class="{{ request()->is('dashboard/posts/create') ? 'active' : '' }}">
-                    <i class="bi bi-plus-circle"></i> New Post
+                <a href="{{ route('dashboard.profile.edit') }}" class="{{ request()->is('dashboard/profile*') ? 'active' : '' }}">
+                    <i class="bi bi-person-circle"></i> My Profile
                 </a>
+            </li>
+            <li class="nav-item">
+                @if(Auth::user()->canSubmitContributorPosts())
+                    <a href="{{ route('dashboard.posts.create') }}" class="{{ request()->is('dashboard/posts/create') ? 'active' : '' }}">
+                        <i class="bi bi-plus-circle"></i> New Post
+                    </a>
+                @else
+                    <a href="{{ route('contributor.register') }}">
+                        <i class="bi bi-arrow-repeat"></i> Renew Plan
+                    </a>
+                @endif
             </li>
         </ul>
 
@@ -347,7 +358,7 @@
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a href="{{ route('contributors.index') }}" target="_blank">
-                    <i class="bi bi-globe"></i> Contributor Posts
+                    <i class="bi bi-globe"></i> The Expert Desk
                 </a>
             </li>
             <li class="nav-item">
@@ -388,9 +399,15 @@
         </div>
         <div class="topbar-right">
             @if(!request()->is('dashboard/posts/create'))
-            <a href="{{ route('dashboard.posts.create') }}" class="btn-new-post d-none d-sm-flex">
-                <i class="bi bi-plus-lg"></i> New Post
-            </a>
+                @if(Auth::user()->canSubmitContributorPosts())
+                    <a href="{{ route('dashboard.posts.create') }}" class="btn-new-post d-none d-sm-flex">
+                        <i class="bi bi-plus-lg"></i> New Post
+                    </a>
+                @else
+                    <a href="{{ route('contributor.register') }}" class="btn-new-post d-none d-sm-flex">
+                        <i class="bi bi-arrow-repeat"></i> Renew Plan
+                    </a>
+                @endif
             @endif
             <div class="topbar-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
         </div>

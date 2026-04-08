@@ -42,9 +42,9 @@
     <section class="bothPadding">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    @if(count($tableOfContents) > 0)
-                        <aside class="contentIndex articleSideCard articleInlineCard">
+                @if(count($tableOfContents) > 0)
+                    <div class="col-lg-2 col-md-4">
+                        <aside class="contentIndex">
                             <p><strong>Table of Contents</strong></p>
                             <ul>
                                 @foreach ($tableOfContents as $item)
@@ -52,81 +52,84 @@
                                 @endforeach
                             </ul>
                         </aside>
-                    @endif
-
-                    <div class="mainContent articleContent">
-                        {!! $htmlContent !!}
                     </div>
+                    <div class="col-lg-7 col-md-8">
+                @else
+                    <div class="col-lg-8 col-md-8">
+                @endif
+                        <div class="mainContent articleContent">
+                            {!! $htmlContent !!}
+                        </div>
 
-                    @php
-                        $profileImage = $founderProfile->image ?? null;
-                        $profileName = $founderProfile->heading ?? ($author->name ?? '');
-                        $profileTitle = $founderProfile->subheading ?? ($author->designation ?? '');
-                        $profileContent = $founderProfile->content ?? ($author->intro ?? '');
-                    @endphp
-                    <div class="overviewCard authorCard">
-                        <div class="founderImg">
-                            <img src="{{ $profileImage ? asset($profileImage) : (isset($author->profile_pic) ? asset('img/site/' . $author->profile_pic) : '/img/site/blank-picture.webp') }}" alt="{{ $profileName }}">
-                            <div>
-                                <h4>{{ $profileName }}</h4>
-                                <span>{{ $profileTitle }}</span>
+                        @include('partials.article-faq', [
+                            'faqItems' => ($article->has_faqs ?? false) ? ($article->faqs ?? []) : [],
+                            'sectionId' => 'article-faqs',
+                        ])
+
+                        @php
+                            $profileImage = $founderProfile->image ?? null;
+                            $profileName = $founderProfile->heading ?? ($author->name ?? '');
+                            $profileTitle = $founderProfile->subheading ?? ($author->designation ?? '');
+                            $profileContent = $founderProfile->content ?? ($author->intro ?? '');
+                        @endphp
+                        <div class="overviewCard authorCard">
+                            <div class="founderImg">
+                                <img src="{{ $profileImage ? asset($profileImage) : (isset($author->profile_pic) ? asset('img/site/' . $author->profile_pic) : '/img/site/blank-picture.webp') }}" alt="{{ $profileName }}">
+                                <div>
+                                    <h4>{{ $profileName }}</h4>
+                                    <span>{{ $profileTitle }}</span>
+                                </div>
+                            </div>
+                            @if($profileContent)
+                                <p>{!! nl2br(e($profileContent)) !!}</p>
+                            @endif
+                            <div class="footerSocial">
+                                <ul>
+                                    @if (!empty($author->insta))
+                                        <li><a href="{{ $author->insta }}"><i class='bx bxl-instagram-alt'></i></a></li>
+                                    @endif
+                                    @if (!empty($author->linkedin))
+                                        <li><a href="{{ $author->linkedin }}"><i class='bx bxl-linkedin'></i></a></li>
+                                    @endif
+                                    @if (!empty($author->twitter))
+                                        <li>
+                                            <a href="{{ $author->twitter }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14">
+                                                    <g fill="none">
+                                                        <g clip-path="url(#primeTwitter0)">
+                                                            <path fill="currentColor"
+                                                                d="M11.025.656h2.147L8.482 6.03L14 13.344H9.68L6.294 8.909l-3.87 4.435H.275l5.016-5.75L0 .657h4.43L7.486 4.71zm-.755 11.4h1.19L3.78 1.877H2.504z" />
+                                                        </g>
+                                                        <defs>
+                                                            <clipPath id="primeTwitter0">
+                                                                <path fill="#fff" d="M0 0h14v14H0z" />
+                                                            </clipPath>
+                                                        </defs>
+                                                    </g>
+                                                </svg>
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
                             </div>
                         </div>
-                        @if($profileContent)
-                            <p>{!! nl2br(e($profileContent)) !!}</p>
-                        @endif
-                        <div class="footerSocial">
-                            <ul>
-                                @if (!empty($author->insta))
-                                    <li><a href="{{ $author->insta }}"><i class='bx bxl-instagram-alt'></i></a></li>
-                                @endif
-                                @if (!empty($author->linkedin))
-                                    <li><a href="{{ $author->linkedin }}"><i class='bx bxl-linkedin'></i></a></li>
-                                @endif
-                                @if (!empty($author->twitter))
-                                    <li>
-                                        <a href="{{ $author->twitter }}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14">
-                                                <g fill="none">
-                                                    <g clip-path="url(#primeTwitter0)">
-                                                        <path fill="currentColor"
-                                                            d="M11.025.656h2.147L8.482 6.03L14 13.344H9.68L6.294 8.909l-3.87 4.435H.275l5.016-5.75L0 .657h4.43L7.486 4.71zm-.755 11.4h1.19L3.78 1.877H2.504z" />
-                                                    </g>
-                                                    <defs>
-                                                        <clipPath id="primeTwitter0">
-                                                            <path fill="#fff" d="M0 0h14v14H0z" />
-                                                        </clipPath>
-                                                    </defs>
-                                                </g>
-                                            </svg>
-                                        </a>
-                                    </li>
-                                @endif
-                            </ul>
-                        </div>
                     </div>
 
                     @php
-                        $filteredRelated = $related->where('id', '!=', $article->id)->take(3);
+                        $filteredRelated = $related->where('id', '!=', $article->id)->take(8);
                     @endphp
                     @if($filteredRelated->isNotEmpty())
-                        <div class="articleRelatedSection">
-                            <h3>Read More</h3>
-                            <div class="row">
-                                @foreach ($filteredRelated as $item)
-                                    <div class="col-md-4 mb-4">
-                                        <div class="postCard articleRelatedCard">
-                                            @if($item->thumbnail)
-                                                <img src="{{ asset('media/' . $item->thumbnail) }}" alt="{{ $item->title }}">
-                                            @endif
-                                            <h3><a href="/{{ $item->slug }}">{{ $item->title }}</a></h3>
-                                        </div>
-                                    </div>
-                                @endforeach
+                        <div class="col-lg-3 col-md-12">
+                            <div class="relatedArticle">
+                                <h3>Read More</h3>
+                                <ul>
+                                    @foreach ($filteredRelated as $item)
+                                        <li><a href="/{{ $item->slug }}">{{ $item->title }}</a></li>
+                                    @endforeach
+                                </ul>
                             </div>
                         </div>
                     @endif
-                </div>
             </div>
         </div>
     </section>

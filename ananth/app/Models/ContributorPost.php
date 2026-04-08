@@ -23,6 +23,8 @@ class ContributorPost extends Model
         'featured_image',
         'is_featured',
         'feature_source_plan',
+        'has_faqs',
+        'faqs',
         'status',
         'rejection_reason',
         'published_at',
@@ -39,6 +41,8 @@ class ContributorPost extends Model
     protected $casts = [
         'published_at' => 'datetime',
         'is_featured' => 'boolean',
+        'has_faqs' => 'boolean',
+        'faqs' => 'array',
         'robots_index' => 'boolean',
         'robots_follow' => 'boolean',
     ];

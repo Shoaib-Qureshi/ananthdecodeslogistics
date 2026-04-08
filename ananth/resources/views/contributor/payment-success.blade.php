@@ -1,6 +1,6 @@
 @extends('layouts.front')
-@section('title', 'Contributor Payment Success - Ananth Decodes Logistics')
-@section('description', 'Your contributor account payment was received successfully.')
+@section('title', 'Expert Desk Payment Success - Ananth Decodes Logistics')
+@section('description', 'Your Expert Desk payment was received successfully.')
 @section('url', route('contributor.payment.success', ['session_id' => request('session_id')]))
 @section('img', asset('img/site-banner.jpg'))
 
@@ -12,37 +12,21 @@
         backdrop-filter: blur(18px);
         -webkit-backdrop-filter: blur(18px);
     }
-
-    .menu_container {
-        height: 82px;
-    }
-
+    .menu_container { height: 82px; }
     .menu_container a,
     .menu_container .menu-bar .nav-link,
-    .menu_container #hamburger {
-        color: #16203b !important;
-    }
-
-    .menu_container .logo img {
-        width: 235px;
-    }
-
-    .paymentStatusSection .container {
-        position: relative;
-        z-index: 1;
-    }
-
+    .menu_container #hamburger { color: #16203b !important; }
+    .menu_container .logo img { width: 235px; }
+    .paymentStatusSection .container { position: relative; z-index: 1; }
     .paymentStatusSection {
         padding: 9rem 0 6rem;
         position: relative;
         overflow: hidden;
     }
-
     .paymentStatusWrap {
         max-width: 980px;
         margin: 0 auto;
     }
-
     .paymentStatusCard {
         position: relative;
         border-radius: 32px;
@@ -53,7 +37,6 @@
         color: #fff;
         overflow: hidden;
     }
-
     .paymentStatusCard::before,
     .paymentStatusCard::after {
         content: "";
@@ -62,7 +45,6 @@
         filter: blur(10px);
         pointer-events: none;
     }
-
     .paymentStatusCard::before {
         width: 220px;
         height: 220px;
@@ -70,7 +52,6 @@
         top: -80px;
         background: radial-gradient(circle, rgba(56, 130, 250, 0.42) 0%, rgba(56, 130, 250, 0) 72%);
     }
-
     .paymentStatusCard::after {
         width: 260px;
         height: 260px;
@@ -78,12 +59,7 @@
         bottom: -120px;
         background: radial-gradient(circle, rgba(110, 163, 255, 0.18) 0%, rgba(110, 163, 255, 0) 74%);
     }
-
-    .paymentStatusInner {
-        position: relative;
-        z-index: 1;
-    }
-
+    .paymentStatusInner { position: relative; z-index: 1; }
     .paymentStatusBadge {
         display: inline-flex;
         align-items: center;
@@ -97,7 +73,6 @@
         font-weight: 600;
         letter-spacing: 0.02em;
     }
-
     .paymentStatusDot {
         width: 12px;
         height: 12px;
@@ -105,7 +80,6 @@
         background: #57e389;
         box-shadow: 0 0 0 6px rgba(87, 227, 137, 0.14);
     }
-
     .paymentPlanPill {
         display: inline-flex;
         align-items: center;
@@ -119,7 +93,6 @@
         font-size: 0.92rem;
         font-weight: 600;
     }
-
     .paymentStatusHero h1 {
         margin: 1.2rem 0 1rem;
         color: #fff;
@@ -127,7 +100,6 @@
         line-height: 1.05;
         letter-spacing: -0.03em;
     }
-
     .paymentStatusLead {
         max-width: 760px;
         margin: 0 auto;
@@ -135,18 +107,13 @@
         font-size: 1.2rem;
         line-height: 1.75;
     }
-
-    .paymentStatusLead strong {
-        color: #fff;
-    }
-
+    .paymentStatusLead strong { color: #fff; }
     .paymentStatusGrid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 1rem;
         margin-top: 2.5rem;
     }
-
     .paymentStatusItem {
         padding: 1.25rem;
         border-radius: 24px;
@@ -155,7 +122,6 @@
         text-align: left;
         min-height: 100%;
     }
-
     .paymentStatusItem span {
         display: inline-block;
         margin-bottom: 0.7rem;
@@ -165,20 +131,17 @@
         letter-spacing: 0.08em;
         text-transform: uppercase;
     }
-
     .paymentStatusItem h3 {
         margin-bottom: 0.55rem;
         color: #fff;
         font-size: 1.12rem;
     }
-
     .paymentStatusItem p {
         margin-bottom: 0;
         color: rgba(225, 233, 252, 0.82);
         font-size: 0.98rem;
         line-height: 1.7;
     }
-
     .paymentStatusActions {
         display: flex;
         justify-content: center;
@@ -186,7 +149,6 @@
         flex-wrap: wrap;
         margin-top: 2.4rem;
     }
-
     .paymentStatusBtn {
         display: inline-flex;
         align-items: center;
@@ -198,66 +160,41 @@
         font-weight: 600;
         transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
     }
-
     .paymentStatusBtnPrimary {
         background: #3882fa;
         color: #fff;
         box-shadow: 0 14px 30px rgba(56, 130, 250, 0.28);
     }
-
     .paymentStatusBtnSecondary {
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.14);
         color: #fff;
     }
-
     .paymentStatusBtn:hover {
         transform: translateY(-2px);
         color: #fff;
     }
-
     .paymentStatusBtnPrimary:hover {
         background: #4a90ff;
         box-shadow: 0 18px 34px rgba(56, 130, 250, 0.32);
     }
-
-    .paymentStatusBtnSecondary:hover {
-        background: rgba(255, 255, 255, 0.13);
-    }
-
+    .paymentStatusBtnSecondary:hover { background: rgba(255, 255, 255, 0.13); }
     @media (max-width: 991px) {
-        .menu_container {
-            height: 74px;
-        }
-
-        .paymentStatusSection {
-            padding: 8rem 0 5rem;
-        }
-
+        .menu_container { height: 74px; }
+        .paymentStatusSection { padding: 8rem 0 5rem; }
         .paymentStatusCard {
             padding: 2.2rem;
             border-radius: 26px;
         }
-
-        .paymentStatusGrid {
-            grid-template-columns: 1fr;
-        }
+        .paymentStatusGrid { grid-template-columns: 1fr; }
     }
-
     @media (max-width: 575px) {
-        .paymentStatusSection {
-            padding: 7.4rem 0 4rem;
-        }
-
+        .paymentStatusSection { padding: 7.4rem 0 4rem; }
         .paymentStatusCard {
             padding: 1.5rem;
             border-radius: 22px;
         }
-
-        .paymentStatusLead {
-            font-size: 1.02rem;
-        }
-
+        .paymentStatusLead { font-size: 1.02rem; }
         .paymentStatusBtn {
             width: 100%;
             min-width: 0;
@@ -278,14 +215,14 @@
                     </div>
 
                     <div class="paymentPlanPill">
-                        {{ $payment->plan === 'paid_featured' ? 'Featured Contributor Plan • $100' : 'Standard Contributor Plan • $50' }}
+                        {{ $plan['success_label'] }}
                     </div>
 
                     <div class="paymentStatusHero">
-                        <h1>Your contributor access is ready</h1>
+                        <h1>Your Expert Desk access is ready</h1>
                         <p class="paymentStatusLead">
                             Your plan has been activated successfully. We have sent a password setup email to
-                            <strong>{{ $payment->email }}</strong> so you can sign in, access your contributor dashboard,
+                            <strong>{{ $payment->email }}</strong> so you can sign in, access your Expert Desk dashboard,
                             and begin submitting posts.
                         </p>
                     </div>
@@ -294,27 +231,23 @@
                         <div class="paymentStatusItem">
                             <span>Step 1</span>
                             <h3>Check your inbox</h3>
-                            <p>Open the password setup email we sent and finish creating your contributor login credentials.</p>
+                            <p>Open the password setup email we sent and finish creating your Expert Desk login credentials.</p>
                         </div>
                         <div class="paymentStatusItem">
                             <span>Step 2</span>
                             <h3>Access your dashboard</h3>
-                            <p>Sign in to manage your profile and submit your first contributor article for review.</p>
+                            <p>Sign in to manage your profile, track your plan, and submit Expert Desk articles from one place.</p>
                         </div>
                         <div class="paymentStatusItem">
                             <span>Step 3</span>
                             <h3>Start publishing</h3>
-                            <p>
-                                {{ $payment->plan === 'paid_featured'
-                                    ? 'Your account is eligible for featured contributor placement once approved posts go live.'
-                                    : 'Your published posts will appear in the contributor blog once they are reviewed and approved.' }}
-                            </p>
+                            <p>{{ $plan['success_note'] }}</p>
                         </div>
                     </div>
 
                     <div class="paymentStatusActions">
-                        <a href="{{ route('contributor.login') }}" class="paymentStatusBtn paymentStatusBtnPrimary">Go to Contributor Login</a>
-                        <a href="{{ route('contributors.index') }}" class="paymentStatusBtn paymentStatusBtnSecondary">View Contributors Blog</a>
+                        <a href="{{ route('contributor.login') }}" class="paymentStatusBtn paymentStatusBtnPrimary">Go to The Expert Desk Login</a>
+                        <a href="{{ route('contributors.index') }}" class="paymentStatusBtn paymentStatusBtnSecondary">View The Expert Desk</a>
                     </div>
                 </div>
             </div>

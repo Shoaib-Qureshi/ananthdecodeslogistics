@@ -79,6 +79,13 @@
                                 <textarea name="body" id="ckeditor">{{ old('body', $post->body) }}</textarea>
                             </div>
                             <div class="col-md-12">
+                                @include('partials.faq-editor', [
+                                    'instance' => 'admin-contributor-edit',
+                                    'faqEnabled' => old('has_faqs', $post->has_faqs ?? false),
+                                    'faqItems' => old('faq_items', $post->faqs ?? []),
+                                ])
+                            </div>
+                            <div class="col-md-12">
                                 <hr>
                                 <h4>SEO Meta Title</h4>
                                 <input name="meta_title" value="{{ old('meta_title', $post->meta_title) }}" type="text" placeholder="Optional SEO title">
@@ -93,7 +100,7 @@
                             </div>
                             <div class="col-md-4">
                                 <h4>Canonical URL</h4>
-                                <input name="canonical_url" value="{{ old('canonical_url', $post->canonical_url) }}" type="text" placeholder="https://example.com/contributors/post">
+                                <input name="canonical_url" value="{{ old('canonical_url', $post->canonical_url) }}" type="text" placeholder="https://example.com/expert-desk/post">
                             </div>
                             <div class="col-md-4">
                                 <h4>OG Image Path</h4>

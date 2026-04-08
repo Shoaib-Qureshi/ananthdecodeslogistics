@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contributor Login — Ananth Decodes Logistics</title>
+    <title>The Expert Desk Login - Ananth Decodes Logistics</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; }
@@ -19,7 +19,6 @@
             position: relative;
             overflow: hidden;
         }
-        /* Subtle background orbs */
         body::before {
             content: '';
             position: fixed;
@@ -118,6 +117,32 @@
         }
         .form-control.is-invalid { border-color: rgba(239,68,68,0.6); }
         .invalid-feedback { font-size: .78rem; color: #fca5a5; }
+        .password-field {
+            position: relative;
+        }
+        .password-field .form-control {
+            padding-right: 4.75rem;
+        }
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: .7rem;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #7eb8ff;
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .02em;
+            padding: .2rem .3rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .password-toggle:hover { color: #aaccff; }
+        .password-toggle:focus-visible {
+            outline: 2px solid rgba(126, 184, 255, 0.4);
+            outline-offset: 2px;
+        }
         .form-check-input {
             background-color: rgba(255,255,255,0.08);
             border-color: rgba(255,255,255,0.2);
@@ -176,17 +201,16 @@
 <div class="login-wrapper">
     <div class="login-card">
 
-        {{-- Brand --}}
         <div class="text-center mb-4">
             <a href="/" class="brand-logo">
                 <img src="/img/site/ananth-inverted0logo.svg" alt="Ananth Decodes Logistics" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
                 <span style="display:none;color:#fff;font-weight:700;font-size:1.1rem;">Ananth Decodes Logistics</span>
             </a>
-            <span class="brand-badge">Contributor Portal</span>
+            <span class="brand-badge">The Expert Desk</span>
         </div>
 
         <div class="login-title">Welcome back</div>
-        <div class="login-sub">Sign in to access your contributor dashboard</div>
+        <div class="login-sub">Sign in to access your Expert Desk dashboard</div>
 
         @if(session('success'))
             <div class="alert-custom success">{{ session('success') }}</div>
@@ -207,18 +231,21 @@
             @csrf
 
             <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                       value="{{ old('email') }}" placeholder="you@example.com" required autofocus>
+                <label class="form-label" for="email">Email</label>
+                <input id="email" type="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                       value="{{ old('email') }}" placeholder="you@example.com" autocomplete="email" required autofocus>
                 @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
             <div class="mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                    <label class="form-label mb-0">Password</label>
+                    <label class="form-label mb-0" for="password">Password</label>
                     <a href="{{ route('password.request') }}" class="forgot-link">Forgot password?</a>
                 </div>
-                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                <div class="password-field">
+                    <input id="password" type="password" name="password" class="form-control" placeholder="Enter your password" autocomplete="current-password" required>
+                    <button type="button" class="password-toggle" data-password-toggle data-target="password" aria-controls="password" aria-pressed="false">Show</button>
+                </div>
             </div>
 
             <div class="mb-4">
@@ -237,18 +264,34 @@
            style="display:block;text-align:center;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:.7rem;color:rgba(255,255,255,0.75);text-decoration:none;font-size:.88rem;font-weight:500;transition:background .15s;"
            onmouseover="this.style.background='rgba(255,255,255,0.1)'"
            onmouseout="this.style.background='rgba(255,255,255,0.06)'">
-            Apply to become a contributor →
+            Apply to The Expert Desk &rarr;
         </a>
 
     </div>
 
     <div class="footer-links">
-        <a href="/">← Back to site</a>
-        <span>·</span>
+        <a href="/">&larr; Back to site</a>
+        <span>&middot;</span>
         <a href="/privacy-policy/">Privacy Policy</a>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.querySelectorAll('[data-password-toggle]').forEach(function(button) {
+        var input = document.getElementById(button.getAttribute('data-target'));
+
+        if (!input) {
+            return;
+        }
+
+        button.addEventListener('click', function() {
+            var showingPassword = input.type === 'text';
+            input.type = showingPassword ? 'password' : 'text';
+            button.textContent = showingPassword ? 'Show' : 'Hide';
+            button.setAttribute('aria-pressed', showingPassword ? 'false' : 'true');
+        });
+    });
+</script>
 </body>
 </html>

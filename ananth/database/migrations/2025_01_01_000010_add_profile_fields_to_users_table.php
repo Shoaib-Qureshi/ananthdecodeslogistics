@@ -8,27 +8,50 @@ class AddProfileFieldsToUsersTable extends Migration
 {
     public function up()
     {
+        if (!Schema::hasTable('users')) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
-            $table->string('designation')->nullable()->after('user_role');
-            $table->string('insta')->nullable()->after('designation');
-            $table->string('linkedin')->nullable()->after('insta');
-            $table->string('twitter')->nullable()->after('linkedin');
-            $table->text('intro')->nullable()->after('twitter');
-            $table->string('profile_pic')->nullable()->after('intro');
+            if (!Schema::hasColumn('users', 'designation')) {
+                $table->string('designation')->nullable()->after('user_role');
+            }
+            if (!Schema::hasColumn('users', 'insta')) {
+                $table->string('insta')->nullable()->after('designation');
+            }
+            if (!Schema::hasColumn('users', 'linkedin')) {
+                $table->string('linkedin')->nullable()->after('insta');
+            }
+            if (!Schema::hasColumn('users', 'twitter')) {
+                $table->string('twitter')->nullable()->after('linkedin');
+            }
+            if (!Schema::hasColumn('users', 'intro')) {
+                $table->text('intro')->nullable()->after('twitter');
+            }
+            if (!Schema::hasColumn('users', 'profile_pic')) {
+                $table->string('profile_pic')->nullable()->after('intro');
+            }
         });
     }
 
     public function down()
     {
+        if (!Schema::hasTable('users')) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn([
-                'designation',
-                'insta',
-                'linkedin',
-                'twitter',
-                'intro',
-                'profile_pic',
-            ]);
+            $columns = [];
+
+            foreach (['designation', 'insta', 'linkedin', 'twitter', 'intro', 'profile_pic'] as $column) {
+                if (Schema::hasColumn('users', $column)) {
+                    $columns[] = $column;
+                }
+            }
+
+            if ($columns) {
+                $table->dropColumn($columns);
+            }
         });
     }
 }

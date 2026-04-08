@@ -473,6 +473,35 @@ header {
     background-color: var(--dark-blue);
 }
 
+.menu_container .menu_secondary_btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid #dbeafe;
+    background: #f3f7ff;
+    color: var(--primary-color);
+    line-height: 1;
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.menu_container .menu_secondary_btn i {
+    font-size: 1.3rem;
+}
+
+.menu_container .menu_secondary_btn:hover {
+    background: #e8f1ff;
+    border-color: #bfdbfe;
+    color: var(--dark-blue);
+}
+
+.menu_container .contributor-mobile-link {
+    display: none;
+}
+
 .menu_container .icon {
     padding: 0.5rem;
     background-color: var(--light-grey);
@@ -701,6 +730,10 @@ header {
 }
 
 @media (max-width: 600px) {
+    .menu_container .contributor-mobile-link {
+        display: list-item;
+    }
+
     .menu_container .right-container {
         display: none;
     }

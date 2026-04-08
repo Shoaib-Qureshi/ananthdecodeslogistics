@@ -71,6 +71,13 @@
                                 <h4>Content</h4>
                                 <textarea name="content" id="ckeditor"></textarea>
                             </div>
+                            <div class="col-md-12">
+                                @include('partials.faq-editor', [
+                                    'instance' => 'admin-blog-create',
+                                    'faqEnabled' => old('has_faqs', false),
+                                    'faqItems' => old('faq_items', []),
+                                ])
+                            </div>
                             <div class="col-md-4">
                                 <h4>Status</h4>
                                 <select name="status" required>

@@ -36,10 +36,10 @@
 
 <section class="bothPadding">
     <div class="container">
-        <div class="row justify-content-center articleLayoutRow">
+        <div class="row justify-content-center">
             @if(count($tableOfContents) > 0)
-                <div class="col-lg-3 col-md-4">
-                    <aside class="contentIndex articleSideCard">
+                <div class="col-lg-2 col-md-4">
+                    <aside class="contentIndex">
                         <p><strong>Table of Contents</strong></p>
                         <ul>
                             @foreach ($tableOfContents as $item)
@@ -48,13 +48,18 @@
                         </ul>
                     </aside>
                 </div>
-                <div class="col-lg-8 col-md-8 articleMainColumn">
+                <div class="col-lg-7 col-md-8">
             @else
-                <div class="col-lg-8 articleMainColumn">
+                <div class="col-lg-8 col-md-8">
             @endif
                 <div class="mainContent articleContent">
                     {!! $htmlContent !!}
                 </div>
+
+                @include('partials.article-faq', [
+                    'faqItems' => ($post->has_faqs ?? false) ? ($post->faqs ?? []) : [],
+                    'sectionId' => 'blog-faqs',
+                ])
 
                 @if($post->user)
                     <div class="overviewCard authorCard">
@@ -104,25 +109,20 @@
                     </div>
                 @endif
 
-                @if($related->isNotEmpty())
-                    <div class="articleRelatedSection">
-                        <h3>Read More</h3>
-                        <div class="row">
-                            @foreach($related as $rel)
-                            <div class="col-md-4 mb-4">
-                                <div class="postCard articleRelatedCard" style="height:100%;">
-                                    @if($rel->thumbnail)
-                                        <img src="{{ asset('media/' . $rel->thumbnail) }}" alt="{{ $rel->title }}">
-                                    @endif
-                                    <h3><a href="{{ route('blog.show', $rel->slug) }}">{{ $rel->title }}</a></h3>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
             </div>
+
+            @if($related->isNotEmpty())
+                <div class="col-lg-3 col-md-12">
+                    <div class="relatedArticle">
+                        <h3>Read More</h3>
+                        <ul>
+                            @foreach($related as $rel)
+                                <li><a href="{{ route('blog.show', $rel->slug) }}">{{ $rel->title }}</a></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </section>

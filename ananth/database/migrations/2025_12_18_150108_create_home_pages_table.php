@@ -13,6 +13,10 @@ class CreateHomePagesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('home_pages')) {
+            return;
+        }
+
         Schema::create('home_pages', function (Blueprint $table) {
             $table->id();
             $table->string('section_key')->unique();

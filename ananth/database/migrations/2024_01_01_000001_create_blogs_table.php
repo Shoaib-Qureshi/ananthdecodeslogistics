@@ -8,6 +8,10 @@ class CreateBlogsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('blogs')) {
+            return;
+        }
+
         Schema::create('blogs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');

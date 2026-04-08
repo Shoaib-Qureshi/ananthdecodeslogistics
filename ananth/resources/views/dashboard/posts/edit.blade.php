@@ -140,6 +140,14 @@
                 @enderror
             </div>
 
+            <div class="form-section">
+                @include('partials.faq-editor', [
+                    'instance' => 'contributor-post-edit',
+                    'faqEnabled' => old('has_faqs', $post->has_faqs ?? false),
+                    'faqItems' => old('faq_items', $post->faqs ?? []),
+                ])
+            </div>
+
             <div class="d-flex gap-3">
                 <button type="submit" class="btn-write px-4 py-2" style="font-size:.9rem;">
                     <i class="bi bi-send"></i> Save Changes & Resubmit

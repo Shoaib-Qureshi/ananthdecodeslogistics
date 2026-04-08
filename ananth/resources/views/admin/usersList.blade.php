@@ -57,7 +57,7 @@
                                                 href="{{ asset('author/' . $item->username) }}/">{{ $item->name }}</a>
                                         </td>
                                         <td>{{ $item->designation }}</td>
-                                        <td>{{ $item->contributor_plan ?? '—' }}</td>
+                                        <td>{{ $item->contributor_plan ? \App\Support\ContributorPlans::label($item->contributor_plan, true) : '—' }}</td>
                                         <td>{{ $item->payment_status ?? '—' }}</td>
                                         <td>{{ $item->status ?? '—' }}</td>
                                         <td>{{ $item->intro }}</td>

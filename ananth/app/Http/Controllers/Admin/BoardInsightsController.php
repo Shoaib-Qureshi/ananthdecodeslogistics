@@ -71,7 +71,11 @@ class BoardInsightsController extends Controller
 
     public function insightList()
     {
-        $insightList = BoardInsights::where('status', 1)->orderBy('id', 'desc')->paginate(9);
+        $insightList = BoardInsights::where('status', 1)->orderByDesc('created_at')->paginate(8);
+        $insightList->setCollection(
+            $insightList->getCollection()->map(fn ($item) => $this->decorateInsightPreview($item))
+        );
+
         return view('front.insightList', [
             'insightList' => $insightList,
         ]);
@@ -114,5 +118,17 @@ class BoardInsightsController extends Controller
             'htmlContent' => $htmlContent,
             'tableOfContents' => $tableOfContents,
         ]);
+    }
+
+    private function decorateInsightPreview(BoardInsights $insight): BoardInsights
+    {
+        $plainText = html_entity_decode(strip_tags($insight->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $plainText = trim(preg_replace('/\s+/u', ' ', $plainText));
+        $wordCount = str_word_count($plainText);
+
+        $insight->excerpt = Str::limit($plainText, 170);
+        $insight->reading_time = max(1, (int) ceil($wordCount / 175));
+
+        return $insight;
     }
 }

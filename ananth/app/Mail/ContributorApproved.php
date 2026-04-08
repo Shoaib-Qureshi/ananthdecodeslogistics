@@ -20,7 +20,7 @@ class ContributorApproved extends Mailable
 
     public function build()
     {
-        return $this->subject('Your Ananth Decodes Logistics contributor account is approved')
+        return $this->subject('Your Expert Desk access is approved')
                     ->view('emails.contributor.approved');
     }
 }

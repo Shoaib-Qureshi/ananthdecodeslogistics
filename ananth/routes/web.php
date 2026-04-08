@@ -23,6 +23,8 @@ Route::post('admin/logout',[AdminController::class,'logOut'])->name('adminLogout
 
 Route::middleware([admin::class])->group(function () {
     Route::get('admin/dashboard',[AdminController::class,'showDashboard'])->name('admin.dashboard');
+    Route::get('admin/profile',[AdminController::class,'editProfile'])->name('admin.profile.edit');
+    Route::post('admin/profile',[AdminController::class,'updateProfile'])->name('admin.profile.update');
     Route::get('admin/messages',[AdminController::class,'messages'])->name('messages');
     Route::get('admin/users-list',[AdminController::class,'usersList'])->name('usersList');
     Route::post('admin/delete-user/{id}',[AdminController::class,'deleteUser'])->name('admin.users.delete');
@@ -109,7 +111,7 @@ Route::post('password/reset', function(\Illuminate\Http\Request $request) {
         $user->forceFill(['password' => bcrypt($password)])->save();
     });
     return $status === Password::PASSWORD_RESET
-        ? redirect('/contributor-login')->with('success', 'Password set successfully. Please log in.')
+        ? redirect()->route('contributor.login')->with('success', 'Password set successfully. Please log in.')
         : back()->withErrors(['email' => __($status)]);
 })->name('password.update');
 
@@ -126,21 +128,28 @@ Route::post('password/reset', function(\Illuminate\Http\Request $request) {
 // Route::post('reset-password', [AuthController::class, 'submitResetPasswordForm'])->name('reset.password.post');
 
 // ─── Contributor Registration (public) ───────────────────────────────────
-Route::get('write-for-us', [ContributorRegistrationController::class, 'showForm'])->name('contributor.register');
-Route::post('write-for-us', [ContributorRegistrationController::class, 'submit'])->name('contributor.register.submit');
-Route::get('contributor/payment/success', [ContributorRegistrationController::class, 'paymentSuccess'])->name('contributor.payment.success');
-Route::get('contributor/payment/cancel', [ContributorRegistrationController::class, 'paymentCancel'])->name('contributor.payment.cancel');
+Route::get('expert-desk/apply', [ContributorRegistrationController::class, 'showForm'])->name('contributor.register');
+Route::post('expert-desk/apply', [ContributorRegistrationController::class, 'submit'])->name('contributor.register.submit');
+Route::get('write-for-us', [ContributorRegistrationController::class, 'showWriteForUs'])->name('write-for-us');
+Route::get('expert-desk/payment/success', [ContributorRegistrationController::class, 'paymentSuccess'])->name('contributor.payment.success');
+Route::get('expert-desk/payment/cancel', [ContributorRegistrationController::class, 'paymentCancel'])->name('contributor.payment.cancel');
+Route::get('contributor/payment/success', [ContributorRegistrationController::class, 'paymentSuccess']);
+Route::get('contributor/payment/cancel', [ContributorRegistrationController::class, 'paymentCancel']);
 Route::post('stripe/webhook', [ContributorRegistrationController::class, 'stripeWebhook'])->name('stripe.webhook');
 
 // ─── Guest Auth ───────────────────────────────────────────────────────────
-Route::get('contributor-login', [GuestAuthController::class, 'showLogin'])->name('contributor.login');
-Route::post('contributor-login', [GuestAuthController::class, 'login'])->name('contributor.login.submit');
-Route::post('contributor-logout', [GuestAuthController::class, 'logout'])->name('contributor.logout');
+Route::get('expert-desk/login', [GuestAuthController::class, 'showLogin'])->name('contributor.login');
+Route::post('expert-desk/login', [GuestAuthController::class, 'login'])->name('contributor.login.submit');
+Route::post('contributor-login', [GuestAuthController::class, 'login']);
+Route::post('expert-desk/logout', [GuestAuthController::class, 'logout'])->name('contributor.logout');
+Route::post('contributor-logout', [GuestAuthController::class, 'logout']);
 
 // ─── Guest Dashboard ──────────────────────────────────────────────────────
 Route::middleware(['guest.contributor'])->prefix('dashboard')->group(function () {
     Route::get('/', [GuestPostController::class, 'index'])->name('dashboard');
     Route::get('/posts', [GuestPostController::class, 'index'])->name('dashboard.posts');
+    Route::get('/profile', [GuestPostController::class, 'editProfile'])->name('dashboard.profile.edit');
+    Route::post('/profile', [GuestPostController::class, 'updateProfile'])->name('dashboard.profile.update');
     Route::get('/posts/create', [GuestPostController::class, 'create'])->name('dashboard.posts.create');
     Route::post('/posts', [GuestPostController::class, 'store'])->name('dashboard.posts.store');
     Route::get('/posts/{id}/edit', [GuestPostController::class, 'edit'])->name('dashboard.posts.edit');
@@ -152,8 +161,39 @@ Route::get('blog', [ContributorBlogController::class, 'blog'])->name('blog.index
 Route::get('blog/{slug}', [ContributorBlogController::class, 'showBlog'])->name('blog.show');
 
 // ─── Public Contributors Posts ────────────────────────────────────────────
-Route::get('contributors', [ContributorBlogController::class, 'contributors'])->name('contributors.index');
-Route::get('contributors/{slug}', [ContributorBlogController::class, 'showContributor'])->name('contributors.show');
+Route::get('expert-desk', [ContributorBlogController::class, 'contributors'])->name('contributors.index');
+Route::get('expert-desk/{slug}', [ContributorBlogController::class, 'showContributor'])->name('contributors.show');
+
+Route::get('contributors', function (\Illuminate\Http\Request $request) {
+    $target = route('contributors.index');
+
+    if ($request->getQueryString()) {
+        $target .= '?' . $request->getQueryString();
+    }
+
+    return redirect()->to($target, 301);
+});
+
+Route::get('contributors/{slug}', function (\Illuminate\Http\Request $request, $slug) {
+    $target = route('contributors.show', ['slug' => $slug]);
+
+    if ($request->getQueryString()) {
+        $target .= '?' . $request->getQueryString();
+    }
+
+    return redirect()->to($target, 301);
+});
+
+
+Route::get('contributor-login', function (\Illuminate\Http\Request $request) {
+    $target = route('contributor.login');
+
+    if ($request->getQueryString()) {
+        $target .= '?' . $request->getQueryString();
+    }
+
+    return redirect()->to($target, 301);
+});
 
 // *********************** Front Routes ***********************
 Route::get('/',[HomeController::class,'homePage']);
@@ -163,7 +203,15 @@ Route::get('terms-and-conditions',[HomeController::class,'termsConditions']);
 Route::get('contact-us',[HomeController::class,'contactUs']);
 Route::post('save-contact',[HomeController::class,'saveContact'])->name('saveContact');
 Route::get('disclaimer',[HomeController::class,'disclaimer']);
-Route::redirect('contribute-a-guest-post', 'write-for-us', 301);
+Route::get('contribute-a-guest-post', function (\Illuminate\Http\Request $request) {
+    $target = route('contributor.register');
+
+    if ($request->getQueryString()) {
+        $target .= '?' . $request->getQueryString();
+    }
+
+    return redirect()->to($target, 301);
+});
 // Route::get('blog',[ArticleController::class,'allPost']); // replaced by blog.index route above
 
 Route::get('topic/{slug}',[ArticleController::class,'categoryPage']);

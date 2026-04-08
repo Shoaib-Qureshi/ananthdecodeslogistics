@@ -1,346 +1,276 @@
 @extends('layouts.front')
-@section('title', 'Contribute a Guest Post — Ananth Decodes Logistics')
-@section('description', 'Are you passionate about logistics, supply chain management, transportation, or warehousing? We invite you to contribute to Ananth Decodes Logistics.')
-@section('url', url('write-for-us'))
+@section('title', 'Apply to The Expert Desk - Ananth Decodes Logistics')
+@section('description', 'Choose an Expert Desk plan and apply to publish your logistics perspective on Ananth Decodes Logistics.')
+@section('url', route('contributor.register'))
 @section('img', asset('img/site-banner.jpg'))
 
 @section('styles')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-    header { position: sticky; top: 0; background-color: var(--white) !important; }
-    .wfu-benefit {
-        display: flex;
-        align-items: flex-start;
-        gap: 1rem;
-        padding: 1rem 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    .wfu-benefit:last-child { border-bottom: none; }
-    .wfu-benefit-icon {
-        width: 40px; height: 40px;
-        border-radius: 10px;
-        background: #eff4ff;
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-    }
-    .wfu-benefit-icon svg { width: 20px; height: 20px; color: #3882fa; fill: currentColor; }
-    .wfu-benefit h6 { font-size: .9rem; font-weight: 600; color: #181a3f; margin-bottom: .25rem; }
-    .wfu-benefit p  { font-size: .83rem; color: #636363; margin: 0; line-height: 1.5; }
-    .form-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 2.25rem 2.5rem;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.07);
-        border: 1px solid #e8edf5;
-    }
-    .form-control, .form-select {
-        border-radius: 8px;
-        padding: .6rem 1rem;
-        border: 1.5px solid #e2e8f0;
-        font-size: .9rem;
-        transition: border-color .15s, box-shadow .15s;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: #3882fa;
-        box-shadow: 0 0 0 3px rgba(56,130,250,.12);
-    }
-    .form-label { font-weight: 600; font-size: .875rem; color: #181a3f; margin-bottom: .4rem; }
-    .btn-submit {
-        background: #3882fa;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: .7rem 2rem;
-        font-weight: 600;
-        font-size: .95rem;
-        width: 100%;
-        cursor: pointer;
-        transition: background .2s, transform .1s;
-        display: flex; align-items: center; justify-content: center; gap: .5rem;
-    }
-    .btn-submit:hover { background: #2563d4; }
-    .btn-submit:active { transform: scale(.99); }
-    .alert-success-custom {
-        background: #f0fdf4;
-        border: 1px solid #bbf7d0;
-        border-left: 4px solid #22c55e;
-        border-radius: 10px;
-        padding: 1rem 1.25rem;
-        font-size: .9rem;
-        color: #166534;
-    }
-    .alert-danger-custom {
-        background: #fef2f2;
-        border: 1px solid #fecaca;
-        border-left: 4px solid #ef4444;
-        border-radius: 10px;
-        padding: 1rem 1.25rem;
-        font-size: .9rem;
-        color: #991b1b;
-    }
-    .invalid-feedback { font-size: .8rem; }
-    .section-divider {
-        height: 1px;
-        background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-        margin: 2.5rem 0;
-    }
-    .plan-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    .plan-card {
-        position: relative;
-        border: 1.5px solid #dbe7f6;
-        border-radius: 14px;
-        padding: 1.15rem;
-        background: #f8fbff;
-        cursor: pointer;
-        transition: border-color .18s, box-shadow .18s, transform .18s;
-    }
-    .plan-card:hover {
-        border-color: #93c5fd;
-        transform: translateY(-2px);
-    }
-    .plan-card input {
-        position: absolute;
-        opacity: 0;
-        inset: 0;
-        cursor: pointer;
-    }
-    .plan-card.is-selected {
-        border-color: #3882fa;
-        box-shadow: 0 0 0 3px rgba(56,130,250,.12);
-        background: #eff6ff;
-    }
-    .plan-card strong {
-        display: block;
-        color: #181a3f;
-        font-size: .98rem;
-        margin-bottom: .35rem;
-    }
-    .plan-card .price {
-        display: block;
-        color: #3882fa;
-        font-size: 1.4rem;
-        font-weight: 700;
-        margin-bottom: .5rem;
-    }
-    .plan-card p {
-        font-size: .82rem;
-        color: #64748b;
-        margin: 0;
-        line-height: 1.6;
-    }
-    @media(max-width: 768px) {
-        .form-card { padding: 1.5rem; }
-        .plan-grid { grid-template-columns: 1fr; }
-    }
+header{position:sticky;top:0;background:var(--white)!important;z-index:100}
+
+/* Page shell */
+.apply-page{min-height:100vh;background:#f8fbff;padding:3rem 0 5rem}
+
+/* Two-column grid */
+.apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+
+/* ── Left panel ── */
+.info-panel{position:sticky;top:88px}
+.info-eyebrow{display:inline-flex;align-items:center;gap:.45rem;padding:.38rem .75rem;background:rgba(37,99,235,.08);color:#1d4ed8;font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;border-radius:999px;margin-bottom:1.1rem}
+.info-title{font-size:clamp(1.7rem,2.5vw,2.4rem);font-weight:800;color:#0f172a;line-height:1.1;letter-spacing:-.03em;margin:0 0 .75rem}
+.info-title span{color:#3882fa}
+.info-sub{color:#475569;font-size:.95rem;line-height:1.8;margin:0 0 1.8rem}
+.info-benefits{list-style:none;padding:0;margin:0 0 2rem;display:grid;gap:.85rem}
+.info-benefits li{display:flex;gap:.75rem;align-items:flex-start}
+.benefit-icon{width:32px;height:32px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem}
+.benefit-icon svg{color:#3882fa}
+.benefit-text strong{display:block;font-size:.9rem;font-weight:700;color:#0f172a;margin-bottom:.15rem}
+.benefit-text span{font-size:.84rem;color:#64748b;line-height:1.6}
+.info-divider{border:none;border-top:1px solid #e2e8f0;margin:1.5rem 0}
+.info-trust{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.trust-chip{padding:.7rem .9rem;background:#fff;border:1px solid #dbeafe;border-radius:14px}
+.trust-chip strong{display:block;font-size:.78rem;font-weight:800;color:#0f172a;margin-bottom:.2rem}
+.trust-chip span{font-size:.74rem;color:#64748b;line-height:1.5}
+.info-more{margin-top:1.5rem;font-size:.83rem;color:#64748b}
+.info-more a{color:#3882fa;font-weight:700;text-decoration:none}
+.info-more a:hover{text-decoration:underline}
+
+/* ── Right panel (form card) ── */
+.form-card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;box-shadow:0 20px 48px rgba(15,23,42,.07);padding:2rem}
+
+/* Alerts */
+.alert-ok,.alert-err{border-radius:12px;padding:.9rem 1.1rem;font-size:.875rem;margin-bottom:1.25rem}
+.alert-ok{background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid #22c55e;color:#166534}
+.alert-err{background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #ef4444;color:#991b1b}
+
+/* Plan selector rows */
+.plan-section-label{font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#64748b;margin-bottom:.65rem}
+.plan-rows{display:grid;gap:.6rem;margin-bottom:.35rem}
+.plan-row{position:relative;display:flex;align-items:center;gap:.85rem;padding:.9rem 1rem;border:1.5px solid #e2e8f0;border-radius:14px;cursor:pointer;transition:.16s ease;background:#fff}
+.plan-row:hover{border-color:#93c5fd;background:#f8fbff}
+.plan-row.is-selected{border-color:#3882fa;background:#eff6ff;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.plan-row input[type="radio"]{position:absolute;opacity:0;pointer-events:none}
+.plan-radio{width:18px;height:18px;border-radius:50%;border:2px solid #cbd5e1;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.16s}
+.plan-row.is-selected .plan-radio{border-color:#3882fa;background:#3882fa}
+.plan-row.is-selected .plan-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+.plan-row-body{flex:1;min-width:0}
+.plan-row-top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.plan-row-name{font-size:.9rem;font-weight:700;color:#0f172a}
+.plan-row-popular{display:inline-flex;align-items:center;padding:.18rem .52rem;background:#3882fa;color:#fff;font-size:.66rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-radius:999px}
+.plan-row-tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.3rem}
+.plan-row-tag{display:inline-flex;align-items:center;padding:.22rem .55rem;background:#f1f5f9;color:#475569;font-size:.74rem;border-radius:999px}
+.plan-row-price{font-size:1.15rem;font-weight:800;color:#0f172a;flex-shrink:0}
+.plan-row-price small{font-size:.72rem;font-weight:600;color:#94a3b8;margin-left:.2rem}
+
+/* Tooltip */
+.plan-info-btn{width:22px;height:22px;border-radius:50%;border:1.5px solid #cbd5e1;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;position:relative;color:#94a3b8;transition:.15s}
+.plan-info-btn:hover{border-color:#3882fa;color:#3882fa}
+.plan-tooltip{position:absolute;right:0;top:calc(100% + 8px);width:230px;background:#0f172a;color:#e2e8f0;font-size:.78rem;line-height:1.6;padding:.85rem 1rem;border-radius:12px;box-shadow:0 16px 32px rgba(0,0,0,.2);z-index:200;display:none;pointer-events:none}
+.plan-tooltip::before{content:'';position:absolute;top:-6px;right:8px;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid #0f172a}
+.plan-info-btn:hover .plan-tooltip,.plan-info-btn:focus .plan-tooltip{display:block}
+.plan-tooltip ul{list-style:none;padding:0;margin:.45rem 0 0;display:grid;gap:.3rem}
+.plan-tooltip ul li::before{content:'· ';color:#60a5fa}
+.tooltip-head{font-weight:700;color:#fff;margin-bottom:.25rem}
+
+/* Form fields */
+.field-group{display:grid;gap:1rem;margin-top:1.25rem}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.field-label{display:block;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b;margin-bottom:.4rem}
+.field-input{width:100%;border:1.5px solid #e2e8f0;border-radius:12px;padding:.75rem .95rem;font-size:.92rem;color:#0f172a;background:#fff;transition:.15s;outline:none}
+.field-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.field-input.is-invalid{border-color:#ef4444}
+.field-error{font-size:.78rem;color:#ef4444;margin-top:.3rem}
+
+/* Divider */
+.form-divider{border:none;border-top:1px solid #f1f5f9;margin:1.5rem 0}
+
+/* Submit */
+.submit-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1.5rem}
+.submit-btn{display:inline-flex;align-items:center;gap:.5rem;background:#3882fa;color:#fff;border:none;border-radius:12px;padding:.85rem 1.5rem;font-size:.92rem;font-weight:800;cursor:pointer;box-shadow:0 10px 24px #168ff938;transition:.16s;text-decoration:none}
+.submit-btn:hover{opacity:.88}
+.submit-note{font-size:.78rem;color:#94a3b8;line-height:1.6;max-width:220px}
+.invalid-feedback{display:block;font-size:.78rem;color:#ef4444;margin-top:.3rem}
+
+@media(max-width:1024px){.apply-grid{grid-template-columns:1fr}.info-panel{position:static}.info-trust{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.field-row{grid-template-columns:1fr}.submit-row{flex-direction:column;align-items:stretch}.submit-btn{justify-content:center}.submit-note{max-width:100%;text-align:center}}
 </style>
 @endsection
 
 @section('content')
-<section class="gradientBg bothPadding">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8 mx-auto">
-                <div class="headingMain text-center">
-                    <p>Interested in writing for us?</p>
-                    <h1>Contribute a Guest Post</h1>
-                    <p style="max-width:560px;margin:1rem auto 0;opacity:.85;">
-                        Share your logistics and supply chain expertise with a wider audience through Ananth Decodes Logistics.
-                    </p>
+@php
+$selectedPlan = old('plan', $defaultPlan);
+$popularPlan  = \App\Support\ContributorPlans::GROWTH;
+@endphp
+
+<div class="apply-page">
+<div class="container">
+<div class="apply-grid">
+
+    {{-- ── LEFT: Info panel ── --}}
+    <div class="info-panel">
+        <div class="info-eyebrow">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.93 10.58-.93.93-.93-.93V8.07l-.93-.93.93-.93H8V4.35l.93.93V7.14l.93.93-.93.93v2.58z"/></svg>
+            The Expert Desk
+        </div>
+        <h1 class="info-title">Publish your <span>logistics perspective</span></h1>
+        <p class="info-sub">Join a credibility-first contributor platform built for logistics professionals. Every plan gives you an author profile, editorial support, and a defined publishing runway.</p>
+
+        <ul class="info-benefits">
+            <li>
+                <div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg></div>
+                <div class="benefit-text"><strong>Author presence</strong><span>Published profile with bio, credentials, and full authorship on every article.</span></div>
+            </li>
+            <li>
+                <div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383-4.708 2.825L15 11.105V5.383zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741zM1 11.105l4.708-2.897L1 5.383v5.722z"/></svg></div>
+                <div class="benefit-text"><strong>Visibility support</strong><span>Co-branded LinkedIn &amp; X promotion with newsletter eligibility on Growth and above.</span></div>
+            </li>
+            <li>
+                <div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 3a.5.5 0 0 0 0 1h11a.5.5 0 0 0 0-1h-11zm5 3a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1h-6zm0 3a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1h-6zm-5 3a.5.5 0 0 0 0 1h11a.5.5 0 0 0 0-1h-11zm.79-5.373.549-.274V9.5a.5.5 0 1 0 1 0V6.171l-.851.425a.5.5 0 1 0 .448.894l-.146.073V9.5a.5.5 0 0 0 1 0V7.171l.659-.33a.5.5 0 0 0-.448-.894l-.211.106V6.5a.5.5 0 0 0-1 0v.246l-.549.274a.5.5 0 1 0 .447.895l.102-.051z"/></svg></div>
+                <div class="benefit-text"><strong>Editorial review</strong><span>Every submission reviewed for clarity and publishing quality before going live.</span></div>
+            </li>
+            <li>
+                <div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/></svg></div>
+                <div class="benefit-text"><strong>Focused audience</strong><span>Reach logistics professionals and supply chain decision-makers who read with intent.</span></div>
+            </li>
+        </ul>
+
+        <hr class="info-divider">
+
+        <div class="info-trust">
+            <div class="trust-chip"><strong>Secure checkout</strong><span>Payment USD · instant activation</span></div>
+            <div class="trust-chip"><strong>3 clear plans</strong><span>Defined windows &amp; post caps</span></div>
+            <div class="trust-chip"><strong>Keep your posts</strong><span>Profile stays after expiry</span></div>
+            <div class="trust-chip"><strong>No hidden fees</strong><span>One payment, full access</span></div>
+        </div>
+
+        <p class="info-more">Not sure yet? <a href="{{ route('write-for-us') }}">Read the full Write for Us page</a> for plan comparison and FAQ.</p>
+    </div>
+
+    {{-- ── RIGHT: Form panel ── --}}
+    <div>
+        @if(session('success'))
+            <div class="alert-ok"><strong>Application received.</strong> {{ session('success') }}</div>
+        @endif
+        @if($errors->any())
+            <div class="alert-err"><ul class="mb-0 ps-3" style="padding-left:1.1rem">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+        @endif
+
+        <div class="form-card">
+            <form method="POST" action="{{ route('contributor.register.submit') }}" id="apply-form">
+                @csrf
+
+                {{-- Plan selector --}}
+                <p class="plan-section-label">Choose your plan</p>
+                <div class="plan-rows" id="planRows">
+                    @foreach($plans as $plan)
+                    @php($isPopular = $plan['code'] === $popularPlan)
+                    <label class="plan-row {{ $selectedPlan === $plan['code'] ? 'is-selected' : '' }}" data-plan="{{ $plan['code'] }}">
+                        <input type="radio" name="plan" value="{{ $plan['code'] }}" {{ $selectedPlan === $plan['code'] ? 'checked' : '' }}>
+                        <div class="plan-radio"></div>
+                        <div class="plan-row-body">
+                            <div class="plan-row-top">
+                                <span class="plan-row-name">{{ $plan['name'] }}</span>
+                                @if($isPopular)<span class="plan-row-popular">Popular</span>@endif
+                            </div>
+                            <div class="plan-row-tags">
+                                <span class="plan-row-tag">{{ $plan['duration_label'] }}</span>
+                                <span class="plan-row-tag">{{ $plan['post_limit_label'] }}</span>
+                            </div>
+                        </div>
+                        <div class="plan-row-price">{{ $plan['price_label'] }}<small>USD</small></div>
+                        <div class="plan-info-btn" tabindex="0" role="button" aria-label="Plan details" onclick="event.preventDefault()">
+                            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>
+                            <div class="plan-tooltip">
+                                <div class="tooltip-head">{{ $plan['name'] }} · {{ $plan['price_label'] }}</div>
+                                <ul>
+                                    @foreach($plan['highlights'] as $h)<li>{{ $h }}</li>@endforeach
+                                    <li>{{ $plan['summary'] }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </label>
+                    @endforeach
                 </div>
-            </div>
+                @error('plan')<div class="field-error">{{ $message }}</div>@enderror
+
+                <hr class="form-divider">
+
+                {{-- Form fields --}}
+                <div class="field-group">
+                    <div class="field-row">
+                        <div>
+                            <label class="field-label">Full Name <span style="color:#ef4444">*</span></label>
+                            <input type="text" name="name" class="field-input @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Your full name" required>
+                            @error('name')<div class="field-error">{{ $message }}</div>@enderror
+                        </div>
+                        <div>
+                            <label class="field-label">Email Address <span style="color:#ef4444">*</span></label>
+                            <input type="email" name="email" class="field-input @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="you@example.com" required>
+                            @error('email')<div class="field-error">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label">Designation / Role <span style="color:#ef4444">*</span></label>
+                        <input type="text" name="designation" class="field-input @error('designation') is-invalid @enderror" value="{{ old('designation') }}" placeholder="e.g. Logistics Manager, Supply Chain Analyst" required>
+                        @error('designation')<div class="field-error">{{ $message }}</div>@enderror
+                    </div>
+                    <div>
+                        <label class="field-label">Short Bio <span style="color:#ef4444">*</span></label>
+                        <textarea name="intro" rows="3" class="field-input @error('intro') is-invalid @enderror" placeholder="Brief background on your experience and expertise." required>{{ old('intro') }}</textarea>
+                        @error('intro')<div class="field-error">{{ $message }}</div>@enderror
+                    </div>
+                    <div>
+                        <label class="field-label">Why do you want to contribute? <span style="color:#ef4444">*</span></label>
+                        <textarea name="reason_for_joining" rows="4" class="field-input @error('reason_for_joining') is-invalid @enderror" placeholder="Tell us what topics you want to write about and the value you want to bring to readers." required>{{ old('reason_for_joining') }}</textarea>
+                        @error('reason_for_joining')<div class="field-error">{{ $message }}</div>@enderror
+                    </div>
+                </div>
+
+                <div class="submit-row">
+                    <button type="submit" class="submit-btn" id="planSubmitBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11z"/></svg>
+                        <span>Continue to Payment</span>
+                    </button>
+                    <p class="submit-note">You'll be taken to secure Payment checkout. Access starts immediately after payment.</p>
+                </div>
+
+            </form>
         </div>
     </div>
-</section>
 
-<section class="bothPadding" style="background:#f8f9fc;">
-    <div class="container">
-        <div class="row justify-content-center g-5">
-
-            <div class="col-lg-4">
-                <h5 style="font-weight:700;color:#181a3f;margin-bottom:1.5rem;">Why Write For Us?</h5>
-
-                <div class="wfu-benefit">
-                    <div class="wfu-benefit-icon">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
-                    </div>
-                    <div>
-                        <h6>Share your knowledge with a wider audience</h6>
-                        <p>Reach logistics professionals, students, and businesses looking for practical insights.</p>
-                    </div>
-                </div>
-
-                <div class="wfu-benefit">
-                    <div class="wfu-benefit-icon">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-                    </div>
-                    <div>
-                        <h6>Build your personal brand</h6>
-                        <p>Get featured on our platform with full author credit and a stronger online presence.</p>
-                    </div>
-                </div>
-
-                <div class="wfu-benefit">
-                    <div class="wfu-benefit-icon">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-                    </div>
-                    <div>
-                        <h6>Contribute to the logistics community</h6>
-                        <p>Help simplify transport and supply chain knowledge for readers across the industry.</p>
-                    </div>
-                </div>
-
-                <div class="wfu-benefit">
-                    <div class="wfu-benefit-icon">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    </div>
-                    <div>
-                        <h6>Establish thought leadership</h6>
-                        <p>Share original ideas, real-world experience, and practical guidance in your domain.</p>
-                    </div>
-                </div>
-
-                <div class="section-divider"></div>
-
-                <div style="background:#eff4ff;border-radius:12px;padding:1.25rem;">
-                    <p style="font-size:.83rem;color:#2563d4;font-weight:600;margin-bottom:.5rem;">What we're looking for</p>
-                    <p style="font-size:.82rem;color:#475569;line-height:1.7;margin:0;">
-                        Logistics trends &amp; innovations · Supply chain strategies · Warehouse management · Transportation &amp; last-mile delivery · Freight forwarding &amp; shipping · Career tips · AI &amp; IoT in logistics
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-7">
-
-                @if(session('success'))
-                    <div class="alert-success-custom mb-4">
-                        <strong>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right:.4rem;vertical-align:-.15em"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
-                            Application Received!
-                        </strong><br>
-                        <span style="font-weight:400;">{{ session('success') }}</span>
-                    </div>
-                @endif
-
-                @if($errors->any())
-                    <div class="alert-danger-custom mb-4">
-                        <ul class="mb-0 ps-3">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
-                    </div>
-                @endif
-
-                <div class="form-card">
-                    <h5 style="font-weight:700;color:#181a3f;margin-bottom:.4rem;">Ready to Contribute?</h5>
-                    <p style="font-size:.875rem;color:#636363;margin-bottom:1.75rem;">Choose a contributor plan, then fill in your details. Paid plans activate your contributor account after successful payment.</p>
-
-                    <form method="POST" action="{{ route('contributor.register.submit') }}">
-                        @csrf
-
-                        <div class="mb-4">
-                            <label class="form-label">Choose Your Contributor Plan <span class="text-danger">*</span></label>
-                            <div class="plan-grid" id="planGrid">
-                                <label class="plan-card {{ old('plan', 'paid_standard') === 'paid_standard' ? 'is-selected' : '' }}">
-                                    <input type="radio" name="plan" value="paid_standard" {{ old('plan', 'paid_standard') === 'paid_standard' ? 'checked' : '' }}>
-                                    <strong>Paid Contributor</strong>
-                                    <span class="price">$50</span>
-                                    <p>One-time payment. Your contributor account is activated after Stripe payment so you can start posting.</p>
-                                </label>
-                                <label class="plan-card {{ old('plan') === 'paid_featured' ? 'is-selected' : '' }}">
-                                    <input type="radio" name="plan" value="paid_featured" {{ old('plan') === 'paid_featured' ? 'checked' : '' }}>
-                                    <strong>Featured Contributor</strong>
-                                    <span class="price">$100</span>
-                                    <p>One-time payment. Includes contributor access plus homepage featured placement for eligible contributor posts.</p>
-                                </label>
-                            </div>
-                            @error('plan')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                        </div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-sm-6">
-                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                                       value="{{ old('name') }}" placeholder="Your full name" required>
-                                @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="col-sm-6">
-                                <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                                       value="{{ old('email') }}" placeholder="you@example.com" required>
-                                @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Designation / Role <span class="text-danger">*</span></label>
-                            <input type="text" name="designation" class="form-control @error('designation') is-invalid @enderror"
-                                   value="{{ old('designation') }}" placeholder="e.g. Logistics Manager, Supply Chain Analyst" required>
-                            @error('designation')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Short Bio <span class="text-danger">*</span></label>
-                            <textarea name="intro" rows="3" class="form-control @error('intro') is-invalid @enderror"
-                                      placeholder="Brief background on your experience and expertise (max 1000 chars)" required>{{ old('intro') }}</textarea>
-                            @error('intro')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label">Why do you want to contribute? <span class="text-danger">*</span></label>
-                            <textarea name="reason_for_joining" rows="4" class="form-control @error('reason_for_joining') is-invalid @enderror"
-                                      placeholder="Tell us what topics you want to write about and the value you'll bring to our readers." required>{{ old('reason_for_joining') }}</textarea>
-                            @error('reason_for_joining')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        </div>
-
-                        <button type="submit" class="btn-submit" id="planSubmitBtn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11z"/></svg>
-                            <span>Submit Application</span>
-                        </button>
-                    </form>
-                </div>
-
-                <div class="mt-4 text-center" style="font-size:.875rem;color:#636363;">
-                    Already a contributor?
-                    <a href="{{ route('contributor.login') }}" style="color:#3882fa;font-weight:600;">Sign in to your dashboard →</a>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</section>
-
+</div>
+</div>
+</div>
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const planCards = document.querySelectorAll('.plan-card');
+(function () {
+    const rows = document.querySelectorAll('.plan-row');
     const submitLabel = document.querySelector('#planSubmitBtn span');
 
-    function syncPlanCards() {
-        let selectedPlan = 'paid_standard';
-        planCards.forEach(card => {
-            const input = card.querySelector('input[type="radio"]');
-            const isSelected = input.checked;
-            card.classList.toggle('is-selected', isSelected);
-            if (isSelected) {
-                selectedPlan = input.value;
+    function sync() {
+        rows.forEach(row => {
+            const input = row.querySelector('input[type="radio"]');
+            const name  = row.querySelector('.plan-row-name');
+            const sel   = input.checked;
+            row.classList.toggle('is-selected', sel);
+            if (sel && submitLabel) {
+                submitLabel.textContent = 'Continue with ' + name.textContent.trim();
             }
         });
-
-        submitLabel.textContent = 'Continue to Payment';
     }
 
-    planCards.forEach(card => {
-        card.addEventListener('click', function () {
+    rows.forEach(row => {
+        row.addEventListener('click', function (e) {
+            if (e.target.closest('.plan-info-btn')) return;
             const input = this.querySelector('input[type="radio"]');
             input.checked = true;
-            syncPlanCards();
+            sync();
         });
     });
 
-    syncPlanCards();
+    sync();
+})();
 </script>
 @endsection

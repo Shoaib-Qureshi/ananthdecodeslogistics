@@ -20,7 +20,7 @@ class PostApproved extends Mailable
 
     public function build()
     {
-        return $this->subject('Your post has been published on Ananth Decodes Logistics')
+        return $this->subject('Your Expert Desk post is now live')
                     ->view('emails.contributor.post-approved');
     }
 }

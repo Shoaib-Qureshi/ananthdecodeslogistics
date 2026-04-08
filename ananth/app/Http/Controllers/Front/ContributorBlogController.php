@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class ContributorBlogController extends Controller
 {
-    // /contributors — guest contributor posts
+    // /expert-desk — guest contributor posts
     public function contributors()
     {
         $posts = ContributorPost::with(['author', 'category'])
@@ -118,7 +118,7 @@ class ContributorBlogController extends Controller
             ->where('status', 1)
             ->where('id', '!=', $post->id)
             ->latest()
-            ->take(3)
+            ->take(8)
             ->get();
 
         return view('blog.show', compact('post', 'related', 'htmlContent', 'tableOfContents', 'readingTime'))->with('seo', [

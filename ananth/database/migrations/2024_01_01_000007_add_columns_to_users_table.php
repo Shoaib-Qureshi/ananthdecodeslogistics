@@ -8,16 +8,39 @@ class AddColumnsToUsersTable extends Migration
 {
     public function up()
     {
+        if (!Schema::hasTable('users')) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
-            $table->string('username')->unique()->nullable()->after('name');
-            $table->string('user_role')->default('user')->after('password'); // admin or user
+            if (!Schema::hasColumn('users', 'username')) {
+                $table->string('username')->unique()->nullable()->after('name');
+            }
+            if (!Schema::hasColumn('users', 'user_role')) {
+                $table->string('user_role')->default('user')->after('password'); // admin or user
+            }
         });
     }
 
     public function down()
     {
+        if (!Schema::hasTable('users')) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['username', 'user_role']);
+            $columns = [];
+
+            if (Schema::hasColumn('users', 'username')) {
+                $columns[] = 'username';
+            }
+            if (Schema::hasColumn('users', 'user_role')) {
+                $columns[] = 'user_role';
+            }
+
+            if ($columns) {
+                $table->dropColumn($columns);
+            }
         });
     }
 }

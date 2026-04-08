@@ -11,7 +11,8 @@
                     <li><a class="mainColor nav-link" href="/">Home</a></li>
                     <li><a class="mainColor nav-link" href="/about-us/">About</a></li>
                     <li><a class="mainColor nav-link" href="/blog/">Blog</a></li>
-                    <li><a class="mainColor nav-link" href="/contributors/">Contributors Blog</a></li>
+                    <li><a class="mainColor nav-link" href="{{ route('contributors.index') }}">The Expert Desk</a></li>
+                    <li class="contributor-mobile-link"><a class="mainColor nav-link" href="{{ route('contributor.login') }}">The Expert Desk Login</a></li>
                     <li><a class="mainColor nav-link" href="/board-insights/">Board Insights</a></li>
                     <li><a class="mainColor nav-link" href="/book-review/">Book Reviews</a></li>
                 </ul>
@@ -19,6 +20,9 @@
         </div>
         <div class="nav-end">
             <div class="right-container">
+                <a href="{{ route('contributor.login') }}" class="menu_secondary_btn" aria-label="The Expert Desk Login" title="The Expert Desk Login">
+                    <i class='bx bx-user-circle' aria-hidden="true"></i>
+                </a>
                 <a href="/contact-us/"><button class="menu_btn">Contact Us</button></a>
             </div>
 

@@ -15,6 +15,7 @@
         <div class="menu_list">
             <ul>
                 <li class="{{ request()->is('admin/dashboard*') ? 'active_tab' : '' }}"><a href="/admin/dashboard/"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
+                <li class="{{ request()->is('admin/profile*') ? 'active_tab' : '' }}"><a href="/admin/profile/"><i class="fas fa-user-cog"></i>My Profile</a></li>
                 <li class="{{ request()->is('admin/add-user*') ? 'active_tab' : '' }}"><a href="/admin/add-user/"><i class="fas fa-plus"></i>Add Author</a></li>
                 <li class="{{ request()->is('admin/users-list*') || request()->is('admin/edit/user/*') ? 'active_tab' : '' }}"><a href="/admin/users-list/"><i class="fas fa-user"></i>Authors List</a></li>
                 <li class="{{ request()->is('admin/create-blog*') ? 'active_tab' : '' }}"><a href="/admin/create-blog/"><i class="fas fa-plus-square"></i>Create Blog</a></li>

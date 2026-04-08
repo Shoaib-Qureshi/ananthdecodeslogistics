@@ -8,6 +8,10 @@ class CreateExecutiveCommitteeTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('executive_committee')) {
+            return;
+        }
+
         Schema::create('executive_committee', function (Blueprint $table) {
             $table->id();
             $table->string('name');

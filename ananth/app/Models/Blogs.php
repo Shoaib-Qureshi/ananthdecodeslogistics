@@ -9,6 +9,10 @@ class Blogs extends Model
 {
     use HasFactory;
     protected $table = 'blogs';
+    protected $casts = [
+        'has_faqs' => 'boolean',
+        'faqs' => 'array',
+    ];
 
     protected array $editorialAuthorNames = [
         'Ananthakrishnan J',

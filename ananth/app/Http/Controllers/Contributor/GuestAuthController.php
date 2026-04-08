@@ -11,7 +11,7 @@ class GuestAuthController extends Controller
     public function showLogin()
     {
         if (Auth::check() && Auth::user()->user_role === 'guest' && Auth::user()->status === 'approved') {
-            return redirect('/dashboard');
+            return redirect()->route('dashboard');
         }
         return view('contributor.login');
     }
@@ -44,7 +44,7 @@ class GuestAuthController extends Controller
             }
 
             $request->session()->regenerate();
-            return redirect('/dashboard');
+            return redirect()->route('dashboard');
         }
 
         return back()->withErrors(['email' => 'Invalid email or password.'])->withInput($request->only('email'));
@@ -55,6 +55,6 @@ class GuestAuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/contributor-login')->with('success', 'You have been logged out.');
+        return redirect()->route('contributor.login')->with('success', 'You have been logged out.');
     }
 }

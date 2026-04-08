@@ -8,6 +8,10 @@ class CreateBoardInsightsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('board_insights')) {
+            return;
+        }
+
         Schema::create('board_insights', function (Blueprint $table) {
             $table->id();
             $table->string('title');

@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\HandlesFaqs;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\ContributorPost;
 use App\Mail\ContributorApproved;
 use App\Mail\ContributorRejected;
 use App\Mail\PostApproved;
 use App\Mail\PostRejected;
 use App\Models\BlogCategories;
+use App\Models\ContributorPost;
+use App\Models\User;
+use App\Support\ContributorPlans;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +21,7 @@ use Illuminate\Support\Str;
 
 class AdminContributorController extends Controller
 {
-    // ── Registrations ────────────────────────────────────────────
+    use HandlesFaqs;
 
     public function registrations(Request $request)
     {
@@ -35,10 +37,12 @@ class AdminContributorController extends Controller
     public function approveRegistration(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $planCode = ContributorPlans::normalize($user->contributor_plan, ContributorPlans::FREE);
+
         $user->update([
             'status' => 'approved',
-            'contributor_plan' => $user->contributor_plan ?: 'free',
-            'payment_status' => $user->payment_status ?: 'unpaid',
+            'contributor_plan' => $planCode,
+            'payment_status' => $user->payment_status ?: ($planCode === ContributorPlans::FREE ? 'complimentary' : 'paid'),
         ]);
 
         Password::sendResetLink(['email' => $user->email]);
@@ -58,7 +62,7 @@ class AdminContributorController extends Controller
 
         $user = User::findOrFail($id);
         $user->update([
-            'status'           => 'rejected',
+            'status' => 'rejected',
             'rejection_reason' => $request->rejection_reason,
         ]);
 
@@ -71,12 +75,10 @@ class AdminContributorController extends Controller
         return redirect()->back()->with('success', "{$user->name} has been rejected.");
     }
 
-    // ── Posts ─────────────────────────────────────────────────────
-
     public function posts(Request $request)
     {
         $status = $request->get('status', 'pending');
-        $posts  = ContributorPost::with(['author', 'category'])
+        $posts = ContributorPost::with(['author', 'category'])
             ->where('status', $status)
             ->latest()
             ->paginate(10);
@@ -97,24 +99,29 @@ class AdminContributorController extends Controller
         $post = ContributorPost::with('author')->findOrFail($id);
 
         $request->validate([
-            'title'            => 'required|string|max:255',
-            'slug'             => 'required|string|max:255',
-            'body'             => 'required|string|min:100',
-            'status'           => 'required|in:pending,published,rejected',
-            'featured_image'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255',
+            'body' => 'required|string|min:100',
+            'status' => 'required|in:pending,published,rejected',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
             'rejection_reason' => 'nullable|string|max:1000',
-            'is_featured'      => 'nullable|in:0,1',
-            'meta_title'       => 'nullable|string|max:255',
+            'is_featured' => 'nullable|in:0,1',
+            'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-            'meta_keywords'    => 'nullable|string|max:1000',
-            'canonical_url'    => 'nullable|string|max:255',
-            'og_image'         => 'nullable|string|max:255',
-            'robots_index'     => 'nullable|in:0,1',
-            'robots_follow'    => 'nullable|in:0,1',
-            'schema_json_ld'   => 'nullable|string',
+            'meta_keywords' => 'nullable|string|max:1000',
+            'canonical_url' => 'nullable|string|max:255',
+            'og_image' => 'nullable|string|max:255',
+            'robots_index' => 'nullable|in:0,1',
+            'robots_follow' => 'nullable|in:0,1',
+            'schema_json_ld' => 'nullable|string',
+            'has_faqs' => 'nullable|boolean',
+            'faq_items' => 'nullable|array|max:20',
+            'faq_items.*.question' => 'nullable|string|max:255',
+            'faq_items.*.answer' => 'nullable|string|max:5000',
         ]);
 
         $category = $this->contributorCategory();
+        $faqPayload = $this->resolveFaqPayload($request);
 
         $imagePath = $post->featured_image;
         if ($request->hasFile('featured_image')) {
@@ -129,26 +136,29 @@ class AdminContributorController extends Controller
         }
 
         $status = $request->status;
+        $isFeatured = $request->boolean('is_featured');
 
         $post->update([
-            'title'            => $request->title,
-            'slug'             => ContributorPost::generateUniqueSlug($request->slug, $post->id),
-            'body'             => $request->body,
-            'category_id'      => $category->id,
-            'featured_image'   => $imagePath,
-            'is_featured'      => $request->boolean('is_featured'),
-            'feature_source_plan' => $request->boolean('is_featured') ? ($post->author->contributor_plan ?: 'free') : null,
-            'status'           => $status,
-            'published_at'     => $status === 'published' ? ($post->published_at ?? now()) : null,
+            'title' => $request->title,
+            'slug' => ContributorPost::generateUniqueSlug($request->slug, $post->id),
+            'body' => $request->body,
+            'category_id' => $category->id,
+            'featured_image' => $imagePath,
+            'is_featured' => $isFeatured,
+            'feature_source_plan' => $isFeatured ? $post->author->contributorPlanCode() : null,
+            'has_faqs' => $faqPayload['has_faqs'],
+            'faqs' => $faqPayload['faqs'],
+            'status' => $status,
+            'published_at' => $status === 'published' ? ($post->published_at ?? now()) : null,
             'rejection_reason' => $status === 'rejected' ? $request->rejection_reason : null,
-            'meta_title'       => $request->meta_title,
+            'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
-            'meta_keywords'    => $request->meta_keywords,
-            'canonical_url'    => $request->canonical_url,
-            'og_image'         => $request->og_image,
-            'robots_index'     => $request->input('robots_index', 1),
-            'robots_follow'    => $request->input('robots_follow', 1),
-            'schema_json_ld'   => $request->schema_json_ld,
+            'meta_keywords' => $request->meta_keywords,
+            'canonical_url' => $request->canonical_url,
+            'og_image' => $request->og_image,
+            'robots_index' => $request->input('robots_index', 1),
+            'robots_follow' => $request->input('robots_follow', 1),
+            'schema_json_ld' => $request->schema_json_ld,
         ]);
 
         return redirect()->route('admin.contributor.posts', ['status' => $status])->with('success', "Post \"{$post->title}\" updated.");
@@ -157,11 +167,13 @@ class AdminContributorController extends Controller
     public function approvePost(Request $request, $id)
     {
         $post = ContributorPost::with('author')->findOrFail($id);
+        $isFeatured = $post->is_featured || $post->author->hasFeaturedContributorPlan();
+
         $post->update([
-            'status'       => 'published',
+            'status' => 'published',
             'published_at' => now(),
-            'is_featured'  => $post->is_featured || $post->author->hasFeaturedContributorPlan(),
-            'feature_source_plan' => ($post->is_featured || $post->author->hasFeaturedContributorPlan()) ? ($post->author->contributor_plan ?: 'free') : null,
+            'is_featured' => $isFeatured,
+            'feature_source_plan' => $isFeatured ? $post->author->contributorPlanCode() : null,
         ]);
 
         try {
@@ -179,7 +191,7 @@ class AdminContributorController extends Controller
 
         $post = ContributorPost::with('author')->findOrFail($id);
         $post->update([
-            'status'           => 'rejected',
+            'status' => 'rejected',
             'rejection_reason' => $request->rejection_reason,
         ]);
 
