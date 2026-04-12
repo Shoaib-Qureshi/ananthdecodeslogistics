@@ -30,7 +30,6 @@ class ContributorRegistrationController extends Controller
         $requestedPlan = $request->query('plan');
         $defaultPlan = ContributorPlans::normalize($requestedPlan, ContributorPlans::STARTER);
 
-        // Ensure it's a public plan
         if (!in_array($defaultPlan, ContributorPlans::publicPlanCodes(), true)) {
             $defaultPlan = ContributorPlans::STARTER;
         }
@@ -62,9 +61,9 @@ class ContributorRegistrationController extends Controller
             'plan' => ['required', Rule::in(ContributorPlans::publicPlanCodes())],
         ]);
 
-        if (!$this->stripeConfigured()) {
+        if (!$this->razorpayConfigured()) {
             return back()->withErrors([
-                'plan' => 'Stripe payment is not configured yet. Please contact the administrator.',
+                'plan' => 'Razorpay payment is not configured yet. Please contact the administrator.',
             ])->withInput();
         }
 
@@ -79,37 +78,122 @@ class ContributorRegistrationController extends Controller
             'reason_for_joining' => $request->reason_for_joining,
             'plan' => $planCode,
             'amount' => $plan['price_usd'],
-            'currency' => 'usd',
+            'currency' => 'USD',
             'status' => 'pending',
         ]);
 
-        $checkoutUrl = $this->createStripeCheckoutSession($payment);
+        $order = $this->createRazorpayOrder($payment);
 
-        if (!$checkoutUrl) {
+        if (!$order) {
             $payment->update(['status' => 'failed']);
 
             return back()->withErrors([
-                'plan' => 'Unable to start Stripe checkout right now. Please try again shortly.',
+                'plan' => 'Unable to start Razorpay checkout right now. Please try again shortly.',
             ])->withInput();
         }
 
-        return redirect()->away($checkoutUrl);
+        $payment = $payment->fresh();
+
+        return view('contributor.checkout', [
+            'payment' => $payment,
+            'plan' => $plan,
+            'checkout' => $this->buildRazorpayCheckoutPayload($payment, $plan, $order),
+        ]);
+    }
+
+    public function paymentVerify(Request $request)
+    {
+        $request->validate([
+            'payment' => 'required|integer',
+            'razorpay_payment_id' => 'required|string|max:255',
+            'razorpay_order_id' => 'required|string|max:255',
+            'razorpay_signature' => 'required|string|max:255',
+        ]);
+
+        $payment = ContributorPayment::findOrFail($request->payment);
+
+        if ($payment->status === 'paid' && $payment->user_id) {
+            return redirect()->route('contributor.payment.success', ['payment' => $payment->id]);
+        }
+
+        if (!$payment->razorpay_order_id || $payment->razorpay_order_id !== $request->razorpay_order_id) {
+            Log::warning('Razorpay order mismatch during contributor payment verification.', [
+                'payment_id' => $payment->id,
+                'stored_order_id' => $payment->razorpay_order_id,
+                'request_order_id' => $request->razorpay_order_id,
+            ]);
+
+            return redirect()->route('contributor.payment.cancel', ['payment' => $payment->id])
+                ->with('error', 'We could not verify your payment session. Please try again.');
+        }
+
+        if (!$this->isValidRazorpayPaymentSignature(
+            $payment->razorpay_order_id,
+            $request->razorpay_payment_id,
+            $request->razorpay_signature,
+            (string) config('services.razorpay.secret')
+        )) {
+            Log::warning('Invalid Razorpay payment signature.', [
+                'payment_id' => $payment->id,
+                'order_id' => $payment->razorpay_order_id,
+                'payment_reference' => $request->razorpay_payment_id,
+            ]);
+
+            return redirect()->route('contributor.payment.cancel', ['payment' => $payment->id])
+                ->with('error', 'Payment verification failed. If your account was charged, please contact support.');
+        }
+
+        $gatewayPayment = $this->fetchRazorpayPayment($request->razorpay_payment_id);
+
+        if (!$gatewayPayment) {
+            return redirect()->route('contributor.payment.cancel', ['payment' => $payment->id])
+                ->with('error', 'We were unable to confirm your payment with Razorpay. Please contact support if the amount was debited.');
+        }
+
+        if (($gatewayPayment['order_id'] ?? null) !== $payment->razorpay_order_id) {
+            Log::warning('Fetched Razorpay payment order mismatch.', [
+                'payment_id' => $payment->id,
+                'stored_order_id' => $payment->razorpay_order_id,
+                'gateway_order_id' => $gatewayPayment['order_id'] ?? null,
+                'gateway_payment_id' => $gatewayPayment['id'] ?? null,
+            ]);
+
+            return redirect()->route('contributor.payment.cancel', ['payment' => $payment->id])
+                ->with('error', 'We could not match your payment to this application. Please contact support.');
+        }
+
+        if (
+            (int) ($gatewayPayment['amount'] ?? 0) !== $this->amountInSubunits($payment->amount) ||
+            strtoupper((string) ($gatewayPayment['currency'] ?? '')) !== strtoupper($payment->currency)
+        ) {
+            Log::warning('Fetched Razorpay payment amount mismatch.', [
+                'payment_id' => $payment->id,
+                'expected_amount' => $this->amountInSubunits($payment->amount),
+                'gateway_amount' => $gatewayPayment['amount'] ?? null,
+                'expected_currency' => strtoupper($payment->currency),
+                'gateway_currency' => $gatewayPayment['currency'] ?? null,
+            ]);
+
+            return redirect()->route('contributor.payment.cancel', ['payment' => $payment->id])
+                ->with('error', 'We could not confirm the payment amount for this application. Please contact support.');
+        }
+
+        $gatewayPayment = $this->captureRazorpayPaymentIfRequired($gatewayPayment, $payment);
+
+        if (!$gatewayPayment || ($gatewayPayment['status'] ?? null) !== 'captured') {
+            return redirect()->route('contributor.payment.cancel', ['payment' => $payment->id])
+                ->with('error', 'Your payment is not marked as captured yet. Please contact support if the amount was debited.');
+        }
+
+        $payment = $this->finalizePaidContributor($payment, $gatewayPayment, $request->razorpay_signature);
+
+        return redirect()->route('contributor.payment.success', ['payment' => $payment->id]);
     }
 
     public function paymentSuccess(Request $request)
     {
-        $sessionId = $request->get('session_id');
-        abort_if(!$sessionId, 404);
-
-        $session = $this->fetchStripeCheckoutSession($sessionId);
-        abort_if(!$session, 404);
-
-        $payment = ContributorPayment::where('stripe_checkout_session_id', $sessionId)->first();
-        abort_if(!$payment, 404);
-
-        if (($session['payment_status'] ?? null) === 'paid') {
-            $payment = $this->finalizePaidContributor($payment, $session);
-        }
+        $payment = ContributorPayment::find($request->get('payment'));
+        abort_if(!$payment || $payment->status !== 'paid', 404);
 
         return view('contributor.payment-success', [
             'payment' => $payment,
@@ -121,7 +205,7 @@ class ContributorRegistrationController extends Controller
     {
         $payment = ContributorPayment::find($request->get('payment'));
 
-        if ($payment && $payment->status === 'pending') {
+        if ($payment && in_array($payment->status, ['pending', 'created'], true)) {
             $payment->update(['status' => 'cancelled']);
         }
 
@@ -131,13 +215,13 @@ class ContributorRegistrationController extends Controller
         ]);
     }
 
-    public function stripeWebhook(Request $request)
+    public function razorpayWebhook(Request $request)
     {
         $payload = $request->getContent();
-        $signature = $request->header('Stripe-Signature');
-        $secret = config('services.stripe.webhook_secret');
+        $signature = $request->header('X-Razorpay-Signature');
+        $secret = config('services.razorpay.webhook_secret');
 
-        if (!$secret || !$signature || !$this->isValidStripeSignature($payload, $signature, $secret)) {
+        if (!$secret || !$signature || !$this->isValidRazorpayWebhookSignature($payload, $signature, $secret)) {
             return response()->json(['message' => 'Invalid signature.'], 400);
         }
 
@@ -146,16 +230,29 @@ class ContributorRegistrationController extends Controller
             return response()->json(['message' => 'Invalid payload.'], 400);
         }
 
-        if (($event['type'] ?? null) === 'checkout.session.completed') {
-            $session = $event['data']['object'] ?? [];
-            $sessionId = $session['id'] ?? null;
+        $eventName = $event['event'] ?? null;
+        $gatewayPayment = $event['payload']['payment']['entity'] ?? [];
+        $orderId = $gatewayPayment['order_id'] ?? ($event['payload']['order']['entity']['id'] ?? null);
 
-            if ($sessionId) {
-                $payment = ContributorPayment::where('stripe_checkout_session_id', $sessionId)->first();
-                if ($payment) {
-                    $this->finalizePaidContributor($payment, $session);
-                }
-            }
+        if (!$orderId || !in_array($eventName, ['payment.authorized', 'payment.captured', 'order.paid'], true)) {
+            return response()->json(['received' => true]);
+        }
+
+        $payment = ContributorPayment::where('razorpay_order_id', $orderId)->first();
+        if (!$payment) {
+            return response()->json(['received' => true]);
+        }
+
+        if (($eventName === 'payment.authorized') && !empty($gatewayPayment)) {
+            $gatewayPayment = $this->captureRazorpayPaymentIfRequired($gatewayPayment, $payment);
+        }
+
+        if (empty($gatewayPayment) && !empty($event['payload']['payment']['entity']['id'])) {
+            $gatewayPayment = $this->fetchRazorpayPayment($event['payload']['payment']['entity']['id']);
+        }
+
+        if (is_array($gatewayPayment) && ($gatewayPayment['status'] ?? null) === 'captured') {
+            $this->finalizePaidContributor($payment, $gatewayPayment);
         }
 
         return response()->json(['received' => true]);
@@ -172,7 +269,7 @@ class ContributorRegistrationController extends Controller
             'payment_status' => $user->payment_status ?: ($planCode === ContributorPlans::FREE ? 'complimentary' : 'paid'),
         ]);
 
-        $status = Password::sendResetLink(['email' => $user->email]);
+        Password::sendResetLink(['email' => $user->email]);
 
         try {
             Mail::to($user->email)->send(new ContributorApproved($user));
@@ -202,33 +299,28 @@ class ContributorRegistrationController extends Controller
         return redirect()->back()->with('success', "Contributor {$user->name} rejected.");
     }
 
-    private function stripeConfigured(): bool
+    private function razorpayConfigured(): bool
     {
-        return (bool) config('services.stripe.secret');
+        return (bool) config('services.razorpay.key') && (bool) config('services.razorpay.secret');
     }
 
-    private function createStripeCheckoutSession(ContributorPayment $payment): ?string
+    private function createRazorpayOrder(ContributorPayment $payment): ?array
     {
-        $plan = ContributorPlans::get($payment->plan, ContributorPlans::STARTER);
-
-        $response = Http::withToken(config('services.stripe.secret'))
-            ->asForm()
-            ->post('https://api.stripe.com/v1/checkout/sessions', [
-                'mode' => 'payment',
-                'success_url' => route('contributor.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('contributor.payment.cancel') . '?payment=' . $payment->id,
-                'customer_email' => $payment->email,
-                'metadata[payment_id]' => $payment->id,
-                'payment_method_types[0]' => 'card',
-                'line_items[0][price_data][currency]' => $payment->currency,
-                'line_items[0][price_data][unit_amount]' => $payment->amount * 100,
-                'line_items[0][price_data][product_data][name]' => ContributorPlans::stripeName($plan['code']),
-                'line_items[0][price_data][product_data][description]' => ContributorPlans::stripeDescription($plan['code']),
-                'line_items[0][quantity]' => 1,
-            ]);
+        $response = Http::withBasicAuth(
+            config('services.razorpay.key'),
+            config('services.razorpay.secret')
+        )->post('https://api.razorpay.com/v1/orders', [
+            'amount' => $this->amountInSubunits($payment->amount),
+            'currency' => strtoupper($payment->currency),
+            'receipt' => 'cp_' . $payment->id,
+            'notes' => [
+                'payment_id' => (string) $payment->id,
+                'plan' => $payment->plan,
+            ],
+        ]);
 
         if ($response->failed()) {
-            Log::error('Stripe checkout session creation failed.', [
+            Log::error('Razorpay order creation failed.', [
                 'payment_id' => $payment->id,
                 'response' => $response->body(),
             ]);
@@ -236,27 +328,66 @@ class ContributorRegistrationController extends Controller
             return null;
         }
 
-        $session = $response->json();
-        $payment->update([
-            'stripe_checkout_session_id' => $session['id'] ?? null,
-            'status' => 'created',
-        ]);
+        $order = $response->json();
 
-        return $session['url'] ?? null;
-    }
+        if (empty($order['id'])) {
+            Log::error('Razorpay order response missing order id.', [
+                'payment_id' => $payment->id,
+                'response' => $order,
+            ]);
 
-    private function fetchStripeCheckoutSession(string $sessionId): ?array
-    {
-        if (!$this->stripeConfigured()) {
             return null;
         }
 
-        $response = Http::withToken(config('services.stripe.secret'))
-            ->get('https://api.stripe.com/v1/checkout/sessions/' . $sessionId);
+        $payment->update([
+            'razorpay_order_id' => $order['id'],
+            'status' => 'created',
+        ]);
+
+        return $order;
+    }
+
+    private function buildRazorpayCheckoutPayload(ContributorPayment $payment, array $plan, array $order): array
+    {
+        return [
+            'key' => config('services.razorpay.key'),
+            'amount' => (int) ($order['amount'] ?? $this->amountInSubunits($payment->amount)),
+            'currency' => strtoupper($order['currency'] ?? $payment->currency),
+            'name' => config('services.razorpay.company_name', config('app.name')),
+            'description' => ContributorPlans::checkoutName($plan['code']),
+            'image' => asset('img/site/ananth-logo.svg'),
+            'order_id' => $order['id'] ?? $payment->razorpay_order_id,
+            'prefill' => [
+                'name' => $payment->name,
+                'email' => $payment->email,
+            ],
+            'notes' => [
+                'payment_id' => (string) $payment->id,
+                'plan' => $payment->plan,
+            ],
+            'theme' => [
+                'color' => '#3882fa',
+            ],
+            'retry' => [
+                'enabled' => true,
+            ],
+        ];
+    }
+
+    private function fetchRazorpayPayment(string $paymentId): ?array
+    {
+        if (!$this->razorpayConfigured()) {
+            return null;
+        }
+
+        $response = Http::withBasicAuth(
+            config('services.razorpay.key'),
+            config('services.razorpay.secret')
+        )->get('https://api.razorpay.com/v1/payments/' . $paymentId);
 
         if ($response->failed()) {
-            Log::warning('Unable to fetch Stripe checkout session.', [
-                'session_id' => $sessionId,
+            Log::warning('Unable to fetch Razorpay payment.', [
+                'payment_reference' => $paymentId,
                 'response' => $response->body(),
             ]);
 
@@ -266,9 +397,73 @@ class ContributorRegistrationController extends Controller
         return $response->json();
     }
 
-    private function finalizePaidContributor(ContributorPayment $payment, array $session): ContributorPayment
+    private function captureRazorpayPaymentIfRequired(array $gatewayPayment, ContributorPayment $payment): ?array
+    {
+        $status = $gatewayPayment['status'] ?? null;
+
+        if ($status === 'captured') {
+            return $gatewayPayment;
+        }
+
+        if ($status !== 'authorized' || empty($gatewayPayment['id'])) {
+            Log::warning('Razorpay payment is not capturable.', [
+                'payment_id' => $payment->id,
+                'gateway_payment_id' => $gatewayPayment['id'] ?? null,
+                'gateway_status' => $status,
+            ]);
+
+            return null;
+        }
+
+        $capturedPayment = $this->captureRazorpayPayment((string) $gatewayPayment['id'], $payment);
+
+        if ($capturedPayment) {
+            return $capturedPayment;
+        }
+
+        return $this->fetchRazorpayPayment((string) $gatewayPayment['id']);
+    }
+
+    private function captureRazorpayPayment(string $paymentId, ContributorPayment $payment): ?array
+    {
+        $response = Http::withBasicAuth(
+            config('services.razorpay.key'),
+            config('services.razorpay.secret')
+        )->post('https://api.razorpay.com/v1/payments/' . $paymentId . '/capture', [
+            'amount' => $this->amountInSubunits($payment->amount),
+            'currency' => strtoupper($payment->currency),
+        ]);
+
+        if ($response->failed()) {
+            Log::warning('Unable to capture Razorpay payment.', [
+                'payment_id' => $payment->id,
+                'gateway_payment_id' => $paymentId,
+                'response' => $response->body(),
+            ]);
+
+            return null;
+        }
+
+        return $response->json();
+    }
+
+    private function finalizePaidContributor(ContributorPayment $payment, array $gatewayPayment, ?string $signature = null): ContributorPayment
     {
         if ($payment->status === 'paid' && $payment->user_id) {
+            $updates = [];
+
+            if (!$payment->razorpay_payment_id && !empty($gatewayPayment['id'])) {
+                $updates['razorpay_payment_id'] = $gatewayPayment['id'];
+            }
+
+            if (!$payment->razorpay_signature && $signature) {
+                $updates['razorpay_signature'] = $signature;
+            }
+
+            if ($updates) {
+                $payment->update($updates);
+            }
+
             return $payment->fresh();
         }
 
@@ -287,7 +482,6 @@ class ContributorRegistrationController extends Controller
                 'status' => 'approved',
                 'contributor_plan' => $planCode,
                 'payment_status' => 'paid',
-                'stripe_customer_id' => $session['customer'] ?? null,
                 'activated_at' => now(),
                 'designation' => $payment->designation,
                 'intro' => $payment->intro,
@@ -298,7 +492,6 @@ class ContributorRegistrationController extends Controller
                 'status' => 'approved',
                 'contributor_plan' => $planCode,
                 'payment_status' => 'paid',
-                'stripe_customer_id' => $session['customer'] ?? $user->stripe_customer_id,
                 'activated_at' => now(),
                 'designation' => $payment->designation ?: $user->designation,
                 'intro' => $payment->intro ?: $user->intro,
@@ -310,8 +503,9 @@ class ContributorRegistrationController extends Controller
             'user_id' => $user->id,
             'plan' => $planCode,
             'status' => 'paid',
-            'stripe_payment_intent_id' => $session['payment_intent'] ?? $payment->stripe_payment_intent_id,
-            'stripe_customer_id' => $session['customer'] ?? $payment->stripe_customer_id,
+            'razorpay_order_id' => $gatewayPayment['order_id'] ?? $payment->razorpay_order_id,
+            'razorpay_payment_id' => $gatewayPayment['id'] ?? $payment->razorpay_payment_id,
+            'razorpay_signature' => $signature ?: $payment->razorpay_signature,
             'activated_at' => now(),
         ]);
 
@@ -346,32 +540,22 @@ class ContributorRegistrationController extends Controller
         return $username;
     }
 
-    private function isValidStripeSignature(string $payload, string $signatureHeader, string $secret): bool
+    private function amountInSubunits(int $amount): int
     {
-        $parts = [];
-        foreach (explode(',', $signatureHeader) as $segment) {
-            [$key, $value] = array_pad(explode('=', $segment, 2), 2, null);
-            if ($key && $value) {
-                $parts[trim($key)][] = trim($value);
-            }
-        }
+        return $amount * 100;
+    }
 
-        $timestamp = $parts['t'][0] ?? null;
-        $signatures = $parts['v1'] ?? [];
+    private function isValidRazorpayPaymentSignature(string $orderId, string $paymentId, string $signature, string $secret): bool
+    {
+        $expected = hash_hmac('sha256', $orderId . '|' . $paymentId, $secret);
 
-        if (!$timestamp || empty($signatures)) {
-            return false;
-        }
+        return hash_equals($expected, $signature);
+    }
 
-        $signedPayload = $timestamp . '.' . $payload;
-        $expected = hash_hmac('sha256', $signedPayload, $secret);
+    private function isValidRazorpayWebhookSignature(string $payload, string $signature, string $secret): bool
+    {
+        $expected = hash_hmac('sha256', $payload, $secret);
 
-        foreach ($signatures as $signature) {
-            if (hash_equals($expected, $signature)) {
-                return true;
-            }
-        }
-
-        return false;
+        return hash_equals($expected, $signature);
     }
 }

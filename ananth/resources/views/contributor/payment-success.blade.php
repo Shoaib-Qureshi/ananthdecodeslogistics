@@ -1,7 +1,7 @@
 @extends('layouts.front')
 @section('title', 'Expert Desk Payment Success - Ananth Decodes Logistics')
 @section('description', 'Your Expert Desk payment was received successfully.')
-@section('url', route('contributor.payment.success', ['session_id' => request('session_id')]))
+@section('url', route('contributor.payment.success', ['payment' => request('payment')]))
 @section('img', asset('img/site-banner.jpg'))
 
 @section('styles')

@@ -168,6 +168,12 @@
         <div class="paymentStatusWrap">
             <div class="paymentStatusCard text-center">
                 <div class="paymentStatusInner">
+                    @if(session('error'))
+                        <div style="margin-bottom:1.4rem;padding:.9rem 1rem;border-radius:16px;background:rgba(239,68,68,.12);border:1px solid rgba(248,113,113,.28);color:#fff;text-align:left;">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     <div class="paymentStatusBadge">
                         <span class="paymentStatusDot"></span>
                         Checkout Cancelled

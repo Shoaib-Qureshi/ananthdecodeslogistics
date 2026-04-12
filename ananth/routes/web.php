@@ -131,11 +131,13 @@ Route::post('password/reset', function(\Illuminate\Http\Request $request) {
 Route::get('expert-desk/apply', [ContributorRegistrationController::class, 'showForm'])->name('contributor.register');
 Route::post('expert-desk/apply', [ContributorRegistrationController::class, 'submit'])->name('contributor.register.submit');
 Route::get('write-for-us', [ContributorRegistrationController::class, 'showWriteForUs'])->name('write-for-us');
+Route::post('expert-desk/payment/verify', [ContributorRegistrationController::class, 'paymentVerify'])->name('contributor.payment.verify');
 Route::get('expert-desk/payment/success', [ContributorRegistrationController::class, 'paymentSuccess'])->name('contributor.payment.success');
 Route::get('expert-desk/payment/cancel', [ContributorRegistrationController::class, 'paymentCancel'])->name('contributor.payment.cancel');
+Route::post('contributor/payment/verify', [ContributorRegistrationController::class, 'paymentVerify']);
 Route::get('contributor/payment/success', [ContributorRegistrationController::class, 'paymentSuccess']);
 Route::get('contributor/payment/cancel', [ContributorRegistrationController::class, 'paymentCancel']);
-Route::post('stripe/webhook', [ContributorRegistrationController::class, 'stripeWebhook'])->name('stripe.webhook');
+Route::post('razorpay/webhook', [ContributorRegistrationController::class, 'razorpayWebhook'])->name('razorpay.webhook');
 
 // ─── Guest Auth ───────────────────────────────────────────────────────────
 Route::get('expert-desk/login', [GuestAuthController::class, 'showLogin'])->name('contributor.login');

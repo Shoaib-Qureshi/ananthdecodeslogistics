@@ -146,5 +146,44 @@
     </section>
     @endif
 
+    <section class="bothPadding writeForUsSection">
+        <div class="container">
+            <div class="writeForUsPanel">
+                <div class="row align-items-center">
+                    <div class="col-lg-7">
+                        <div class="writeForUsContent">
+                            <span class="tinyTitle">WRITE FOR US</span>
+                            <h3>Have a perspective worth sharing on <span>The Expert Desk</span>?</h3>
+                            <p>We publish thoughtful voices across logistics, supply chain, freight, technology, and leadership. Start with the Write for Us page or go straight to the application when you are ready.</p>
+                            <div class="writeForUsActions">
+                                <a href="{{ route('write-for-us') }}" class="siteBtn writeForUsBtn">Write for Us</a>
+                                <a href="{{ route('contributor.register') }}" class="writeForUsLink">
+                                    Apply to The Expert Desk
+                                    <i class='bx bx-right-arrow-alt'></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="writeForUsHighlights">
+                            <div class="writeForUsHighlight">
+                                <span>Focused readership</span>
+                                <p>Reach professionals who care about practical logistics and supply chain insight.</p>
+                            </div>
+                            <div class="writeForUsHighlight">
+                                <span>Author-first publishing</span>
+                                <p>Your articles are published with your name, profile, and professional context.</p>
+                            </div>
+                            <div class="writeForUsHighlight">
+                                <span>Editorial review</span>
+                                <p>Every submission goes through a clear review flow before it goes live.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
 @endsection

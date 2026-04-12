@@ -21,7 +21,6 @@ class User extends Authenticatable
         'status',
         'contributor_plan',
         'payment_status',
-        'stripe_customer_id',
         'activated_at',
         'designation',
         'intro',

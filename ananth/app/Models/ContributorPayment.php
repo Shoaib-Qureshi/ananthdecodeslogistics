@@ -20,9 +20,9 @@ class ContributorPayment extends Model
         'amount',
         'currency',
         'status',
-        'stripe_checkout_session_id',
-        'stripe_payment_intent_id',
-        'stripe_customer_id',
+        'razorpay_order_id',
+        'razorpay_payment_id',
+        'razorpay_signature',
         'activated_at',
     ];
 

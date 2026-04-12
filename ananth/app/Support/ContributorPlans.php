@@ -30,8 +30,8 @@ final class ContributorPlans
                     'Unlimited submissions',
                     'No automatic homepage featuring',
                 ],
-                'stripe_name' => 'Complimentary Contributor Access',
-                'stripe_description' => 'Internal-only complimentary contributor access.',
+                'checkout_name' => 'Complimentary Contributor Access',
+                'checkout_description' => 'Internal-only complimentary contributor access.',
                 'success_label' => 'Complimentary Contributor',
                 'success_note' => 'Your contributor account is active with complimentary internal access.',
                 'renew_cta' => 'Upgrade Plan',
@@ -54,8 +54,8 @@ final class ContributorPlans
                     'Co-branded LinkedIn and X promotion',
                     'Reach a focused logistics audience',
                 ],
-                'stripe_name' => 'Starter Contributor Access',
-                'stripe_description' => 'Three-month Expert Desk access with up to 3 article submissions.',
+                'checkout_name' => 'Starter Contributor Access',
+                'checkout_description' => 'Three-month Expert Desk access with up to 3 article submissions.',
                 'success_label' => 'Starter Contributor - $50',
                 'success_note' => 'Your Starter Contributor access is active for 3 months and includes up to 3 article submissions.',
                 'renew_cta' => 'Renew or Upgrade',
@@ -78,8 +78,8 @@ final class ContributorPlans
                     'Newsletter feature eligibility',
                     'Branding support from the editorial team',
                 ],
-                'stripe_name' => 'Growth Contributor Access',
-                'stripe_description' => 'Six-month Expert Desk access with up to 8 article submissions.',
+                'checkout_name' => 'Growth Contributor Access',
+                'checkout_description' => 'Six-month Expert Desk access with up to 8 article submissions.',
                 'success_label' => 'Growth Contributor - $100',
                 'success_note' => 'Your Growth Contributor access is active for 6 months and includes up to 8 article submissions. Extended promotional benefits are coordinated manually by the editorial team.',
                 'renew_cta' => 'Renew or Upgrade',
@@ -102,8 +102,8 @@ final class ContributorPlans
                     'Homepage featured placement eligibility',
                     'Spotlight and report collaboration opportunities',
                 ],
-                'stripe_name' => 'Authority Contributor Access',
-                'stripe_description' => 'Twelve-month Expert Desk access with unlimited fair-use submissions and homepage featured eligibility.',
+                'checkout_name' => 'Authority Contributor Access',
+                'checkout_description' => 'Twelve-month Expert Desk access with unlimited fair-use submissions and homepage featured eligibility.',
                 'success_label' => 'Authority Contributor - $180',
                 'success_note' => 'Your Authority Contributor access is active for 12 months, supports unlimited fair-use submissions, and makes approved posts eligible for homepage featured placement.',
                 'renew_cta' => 'Renew Authority Access',
@@ -178,14 +178,14 @@ final class ContributorPlans
         return (string) static::get($code)['price_label'];
     }
 
-    public static function stripeName(?string $code): string
+    public static function checkoutName(?string $code): string
     {
-        return (string) static::get($code)['stripe_name'];
+        return (string) static::get($code)['checkout_name'];
     }
 
-    public static function stripeDescription(?string $code): string
+    public static function checkoutDescription(?string $code): string
     {
-        return (string) static::get($code)['stripe_description'];
+        return (string) static::get($code)['checkout_description'];
     }
 
     public static function successLabel(?string $code): string
