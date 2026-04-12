@@ -154,7 +154,7 @@ class AdminController extends Controller
         $user->username = $uniqueUsername;
         $user->password = Hash::make("345hysdygYGTYg5!237");
         $user->user_role = $request->account_type === 'contributor' ? 'guest' : 'author';
-        $user->status = $request->account_type === 'contributor' ? 'approved' : null;
+        $user->status = $request->account_type === 'contributor' ? 'approved' : 'approved';
         $user->contributor_plan = $request->account_type === 'contributor' ? $selectedPlan : null;
         $user->payment_status = $request->account_type === 'contributor'
             ? ($selectedPlan === ContributorPlans::FREE ? 'complimentary' : 'paid')
