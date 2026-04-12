@@ -38,7 +38,7 @@ class AdminController extends Controller
 	Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('admin/tieup-private-login/');
+        return redirect()->route('showAdminLogin');
     } 
 
     public function login(Request $request)

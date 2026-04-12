@@ -55,7 +55,7 @@
                                 <select name="contributor_plan">
                                     @foreach($contributorPlans as $plan)
                                         <option value="{{ $plan['code'] }}" {{ $plan['code'] === \App\Support\ContributorPlans::FREE ? 'selected' : '' }}>
-                                            {{ $plan['admin_name'] }}{{ $plan['price_usd'] > 0 ? ' - ' . $plan['price_label'] : '' }}
+                                            {{ $plan['admin_name'] }}{{ $plan['price_inr'] > 0 ? ' - ' . $plan['price_label'] : '' }}
                                         </option>
                                     @endforeach
                                 </select>
