@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Contributor;
 use App\Http\Controllers\Controller;
 use App\Mail\ContributorApproved;
 use App\Mail\ContributorRejected;
+use App\Mail\NewRegistrationAdminNotification;
 use App\Models\ContributorPayment;
 use App\Models\User;
 use App\Support\ContributorPlans;
@@ -79,8 +80,8 @@ class ContributorRegistrationController extends Controller
             'intro' => $request->intro,
             'reason_for_joining' => $request->reason_for_joining,
             'plan' => $planCode,
-            'amount' => $plan['price_usd'],
-            'currency' => 'USD',
+            'amount' => $plan['price_inr'],
+            'currency' => 'INR',
             'status' => 'pending',
         ]);
 
@@ -524,6 +525,16 @@ class ContributorRegistrationController extends Controller
             Mail::to($user->email)->send(new ContributorApproved($user));
         } catch (\Throwable $exception) {
             Log::warning('Failed sending contributor access email.', [
+                'user_id' => $user->id,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+
+        try {
+            $adminEmail = config('mail.admin_email', 'admin@ananthdecodeslogistics.com');
+            Mail::to($adminEmail)->send(new NewRegistrationAdminNotification($user));
+        } catch (\Throwable $exception) {
+            Log::warning('Failed sending new registration admin notification.', [
                 'user_id' => $user->id,
                 'error' => $exception->getMessage(),
             ]);

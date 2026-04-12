@@ -163,7 +163,7 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
         <hr class="info-divider">
 
         <div class="info-trust">
-            <div class="trust-chip"><strong>Secure checkout</strong><span>Payment USD · instant activation</span></div>
+            <div class="trust-chip"><strong>Secure checkout</strong><span>Payment INR · instant activation</span></div>
             <div class="trust-chip"><strong>3 clear plans</strong><span>Defined windows &amp; post caps</span></div>
             <div class="trust-chip"><strong>Keep your posts</strong><span>Profile stays after expiry</span></div>
             <div class="trust-chip"><strong>No hidden fees</strong><span>One payment, full access</span></div>
@@ -203,7 +203,7 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
                                 <span class="plan-row-tag">{{ $plan['post_limit_label'] }}</span>
                             </div>
                         </div>
-                        <div class="plan-row-price">{{ $plan['price_label'] }}<small>USD</small></div>
+                        <div class="plan-row-price">{{ $plan['price_label'] }}<small>INR</small></div>
                         <div class="plan-info-btn" tabindex="0" role="button" aria-label="Plan details" onclick="event.preventDefault()">
                             <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>
                             <div class="plan-tooltip">
@@ -247,8 +247,8 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
                                 <div class="phone-field-wrap @error('phone') is-invalid @enderror">
                                     <div class="country-select" id="countrySelect">
                                         <button type="button" class="country-trigger" id="countryTrigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Select country code">
-                                            <span class="country-flag" id="selectedFlag">🇺🇸</span>
-                                            <span class="country-code" id="selectedCode">+1</span>
+                                            <span class="country-flag" id="selectedFlag">🇮🇳</span>
+                                            <span class="country-code" id="selectedCode">+91</span>
                                             <svg class="country-chevron" width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>
                                         </button>
                                         <div class="country-dropdown" id="countryDropdown" hidden role="listbox" aria-label="Country codes">
@@ -258,8 +258,8 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
                                             <ul class="country-list" id="countryList"></ul>
                                         </div>
                                     </div>
-                                    <input type="hidden" name="phone_country_code" id="phoneCountryCode" value="+1">
-                                    <input type="tel" name="phone" class="phone-number-input" id="phoneNumberInput" value="{{ old('phone') }}" placeholder="(555) 000-0000" inputmode="tel" autocomplete="tel-national">
+                                    <input type="hidden" name="phone_country_code" id="phoneCountryCode" value="+91">
+                                    <input type="tel" name="phone" class="phone-number-input" id="phoneNumberInput" value="{{ old('phone') }}" placeholder="98765 43210" inputmode="tel" autocomplete="tel-national">
                                 </div>
                                 @error('phone')<div class="field-error">{{ $message }}</div>@enderror
                             </div>
@@ -395,13 +395,13 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
         {code:'DZ',dial:'+213',flag:'🇩🇿',name:'Algeria'},
         {code:'TN',dial:'+216',flag:'🇹🇳',name:'Tunisia'},
     ].sort((a, b) => {
-        // US always first, rest alphabetical
-        if (a.code === 'US') return -1;
-        if (b.code === 'US') return 1;
+        // India always first, rest alphabetical
+        if (a.code === 'IN') return -1;
+        if (b.code === 'IN') return 1;
         return a.name.localeCompare(b.name);
     });
 
-    let selected = COUNTRIES[0]; // US default
+    let selected = COUNTRIES[0]; // India default
     const trigger    = document.getElementById('countryTrigger');
     const dropdown   = document.getElementById('countryDropdown');
     const searchEl   = document.getElementById('countrySearch');
