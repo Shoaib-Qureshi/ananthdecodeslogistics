@@ -210,9 +210,18 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
                         </div>
                     </div>
                     <div>
-                        <label class="field-label">Designation / Role <span style="color:#ef4444">*</span></label>
-                        <input type="text" name="designation" class="field-input @error('designation') is-invalid @enderror" value="{{ old('designation') }}" placeholder="e.g. Logistics Manager, Supply Chain Analyst" required>
-                        @error('designation')<div class="field-error">{{ $message }}</div>@enderror
+                        <div class="field-row">
+                            <div>
+                                <label class="field-label">Designation / Role <span style="color:#ef4444">*</span></label>
+                                <input type="text" name="designation" class="field-input @error('designation') is-invalid @enderror" value="{{ old('designation') }}" placeholder="e.g. Logistics Manager, Supply Chain Analyst" required>
+                                @error('designation')<div class="field-error">{{ $message }}</div>@enderror
+                            </div>
+                            <div>
+                                <label class="field-label">Phone Number</label>
+                                <input type="tel" name="phone" class="field-input @error('phone') is-invalid @enderror" value="{{ old('phone') }}" placeholder="e.g. +91 98765 43210" pattern="[0-9+()\\-\\s]*" inputmode="tel">
+                                @error('phone')<div class="field-error">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <label class="field-label">Short Bio <span style="color:#ef4444">*</span></label>

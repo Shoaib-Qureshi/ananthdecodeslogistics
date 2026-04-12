@@ -55,6 +55,7 @@ class ContributorRegistrationController extends Controller
                     }
                 },
             ],
+            'phone' => 'nullable|string|max:30',
             'designation' => 'required|string|max:255',
             'intro' => 'required|string|max:1000',
             'reason_for_joining' => 'required|string|max:2000',
@@ -73,6 +74,7 @@ class ContributorRegistrationController extends Controller
         $payment = ContributorPayment::create([
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
             'designation' => $request->designation,
             'intro' => $request->intro,
             'reason_for_joining' => $request->reason_for_joining,
@@ -360,6 +362,7 @@ class ContributorRegistrationController extends Controller
             'prefill' => [
                 'name' => $payment->name,
                 'email' => $payment->email,
+                'contact' => $payment->phone,
             ],
             'notes' => [
                 'payment_id' => (string) $payment->id,

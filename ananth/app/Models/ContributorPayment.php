@@ -13,6 +13,7 @@ class ContributorPayment extends Model
         'user_id',
         'name',
         'email',
+        'phone',
         'designation',
         'intro',
         'reason_for_joining',
