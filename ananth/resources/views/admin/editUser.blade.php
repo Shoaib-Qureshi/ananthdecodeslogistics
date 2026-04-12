@@ -60,7 +60,7 @@
                                 <select name="contributor_plan">
                                     @foreach($contributorPlans as $plan)
                                         <option value="{{ $plan['code'] }}" {{ $editUser->contributorPlanCode() === $plan['code'] ? 'selected' : '' }}>
-                                            {{ $plan['admin_name'] }}{{ $plan['price_inr'] > 0 ? ' - ' . $plan['price_label'] : '' }}
+                                            {{ $plan['admin_name'] }}{{ $plan['code'] !== 'free' ? ' - ' . $plan['price_label'] : '' }}
                                         </option>
                                     @endforeach
                                 </select>
