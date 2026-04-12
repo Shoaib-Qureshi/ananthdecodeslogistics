@@ -226,12 +226,14 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
                     <div class="field-row">
                         <div>
                             <label class="field-label">Full Name <span style="color:#ef4444">*</span></label>
-                            <input type="text" name="name" class="field-input @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Your full name" required>
+                            <input type="text" id="fieldName" name="name" class="field-input @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Your full name" autocomplete="name">
+                            <div class="field-error" id="errName" style="display:none"></div>
                             @error('name')<div class="field-error">{{ $message }}</div>@enderror
                         </div>
                         <div>
                             <label class="field-label">Email Address <span style="color:#ef4444">*</span></label>
-                            <input type="email" name="email" class="field-input @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="you@example.com" required>
+                            <input type="email" id="fieldEmail" name="email" class="field-input @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="you@example.com" autocomplete="email">
+                            <div class="field-error" id="errEmail" style="display:none"></div>
                             @error('email')<div class="field-error">{{ $message }}</div>@enderror
                         </div>
                     </div>
@@ -239,12 +241,13 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
                         <div class="field-row">
                             <div>
                                 <label class="field-label">Designation / Role <span style="color:#ef4444">*</span></label>
-                                <input type="text" name="designation" class="field-input @error('designation') is-invalid @enderror" value="{{ old('designation') }}" placeholder="e.g. Logistics Manager, Supply Chain Analyst" required>
+                                <input type="text" id="fieldDesignation" name="designation" class="field-input @error('designation') is-invalid @enderror" value="{{ old('designation') }}" placeholder="e.g. Logistics Manager, Supply Chain Analyst" autocomplete="organization-title">
+                                <div class="field-error" id="errDesignation" style="display:none"></div>
                                 @error('designation')<div class="field-error">{{ $message }}</div>@enderror
                             </div>
                             <div>
                                 <label class="field-label">Phone Number</label>
-                                <div class="phone-field-wrap @error('phone') is-invalid @enderror">
+                                <div class="phone-field-wrap @error('phone') is-invalid @enderror" id="phoneWrap">
                                     <div class="country-select" id="countrySelect">
                                         <button type="button" class="country-trigger" id="countryTrigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Select country code">
                                             <span class="country-flag" id="selectedFlag">🇮🇳</span>
@@ -261,18 +264,21 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
                                     <input type="hidden" name="phone_country_code" id="phoneCountryCode" value="+91">
                                     <input type="tel" name="phone" class="phone-number-input" id="phoneNumberInput" value="{{ old('phone') }}" placeholder="98765 43210" inputmode="tel" autocomplete="tel-national">
                                 </div>
+                                <div class="field-error" id="errPhone" style="display:none"></div>
                                 @error('phone')<div class="field-error">{{ $message }}</div>@enderror
                             </div>
                         </div>
                     </div>
                     <div>
                         <label class="field-label">Short Bio <span style="color:#ef4444">*</span></label>
-                        <textarea name="intro" rows="3" class="field-input @error('intro') is-invalid @enderror" placeholder="Brief background on your experience and expertise." required>{{ old('intro') }}</textarea>
+                        <textarea id="fieldIntro" name="intro" rows="3" class="field-input @error('intro') is-invalid @enderror" placeholder="Brief background on your experience and expertise.">{{ old('intro') }}</textarea>
+                        <div class="field-error" id="errIntro" style="display:none"></div>
                         @error('intro')<div class="field-error">{{ $message }}</div>@enderror
                     </div>
                     <div>
                         <label class="field-label">Why do you want to contribute? <span style="color:#ef4444">*</span></label>
-                        <textarea name="reason_for_joining" rows="4" class="field-input @error('reason_for_joining') is-invalid @enderror" placeholder="Tell us what topics you want to write about and the value you want to bring to readers." required>{{ old('reason_for_joining') }}</textarea>
+                        <textarea id="fieldReason" name="reason_for_joining" rows="4" class="field-input @error('reason_for_joining') is-invalid @enderror" placeholder="Tell us what topics you want to write about and the value you want to bring to readers.">{{ old('reason_for_joining') }}</textarea>
+                        <div class="field-error" id="errReason" style="display:none"></div>
                         @error('reason_for_joining')<div class="field-error">{{ $message }}</div>@enderror
                     </div>
                 </div>
@@ -322,6 +328,129 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
     });
 
     sync();
+})();
+
+/* ── Form validation ── */
+(function () {
+    const form = document.getElementById('apply-form');
+
+    const rules = [
+        {
+            id: 'fieldName',
+            err: 'errName',
+            validate(v) {
+                if (!v) return 'Full name is required.';
+                if (v.length < 2) return 'Name must be at least 2 characters.';
+                if (v.length > 255) return 'Name must be under 255 characters.';
+                if (!/^[\p{L}\s'\-\.]+$/u.test(v)) return 'Name contains invalid characters.';
+                return null;
+            }
+        },
+        {
+            id: 'fieldEmail',
+            err: 'errEmail',
+            validate(v) {
+                if (!v) return 'Email address is required.';
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return 'Please enter a valid email address.';
+                if (v.length > 255) return 'Email must be under 255 characters.';
+                return null;
+            }
+        },
+        {
+            id: 'fieldDesignation',
+            err: 'errDesignation',
+            validate(v) {
+                if (!v) return 'Designation / Role is required.';
+                if (v.length < 2) return 'Designation must be at least 2 characters.';
+                if (v.length > 255) return 'Designation must be under 255 characters.';
+                return null;
+            }
+        },
+        {
+            id: 'phoneNumberInput',
+            err: 'errPhone',
+            wrap: 'phoneWrap',
+            validate(v) {
+                if (!v) return null; // phone is optional
+                const digits = v.replace(/[\s\-\(\)]/g, '');
+                if (!/^\d+$/.test(digits)) return 'Phone number can only contain digits, spaces, hyphens, and parentheses.';
+                if (digits.length < 6) return 'Phone number is too short.';
+                if (digits.length > 15) return 'Phone number is too long (max 15 digits).';
+                return null;
+            }
+        },
+        {
+            id: 'fieldIntro',
+            err: 'errIntro',
+            validate(v) {
+                if (!v) return 'Short bio is required.';
+                if (v.length < 20) return 'Bio must be at least 20 characters.';
+                if (v.length > 1000) return 'Bio must be under 1000 characters.';
+                return null;
+            }
+        },
+        {
+            id: 'fieldReason',
+            err: 'errReason',
+            validate(v) {
+                if (!v) return 'Please tell us why you want to contribute.';
+                if (v.length < 30) return 'Please write at least 30 characters.';
+                if (v.length > 2000) return 'Response must be under 2000 characters.';
+                return null;
+            }
+        },
+    ];
+
+    function showError(rule, msg) {
+        const el = document.getElementById(rule.id);
+        const errEl = document.getElementById(rule.err);
+        const wrap = rule.wrap ? document.getElementById(rule.wrap) : null;
+        if (el) el.classList.add('is-invalid');
+        if (wrap) wrap.classList.add('is-invalid');
+        if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; }
+    }
+
+    function clearError(rule) {
+        const el = document.getElementById(rule.id);
+        const errEl = document.getElementById(rule.err);
+        const wrap = rule.wrap ? document.getElementById(rule.wrap) : null;
+        if (el) el.classList.remove('is-invalid');
+        if (wrap) wrap.classList.remove('is-invalid');
+        if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
+    }
+
+    function validateRule(rule) {
+        const el = document.getElementById(rule.id);
+        if (!el) return true;
+        const msg = rule.validate(el.value.trim());
+        if (msg) { showError(rule, msg); return false; }
+        clearError(rule);
+        return true;
+    }
+
+    // Live validation on blur and input
+    rules.forEach(rule => {
+        const el = document.getElementById(rule.id);
+        if (!el) return;
+        el.addEventListener('blur', () => validateRule(rule));
+        el.addEventListener('input', () => {
+            // Only clear once valid — don't show errors while typing
+            const msg = rule.validate(el.value.trim());
+            if (!msg) clearError(rule);
+        });
+    });
+
+    // Block submit if any rule fails
+    form.addEventListener('submit', function (e) {
+        let valid = true;
+        rules.forEach(rule => { if (!validateRule(rule)) valid = false; });
+        if (!valid) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstErr = form.querySelector('.is-invalid');
+            if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
 })();
 
 /* ── Country code picker ── */
