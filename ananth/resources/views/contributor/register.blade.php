@@ -81,6 +81,32 @@ header{position:sticky;top:0;background:var(--white)!important;z-index:100}
 .field-input.is-invalid{border-color:#ef4444}
 .field-error{font-size:.78rem;color:#ef4444;margin-top:.3rem}
 
+/* Phone field with country picker */
+.phone-field-wrap{display:flex;border:1.5px solid #e2e8f0;border-radius:12px;overflow:visible;transition:.15s;background:#fff;position:relative}
+.phone-field-wrap:focus-within{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.phone-field-wrap.is-invalid{border-color:#ef4444}
+.country-select{position:relative;flex-shrink:0}
+.country-trigger{display:flex;align-items:center;gap:.35rem;padding:.75rem .65rem .75rem .85rem;background:transparent;border:none;border-right:1.5px solid #e2e8f0;cursor:pointer;font-size:.85rem;color:#0f172a;white-space:nowrap;border-radius:0;outline:none;transition:.15s}
+.country-trigger:hover{background:#f8fbff}
+.country-flag{font-size:1.1rem;line-height:1}
+.country-code{font-size:.84rem;font-weight:600;color:#334155}
+.country-chevron{color:#94a3b8;transition:transform .2s}
+.country-trigger[aria-expanded="true"] .country-chevron{transform:rotate(180deg)}
+.country-dropdown{position:absolute;top:calc(100% + 6px);left:0;width:270px;background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;box-shadow:0 16px 40px rgba(15,23,42,.12);z-index:500;overflow:hidden}
+.country-search-wrap{padding:.65rem .75rem;border-bottom:1px solid #f1f5f9}
+.country-search{width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:.5rem .75rem;font-size:.83rem;color:#0f172a;outline:none;background:#f8fbff}
+.country-search:focus{border-color:#3b82f6}
+.country-list{list-style:none;padding:.35rem 0;margin:0;max-height:220px;overflow-y:auto}
+.country-list::-webkit-scrollbar{width:4px}
+.country-list::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:4px}
+.country-item{display:flex;align-items:center;gap:.65rem;padding:.5rem .9rem;cursor:pointer;font-size:.84rem;color:#334155;transition:.1s}
+.country-item:hover,.country-item.is-active{background:#eff6ff;color:#1d4ed8}
+.country-item-flag{font-size:1.05rem;line-height:1;flex-shrink:0}
+.country-item-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.country-item-dial{font-size:.78rem;color:#94a3b8;flex-shrink:0}
+.country-no-results{padding:.75rem .9rem;font-size:.83rem;color:#94a3b8;text-align:center}
+.phone-number-input{flex:1;border:none;border-radius:0;padding:.75rem .95rem;font-size:.92rem;color:#0f172a;background:transparent;outline:none;min-width:0}
+
 /* Divider */
 .form-divider{border:none;border-top:1px solid #f1f5f9;margin:1.5rem 0}
 
@@ -218,7 +244,23 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
                             </div>
                             <div>
                                 <label class="field-label">Phone Number</label>
-                                <input type="tel" name="phone" class="field-input @error('phone') is-invalid @enderror" value="{{ old('phone') }}" placeholder="e.g. +91 98765 43210" pattern="[0-9+()\\-\\s]*" inputmode="tel">
+                                <div class="phone-field-wrap @error('phone') is-invalid @enderror">
+                                    <div class="country-select" id="countrySelect">
+                                        <button type="button" class="country-trigger" id="countryTrigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Select country code">
+                                            <span class="country-flag" id="selectedFlag">🇺🇸</span>
+                                            <span class="country-code" id="selectedCode">+1</span>
+                                            <svg class="country-chevron" width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>
+                                        </button>
+                                        <div class="country-dropdown" id="countryDropdown" hidden role="listbox" aria-label="Country codes">
+                                            <div class="country-search-wrap">
+                                                <input type="text" class="country-search" id="countrySearch" placeholder="Search country..." autocomplete="off" aria-label="Search countries">
+                                            </div>
+                                            <ul class="country-list" id="countryList"></ul>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="phone_country_code" id="phoneCountryCode" value="+1">
+                                    <input type="tel" name="phone" class="phone-number-input" id="phoneNumberInput" value="{{ old('phone') }}" placeholder="(555) 000-0000" inputmode="tel" autocomplete="tel-national">
+                                </div>
                                 @error('phone')<div class="field-error">{{ $message }}</div>@enderror
                             </div>
                         </div>
@@ -280,6 +322,158 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
     });
 
     sync();
+})();
+
+/* ── Country code picker ── */
+(function () {
+    const COUNTRIES = [
+        {code:'US',dial:'+1',flag:'🇺🇸',name:'United States'},
+        {code:'GB',dial:'+44',flag:'🇬🇧',name:'United Kingdom'},
+        {code:'CA',dial:'+1',flag:'🇨🇦',name:'Canada'},
+        {code:'AU',dial:'+61',flag:'🇦🇺',name:'Australia'},
+        {code:'IN',dial:'+91',flag:'🇮🇳',name:'India'},
+        {code:'DE',dial:'+49',flag:'🇩🇪',name:'Germany'},
+        {code:'FR',dial:'+33',flag:'🇫🇷',name:'France'},
+        {code:'IT',dial:'+39',flag:'🇮🇹',name:'Italy'},
+        {code:'ES',dial:'+34',flag:'🇪🇸',name:'Spain'},
+        {code:'NL',dial:'+31',flag:'🇳🇱',name:'Netherlands'},
+        {code:'BE',dial:'+32',flag:'🇧🇪',name:'Belgium'},
+        {code:'CH',dial:'+41',flag:'🇨🇭',name:'Switzerland'},
+        {code:'AT',dial:'+43',flag:'🇦🇹',name:'Austria'},
+        {code:'SE',dial:'+46',flag:'🇸🇪',name:'Sweden'},
+        {code:'NO',dial:'+47',flag:'🇳🇴',name:'Norway'},
+        {code:'DK',dial:'+45',flag:'🇩🇰',name:'Denmark'},
+        {code:'FI',dial:'+358',flag:'🇫🇮',name:'Finland'},
+        {code:'PL',dial:'+48',flag:'🇵🇱',name:'Poland'},
+        {code:'PT',dial:'+351',flag:'🇵🇹',name:'Portugal'},
+        {code:'IE',dial:'+353',flag:'🇮🇪',name:'Ireland'},
+        {code:'NZ',dial:'+64',flag:'🇳🇿',name:'New Zealand'},
+        {code:'SG',dial:'+65',flag:'🇸🇬',name:'Singapore'},
+        {code:'AE',dial:'+971',flag:'🇦🇪',name:'United Arab Emirates'},
+        {code:'SA',dial:'+966',flag:'🇸🇦',name:'Saudi Arabia'},
+        {code:'QA',dial:'+974',flag:'🇶🇦',name:'Qatar'},
+        {code:'KW',dial:'+965',flag:'🇰🇼',name:'Kuwait'},
+        {code:'BH',dial:'+973',flag:'🇧🇭',name:'Bahrain'},
+        {code:'OM',dial:'+968',flag:'🇴🇲',name:'Oman'},
+        {code:'EG',dial:'+20',flag:'🇪🇬',name:'Egypt'},
+        {code:'ZA',dial:'+27',flag:'🇿🇦',name:'South Africa'},
+        {code:'NG',dial:'+234',flag:'🇳🇬',name:'Nigeria'},
+        {code:'KE',dial:'+254',flag:'🇰🇪',name:'Kenya'},
+        {code:'GH',dial:'+233',flag:'🇬🇭',name:'Ghana'},
+        {code:'ET',dial:'+251',flag:'🇪🇹',name:'Ethiopia'},
+        {code:'TZ',dial:'+255',flag:'🇹🇿',name:'Tanzania'},
+        {code:'BR',dial:'+55',flag:'🇧🇷',name:'Brazil'},
+        {code:'MX',dial:'+52',flag:'🇲🇽',name:'Mexico'},
+        {code:'AR',dial:'+54',flag:'🇦🇷',name:'Argentina'},
+        {code:'CO',dial:'+57',flag:'🇨🇴',name:'Colombia'},
+        {code:'CL',dial:'+56',flag:'🇨🇱',name:'Chile'},
+        {code:'PE',dial:'+51',flag:'🇵🇪',name:'Peru'},
+        {code:'JP',dial:'+81',flag:'🇯🇵',name:'Japan'},
+        {code:'KR',dial:'+82',flag:'🇰🇷',name:'South Korea'},
+        {code:'CN',dial:'+86',flag:'🇨🇳',name:'China'},
+        {code:'HK',dial:'+852',flag:'🇭🇰',name:'Hong Kong'},
+        {code:'TW',dial:'+886',flag:'🇹🇼',name:'Taiwan'},
+        {code:'TH',dial:'+66',flag:'🇹🇭',name:'Thailand'},
+        {code:'MY',dial:'+60',flag:'🇲🇾',name:'Malaysia'},
+        {code:'ID',dial:'+62',flag:'🇮🇩',name:'Indonesia'},
+        {code:'PH',dial:'+63',flag:'🇵🇭',name:'Philippines'},
+        {code:'VN',dial:'+84',flag:'🇻🇳',name:'Vietnam'},
+        {code:'PK',dial:'+92',flag:'🇵🇰',name:'Pakistan'},
+        {code:'BD',dial:'+880',flag:'🇧🇩',name:'Bangladesh'},
+        {code:'LK',dial:'+94',flag:'🇱🇰',name:'Sri Lanka'},
+        {code:'NP',dial:'+977',flag:'🇳🇵',name:'Nepal'},
+        {code:'RU',dial:'+7',flag:'🇷🇺',name:'Russia'},
+        {code:'UA',dial:'+380',flag:'🇺🇦',name:'Ukraine'},
+        {code:'TR',dial:'+90',flag:'🇹🇷',name:'Turkey'},
+        {code:'GR',dial:'+30',flag:'🇬🇷',name:'Greece'},
+        {code:'CZ',dial:'+420',flag:'🇨🇿',name:'Czech Republic'},
+        {code:'HU',dial:'+36',flag:'🇭🇺',name:'Hungary'},
+        {code:'RO',dial:'+40',flag:'🇷🇴',name:'Romania'},
+        {code:'IL',dial:'+972',flag:'🇮🇱',name:'Israel'},
+        {code:'JO',dial:'+962',flag:'🇯🇴',name:'Jordan'},
+        {code:'MA',dial:'+212',flag:'🇲🇦',name:'Morocco'},
+        {code:'DZ',dial:'+213',flag:'🇩🇿',name:'Algeria'},
+        {code:'TN',dial:'+216',flag:'🇹🇳',name:'Tunisia'},
+    ].sort((a, b) => {
+        // US always first, rest alphabetical
+        if (a.code === 'US') return -1;
+        if (b.code === 'US') return 1;
+        return a.name.localeCompare(b.name);
+    });
+
+    let selected = COUNTRIES[0]; // US default
+    const trigger    = document.getElementById('countryTrigger');
+    const dropdown   = document.getElementById('countryDropdown');
+    const searchEl   = document.getElementById('countrySearch');
+    const listEl     = document.getElementById('countryList');
+    const flagEl     = document.getElementById('selectedFlag');
+    const codeEl     = document.getElementById('selectedCode');
+    const hiddenCode = document.getElementById('phoneCountryCode');
+
+    function renderList(filter) {
+        const q = (filter || '').toLowerCase();
+        const filtered = q
+            ? COUNTRIES.filter(c => c.name.toLowerCase().includes(q) || c.dial.includes(q) || c.code.toLowerCase().includes(q))
+            : COUNTRIES;
+        listEl.innerHTML = '';
+        if (!filtered.length) {
+            listEl.innerHTML = '<li class="country-no-results">No countries found</li>';
+            return;
+        }
+        filtered.forEach(c => {
+            const li = document.createElement('li');
+            li.className = 'country-item' + (c.code === selected.code ? ' is-active' : '');
+            li.setAttribute('role', 'option');
+            li.setAttribute('aria-selected', c.code === selected.code ? 'true' : 'false');
+            li.innerHTML =
+                '<span class="country-item-flag">' + c.flag + '</span>' +
+                '<span class="country-item-name">' + c.name + '</span>' +
+                '<span class="country-item-dial">' + c.dial + '</span>';
+            li.addEventListener('click', function () { select(c); });
+            listEl.appendChild(li);
+        });
+    }
+
+    function select(c) {
+        selected = c;
+        flagEl.textContent  = c.flag;
+        codeEl.textContent  = c.dial;
+        hiddenCode.value    = c.dial;
+        close();
+    }
+
+    function open() {
+        dropdown.hidden = false;
+        trigger.setAttribute('aria-expanded', 'true');
+        searchEl.value = '';
+        renderList('');
+        searchEl.focus();
+    }
+
+    function close() {
+        dropdown.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        dropdown.hidden ? open() : close();
+    });
+
+    searchEl.addEventListener('input', function () {
+        renderList(this.value);
+    });
+
+    searchEl.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { close(); trigger.focus(); }
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!document.getElementById('countrySelect').contains(e.target)) close();
+    });
+
+    // Initial render (populate list but keep dropdown hidden)
+    renderList('');
 })();
 </script>
 @endsection
