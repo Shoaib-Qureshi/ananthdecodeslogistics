@@ -17,7 +17,8 @@ final class ContributorPlans
                 'public' => false,
                 'name' => 'Complimentary Contributor',
                 'admin_name' => 'Complimentary / Internal',
-                'price_usd' => 0,
+                'price' => 0,
+                'currency' => 'USD',
                 'price_label' => 'Complimentary',
                 'duration_months' => null,
                 'duration_label' => 'Internal access',
@@ -41,8 +42,9 @@ final class ContributorPlans
                 'public' => true,
                 'name' => 'Starter Contributor',
                 'admin_name' => 'Starter Contributor',
-                'price_inr' => 2999,
-                'price_label' => '₹2,999',
+                'price' => 50,
+                'currency' => 'USD',
+                'price_label' => '$50',
                 'duration_months' => 3,
                 'duration_label' => '3 months',
                 'max_posts' => 3,
@@ -56,7 +58,7 @@ final class ContributorPlans
                 ],
                 'checkout_name' => 'Starter Contributor Access',
                 'checkout_description' => 'Three-month Expert Desk access with up to 3 article submissions.',
-                'success_label' => 'Starter Contributor - ₹2,999',
+                'success_label' => 'Starter Contributor - $50',
                 'success_note' => 'Your Starter Contributor access is active for 3 months and includes up to 3 article submissions.',
                 'renew_cta' => 'Renew or Upgrade',
             ],
@@ -65,8 +67,9 @@ final class ContributorPlans
                 'public' => true,
                 'name' => 'Growth Contributor',
                 'admin_name' => 'Growth Contributor',
-                'price_inr' => 4999,
-                'price_label' => '₹4,999',
+                'price' => 80,
+                'currency' => 'USD',
+                'price_label' => '$80',
                 'duration_months' => 6,
                 'duration_label' => '6 months',
                 'max_posts' => 8,
@@ -80,7 +83,7 @@ final class ContributorPlans
                 ],
                 'checkout_name' => 'Growth Contributor Access',
                 'checkout_description' => 'Six-month Expert Desk access with up to 8 article submissions.',
-                'success_label' => 'Growth Contributor - ₹4,999',
+                'success_label' => 'Growth Contributor - $80',
                 'success_note' => 'Your Growth Contributor access is active for 6 months and includes up to 8 article submissions. Extended promotional benefits are coordinated manually by the editorial team.',
                 'renew_cta' => 'Renew or Upgrade',
             ],
@@ -89,8 +92,9 @@ final class ContributorPlans
                 'public' => true,
                 'name' => 'Authority Contributor',
                 'admin_name' => 'Authority Contributor',
-                'price_inr' => 8999,
-                'price_label' => '₹8,999',
+                'price' => 120,
+                'currency' => 'USD',
+                'price_label' => '$120',
                 'duration_months' => 12,
                 'duration_label' => '12 months',
                 'max_posts' => null,
@@ -104,7 +108,7 @@ final class ContributorPlans
                 ],
                 'checkout_name' => 'Authority Contributor Access',
                 'checkout_description' => 'Twelve-month Expert Desk access with unlimited fair-use submissions and homepage featured eligibility.',
-                'success_label' => 'Authority Contributor - ₹8,999',
+                'success_label' => 'Authority Contributor - $120',
                 'success_note' => 'Your Authority Contributor access is active for 12 months, supports unlimited fair-use submissions, and makes approved posts eligible for homepage featured placement.',
                 'renew_cta' => 'Renew Authority Access',
             ],
@@ -170,7 +174,12 @@ final class ContributorPlans
 
     public static function price(?string $code): int
     {
-        return (int) static::get($code)['price_inr'];
+        return (int) static::get($code)['price'];
+    }
+
+    public static function currency(?string $code): string
+    {
+        return (string) static::get($code)['currency'];
     }
 
     public static function priceLabel(?string $code): string

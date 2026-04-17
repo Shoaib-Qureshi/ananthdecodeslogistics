@@ -10,6 +10,7 @@ header{position:sticky;top:0;background:var(--white)!important;z-index:100}
 
 /* Page shell */
 .apply-page{min-height:100vh;background:#f8fbff;padding:3rem 0 5rem}
+.apply-page .container{padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right))}
 
 /* Two-column grid */
 .apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
@@ -117,8 +118,54 @@ header{position:sticky;top:0;background:var(--white)!important;z-index:100}
 .submit-note{font-size:.78rem;color:#94a3b8;line-height:1.6;max-width:220px}
 .invalid-feedback{display:block;font-size:.78rem;color:#ef4444;margin-top:.3rem}
 
-@media(max-width:1024px){.apply-grid{grid-template-columns:1fr}.info-panel{position:static}.info-trust{grid-template-columns:1fr 1fr}}
-@media(max-width:640px){.field-row{grid-template-columns:1fr}.submit-row{flex-direction:column;align-items:stretch}.submit-btn{justify-content:center}.submit-note{max-width:100%;text-align:center}}
+/* ── Responsive ── */
+@media(max-width:1024px){
+  .apply-grid{grid-template-columns:1fr}
+  .info-panel{position:static}
+  .info-trust{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:768px){
+  .apply-page{padding:1.5rem 0 3.5rem}
+  .form-card{padding:1.25rem;border-radius:16px}
+  .plan-row{gap:.6rem;padding:.75rem .85rem}
+  .plan-row-price{font-size:1rem}
+  .plan-tooltip{width:200px;font-size:.74rem}
+  .field-group{gap:.85rem}
+  .field-row{grid-template-columns:1fr}
+  .info-trust{grid-template-columns:1fr 1fr;gap:.5rem}
+  .trust-chip{padding:.55rem .7rem}
+  .country-dropdown{width:240px}
+  .submit-row{flex-direction:column;align-items:stretch}
+  .submit-btn{justify-content:center;width:100%}
+  .submit-note{max-width:100%;text-align:center}
+}
+
+@media(max-width:480px){
+  .apply-page{padding:1rem 0 3rem}
+  .form-card{padding:1rem;border-radius:14px;border-left:none;border-right:none;border-radius:0;box-shadow:none;margin:0 -12px}
+  .info-title{font-size:1.6rem}
+  .info-sub{font-size:.88rem}
+  .plan-row{padding:.65rem .75rem;gap:.5rem}
+  .plan-row-name{font-size:.84rem}
+  .plan-row-price{font-size:.95rem}
+  .plan-row-tag{font-size:.7rem;padding:.18rem .45rem}
+  .plan-info-btn{display:none}
+  .field-input{font-size:.88rem;padding:.65rem .85rem}
+  .phone-number-input{font-size:.88rem;padding:.65rem .75rem}
+  .country-trigger{padding:.65rem .5rem .65rem .7rem}
+  .country-dropdown{width:calc(100vw - 2rem);left:0}
+  .info-trust{grid-template-columns:1fr 1fr;gap:.4rem}
+  .trust-chip{padding:.5rem .6rem}
+  .trust-chip strong{font-size:.72rem}
+  .trust-chip span{font-size:.68rem}
+  .submit-btn{padding:.8rem 1.25rem;font-size:.88rem}
+  .info-benefits{gap:.65rem}
+  .benefit-text strong{font-size:.85rem}
+  .benefit-text span{font-size:.8rem}
+  .plan-section-label{font-size:.68rem}
+  .field-label{font-size:.7rem}
+}
 </style>
 @endsection
 
@@ -163,7 +210,7 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
         <hr class="info-divider">
 
         <div class="info-trust">
-            <div class="trust-chip"><strong>Secure checkout</strong><span>Payment INR · instant activation</span></div>
+            <div class="trust-chip"><strong>Secure checkout</strong><span>Payment USD · instant activation</span></div>
             <div class="trust-chip"><strong>3 clear plans</strong><span>Defined windows &amp; post caps</span></div>
             <div class="trust-chip"><strong>Keep your posts</strong><span>Profile stays after expiry</span></div>
             <div class="trust-chip"><strong>No hidden fees</strong><span>One payment, full access</span></div>
@@ -203,7 +250,7 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
                                 <span class="plan-row-tag">{{ $plan['post_limit_label'] }}</span>
                             </div>
                         </div>
-                        <div class="plan-row-price">{{ $plan['price_label'] }}<small>INR</small></div>
+                        <div class="plan-row-price">{{ $plan['price_label'] }}<small>{{ $plan['currency'] }}</small></div>
                         <div class="plan-info-btn" tabindex="0" role="button" aria-label="Plan details" onclick="event.preventDefault()">
                             <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>
                             <div class="plan-tooltip">

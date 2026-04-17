@@ -40,6 +40,10 @@
                                 <input name="name" type="text" placeholder="e.g. Mark" required>
                             </div>
                             <div class="col-md-6">
+                                <h4>Email <small style="font-weight:400;color:#6b7280;">(required for contributors — welcome email will be sent)</small></h4>
+                                <input name="email" type="email" placeholder="e.g. mark@example.com" value="{{ old('email') }}">
+                            </div>
+                            <div class="col-md-6">
                                 <h4>Designation</h4>
                                 <input name="designation" type="text" placeholder="e.g. Engineer" required>
                             </div>

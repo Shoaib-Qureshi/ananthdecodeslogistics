@@ -41,6 +41,11 @@
                                     placeholder="e.g. M.S. Dhoni" required>
                             </div>
                             <div class="col-md-6">
+                                <h4>Email</h4>
+                                <input name="email" type="email" value="{{ old('email', $editUser->email) }}"
+                                    placeholder="e.g. mark@example.com">
+                            </div>
+                            <div class="col-md-6">
                                 <h4>Designation</h4>
                                 <input value="{{ $editUser->designation }}" name="designation" type="text"
                                     placeholder="e.g. Engineer" required>

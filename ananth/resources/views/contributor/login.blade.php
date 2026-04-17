@@ -9,15 +9,14 @@
         *, *::before, *::after { box-sizing: border-box; }
         body {
             min-height: 100vh;
+            min-height: 100dvh;
             margin: 0;
             font-family: "Inter", "Helvetica Neue", sans-serif;
             background: #0f1e2e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
+            padding: clamp(1rem, 3vw, 1.5rem);
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
         body::before {
             content: '';
@@ -38,6 +37,12 @@
         .login-wrapper {
             width: 100%;
             max-width: 420px;
+            margin: 0 auto;
+            min-height: calc(100vh - 3rem);
+            min-height: calc(100dvh - 3rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             position: relative;
             z-index: 1;
         }
@@ -47,7 +52,7 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 20px;
-            padding: 2.5rem;
+            padding: clamp(1.5rem, 4vw, 2.5rem);
             box-shadow: 0 24px 64px rgba(0,0,0,0.4);
         }
         .brand-logo {
@@ -76,6 +81,8 @@
             display: block;
             text-align: center;
             margin-top: .5rem;
+            width: fit-content;
+            margin: 0 auto;
         }
         .login-title {
             color: #fff;
@@ -85,10 +92,11 @@
             text-align: center;
         }
         .login-sub {
-            color: rgba(255,255,255,0.45);
+            color: rgba(255,255,255,0.62);
             font-size: .83rem;
             text-align: center;
             margin-bottom: 1.75rem;
+            line-height: 1.6;
         }
         .form-label {
             font-size: .8rem;
@@ -187,14 +195,74 @@
             font-size: .83rem;
             margin-bottom: 1rem;
             border: 1px solid;
+            line-height: 1.55;
         }
         .alert-custom.danger { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.25); color: #fca5a5; }
         .alert-custom.success { background: rgba(34,197,94,.1); border-color: rgba(34,197,94,.25); color: #86efac; }
         .alert-custom.info { background: rgba(56,130,250,.1); border-color: rgba(56,130,250,.25); color: #93c5fd; }
         .footer-links { text-align: center; margin-top: 1.5rem; }
-        .footer-links a { color: rgba(255,255,255,0.38); font-size: .8rem; text-decoration: none; transition: color .15s; }
+        .footer-links a { color: rgba(255,255,255,0.58); font-size: .8rem; text-decoration: none; transition: color .15s; }
         .footer-links a:hover { color: rgba(255,255,255,0.7); }
         .footer-links span { color: rgba(255,255,255,0.15); margin: 0 .5rem; }
+        .btn-google {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1.5px solid rgba(255,255,255,0.14);
+            border-radius: 10px;
+            padding: .65rem 1rem;
+            color: rgba(255,255,255,0.8);
+            font-size: .9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background .15s, border-color .15s, color .15s;
+            cursor: pointer;
+        }
+        .btn-google:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.22);
+            color: #fff;
+        }
+        .btn-google svg { flex-shrink: 0; }
+        .secondary-link-card {
+            display: block;
+            text-align: center;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: .7rem;
+            color: rgba(255,255,255,0.82);
+            text-decoration: none;
+            font-size: .88rem;
+            font-weight: 500;
+            transition: background .15s, border-color .15s, color .15s;
+        }
+        .secondary-link-card:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid rgba(126,184,255,0.55);
+            outline-offset: 3px;
+        }
+        @media (max-width: 575.98px), (max-height: 760px) {
+            body {
+                padding: 1rem;
+            }
+            .login-wrapper {
+                min-height: calc(100vh - 2rem);
+                min-height: calc(100dvh - 2rem);
+                justify-content: flex-start;
+            }
+            .footer-links {
+                margin-top: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -258,19 +326,38 @@
             <button type="submit" class="btn-login">Sign In</button>
         </form>
 
+        <div class="divider"><span>or</span></div>
+
+        <a href="{{ route('contributor.google.redirect') }}" class="btn-google">
+            <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+                <path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/>
+                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+            Sign in with Google
+        </a>
+
         <div class="divider"><span>New here?</span></div>
 
-        <a href="{{ route('contributor.register') }}"
-           style="display:block;text-align:center;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:.7rem;color:rgba(255,255,255,0.75);text-decoration:none;font-size:.88rem;font-weight:500;transition:background .15s;"
-           onmouseover="this.style.background='rgba(255,255,255,0.1)'"
-           onmouseout="this.style.background='rgba(255,255,255,0.06)'">
-            Apply to The Expert Desk &rarr;
+        <a href="{{ route('contributor.register') }}" class="secondary-link-card">
+            Apply to The Expert Desk 
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+</svg>
         </a>
 
     </div>
 
     <div class="footer-links">
-        <a href="/">&larr; Back to site</a>
+        <a href="/">
+            
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+</svg>
+
+        Back to site</a>
         <span>&middot;</span>
         <a href="/privacy-policy/">Privacy Policy</a>
     </div>

@@ -145,6 +145,9 @@ Route::post('expert-desk/login', [GuestAuthController::class, 'login'])->name('c
 Route::post('contributor-login', [GuestAuthController::class, 'login']);
 Route::post('expert-desk/logout', [GuestAuthController::class, 'logout'])->name('contributor.logout');
 Route::post('contributor-logout', [GuestAuthController::class, 'logout']);
+Route::get('expert-desk/set-password', [GuestAuthController::class, 'showSetPassword'])->name('contributor.set-password');
+Route::post('expert-desk/set-password', [GuestAuthController::class, 'setPassword'])->name('contributor.set-password.submit');
+Route::get('expert-desk/auth/google', [GuestAuthController::class, 'redirectToGoogle'])->name('contributor.google.redirect');
 
 // ─── Guest Dashboard ──────────────────────────────────────────────────────
 Route::middleware(['guest.contributor'])->prefix('dashboard')->group(function () {

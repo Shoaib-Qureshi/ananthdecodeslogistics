@@ -74,6 +74,7 @@
             letter-spacing: .08em;
             padding: .2rem .6rem;
             border-radius: 20px;
+            width: fit-content;
         }
 
         .sidebar-nav {

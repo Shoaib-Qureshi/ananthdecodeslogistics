@@ -10,15 +10,14 @@
 
         body {
             min-height: 100vh;
+            min-height: 100dvh;
             margin: 0;
             font-family: "Inter", "Helvetica Neue", sans-serif;
             background: #0f1e2e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
+            padding: clamp(1rem, 3vw, 1.5rem);
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         body::before {
@@ -46,6 +45,12 @@
         .auth-wrapper {
             width: 100%;
             max-width: 420px;
+            margin: 0 auto;
+            min-height: calc(100vh - 3rem);
+            min-height: calc(100dvh - 3rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             position: relative;
             z-index: 1;
         }
@@ -56,7 +61,7 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 2.5rem;
+            padding: clamp(1.5rem, 4vw, 2.5rem);
             box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
         }
 
@@ -88,6 +93,8 @@
             display: block;
             text-align: center;
             margin-top: 0.5rem;
+            width: fit-content;
+            margin: 0 auto;
         }
 
         .auth-title {
@@ -99,10 +106,21 @@
         }
 
         .auth-sub {
-            color: rgba(255, 255, 255, 0.45);
+            color: rgba(255, 255, 255, 0.62);
             font-size: 0.83rem;
             text-align: center;
             margin-bottom: 1.75rem;
+            line-height: 1.6;
+        }
+        @media (max-width: 575.98px), (max-height: 760px) {
+            body {
+                padding: 1rem;
+            }
+            .auth-wrapper {
+                min-height: calc(100vh - 2rem);
+                min-height: calc(100dvh - 2rem);
+                justify-content: flex-start;
+            }
         }
 
         .form-label {

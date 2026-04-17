@@ -80,8 +80,8 @@ class ContributorRegistrationController extends Controller
             'intro' => $request->intro,
             'reason_for_joining' => $request->reason_for_joining,
             'plan' => $planCode,
-            'amount' => $plan['price_inr'],
-            'currency' => 'INR',
+            'amount' => $plan['price'],
+            'currency' => $plan['currency'],
             'status' => 'pending',
         ]);
 
@@ -190,7 +190,9 @@ class ContributorRegistrationController extends Controller
 
         $payment = $this->finalizePaidContributor($payment, $gatewayPayment, $request->razorpay_signature);
 
-        return redirect()->route('contributor.payment.success', ['payment' => $payment->id]);
+        session(['new_contributor_user_id' => $payment->user_id]);
+
+        return redirect()->route('contributor.set-password');
     }
 
     public function paymentSuccess(Request $request)
@@ -255,7 +257,8 @@ class ContributorRegistrationController extends Controller
         }
 
         if (is_array($gatewayPayment) && ($gatewayPayment['status'] ?? null) === 'captured') {
-            $this->finalizePaidContributor($payment, $gatewayPayment);
+            // Pass true so the webhook path sends a password-reset email (no browser session available)
+            $this->finalizePaidContributor($payment, $gatewayPayment, null, true);
         }
 
         return response()->json(['received' => true]);
@@ -451,7 +454,7 @@ class ContributorRegistrationController extends Controller
         return $response->json();
     }
 
-    private function finalizePaidContributor(ContributorPayment $payment, array $gatewayPayment, ?string $signature = null): ContributorPayment
+    private function finalizePaidContributor(ContributorPayment $payment, array $gatewayPayment, ?string $signature = null, bool $sendPasswordLink = false): ContributorPayment
     {
         if ($payment->status === 'paid' && $payment->user_id) {
             $updates = [];
@@ -513,15 +516,17 @@ class ContributorRegistrationController extends Controller
             'activated_at' => now(),
         ]);
 
-        $this->sendContributorAccessEmails($user);
+        $this->sendContributorAccessEmails($user, $sendPasswordLink);
 
         return $payment->fresh();
     }
 
-    private function sendContributorAccessEmails(User $user): void
+    private function sendContributorAccessEmails(User $user, bool $sendPasswordLink = false): void
     {
         try {
-            Password::sendResetLink(['email' => $user->email]);
+            if ($sendPasswordLink) {
+                Password::sendResetLink(['email' => $user->email]);
+            }
             Mail::to($user->email)->send(new ContributorApproved($user));
         } catch (\Throwable $exception) {
             Log::warning('Failed sending contributor access email.', [

@@ -18,7 +18,12 @@ use App\Models\BlogCategories;
 use App\Models\ContributorPost;
 use App\Models\Contact;
 use App\Models\TeamMember;
+use App\Mail\AdminCreatedContributor;
+use App\Mail\NewRegistrationAdminNotification;
 use App\Support\ContributorPlans;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
@@ -137,10 +142,11 @@ class AdminController extends Controller
     public function saveUser(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'designation' => 'required',
-            'profile_pic' => 'required',
-            'account_type' => 'required|in:author,contributor',
+            'name'             => 'required',
+            'email'            => ['nullable', 'email', 'unique:users,email'],
+            'designation'      => 'required',
+            'profile_pic'      => 'required',
+            'account_type'     => 'required|in:author,contributor',
             'contributor_plan' => ['nullable', Rule::in(ContributorPlans::adminSelectableCodes())],
         ]);
 
@@ -148,9 +154,11 @@ class AdminController extends Controller
         $uniqueUsername = $this->generateUniqueUsername($baseUsername);
         $selectedPlan = ContributorPlans::normalize($request->contributor_plan, ContributorPlans::FREE);
 
+        $providedEmail = $request->filled('email') ? trim($request->email) : null;
+
         $user = new User();
         $user->name = $request->name;
-        $user->email = $uniqueUsername."@ananthdecodeslogistics.com";
+        $user->email = $providedEmail ?? ($uniqueUsername . '@ananthdecodeslogistics.com');
         $user->username = $uniqueUsername;
         $user->password = Hash::make("345hysdygYGTYg5!237");
         $user->user_role = $request->account_type === 'contributor' ? 'guest' : 'author';
@@ -184,6 +192,25 @@ class AdminController extends Controller
         }
         $user->save();
 
+        if ($request->account_type === 'contributor') {
+            // Notify the admin that a new contributor was manually added
+            try {
+                $adminEmail = config('mail.admin_email', 'admin@ananthdecodeslogistics.com');
+                Mail::to($adminEmail)->send(new NewRegistrationAdminNotification($user));
+            } catch (\Throwable $e) {
+                Log::warning('Failed to send admin notification for manually created contributor.', [
+                    'user_id' => $user->id,
+                    'error'   => $e->getMessage(),
+                ]);
+            }
+
+            // Send welcome email with password setup link if a real email was provided
+            if ($providedEmail) {
+                $this->sendAdminCreatedContributorEmail($user);
+                return redirect()->back()->with('message', "Contributor created! A welcome email with password setup link has been sent to {$providedEmail}.");
+            }
+        }
+
         return redirect()->back()->with('message', "User Successfully Created!");
     }
 
@@ -199,10 +226,11 @@ class AdminController extends Controller
     public function updateUser(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required',
-            'designation' => 'required',
-            'profile_pic' => 'nullable',
-            'account_type' => 'required|in:author,contributor',
+            'name'             => 'required',
+            'email'            => ['nullable', 'email', "unique:users,email,{$id}"],
+            'designation'      => 'required',
+            'profile_pic'      => 'nullable',
+            'account_type'     => 'required|in:author,contributor',
             'contributor_plan' => ['nullable', Rule::in(ContributorPlans::adminSelectableCodes())],
         ]);
 
@@ -211,9 +239,9 @@ class AdminController extends Controller
         $previousPlan = $updateUser->contributorPlanCode();
         $selectedPlan = ContributorPlans::normalize($request->contributor_plan, ContributorPlans::FREE);
         $updateUser->name = $request->name;
-        // $updateUser->username = $request->username;  
-        // $updateUser->email = $request->email;      
-        // $updateUser->password = $request->password;
+        if ($request->filled('email')) {
+            $updateUser->email = trim($request->email);
+        }
         $updateUser->user_role = $request->account_type === 'contributor' ? 'guest' : 'author';
         $updateUser->status = $request->account_type === 'contributor' ? 'approved' : $updateUser->status;
         $updateUser->contributor_plan = $request->account_type === 'contributor' ? $selectedPlan : null;
@@ -257,6 +285,20 @@ class AdminController extends Controller
         }
 
         return redirect()->back()->with('message', "User Successfully Updated");
+    }
+
+    private function sendAdminCreatedContributorEmail(User $user): void
+    {
+        try {
+            $token    = Password::broker()->createToken($user);
+            $resetUrl = url(route('password.reset', ['token' => $token, 'email' => $user->email], false));
+            Mail::to($user->email)->send(new AdminCreatedContributor($user, $resetUrl));
+        } catch (\Throwable $e) {
+            Log::warning('Failed to send admin-created contributor email.', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+        }
     }
 
     private function moveAuthorBlogsToContributor(User $user): void

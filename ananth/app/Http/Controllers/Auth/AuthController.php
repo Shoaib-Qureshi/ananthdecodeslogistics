@@ -221,6 +221,31 @@ class AuthController extends Controller
 
             $googleUserInfo = json_decode($googleUser->getBody(), true);
 
+            // Handle contributor Google login flow
+            if (session('google_oauth_flow') === 'contributor') {
+                session()->forget('google_oauth_flow');
+
+                $user = User::where('email', $googleUserInfo['email'])->where('user_role', 'guest')->first();
+
+                if (!$user) {
+                    return redirect()->route('contributor.register')
+                        ->with('info', 'No Expert Desk account found for this Google account. Please apply first.');
+                }
+
+                if ($user->status === 'pending') {
+                    return redirect()->route('contributor.login')
+                        ->with('error', 'Your application is pending admin approval. Please wait for the approval email.');
+                }
+
+                if ($user->status === 'rejected') {
+                    return redirect()->route('contributor.login')
+                        ->with('error', 'Your application was not approved. Please contact us for more information.');
+                }
+
+                Auth::login($user);
+                return redirect()->route('dashboard');
+            }
+
             // Check if user exists in your database
             $user = User::where('email', $googleUserInfo['email'])->first();
 
