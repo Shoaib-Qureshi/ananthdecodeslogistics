@@ -79,6 +79,8 @@ Route::middleware([admin::class])->group(function () {
     Route::get('admin/registrations', [AdminContributorController::class, 'registrations'])->name('admin.registrations');
     Route::post('admin/registrations/{id}/approve', [AdminContributorController::class, 'approveRegistration'])->name('admin.registrations.approve');
     Route::post('admin/registrations/{id}/reject', [AdminContributorController::class, 'rejectRegistration'])->name('admin.registrations.reject');
+    Route::get('admin/contributor-plans', [AdminContributorController::class, 'plans'])->name('admin.contributor.plans');
+    Route::post('admin/contributor-plans', [AdminContributorController::class, 'updatePlans'])->name('admin.contributor.plans.update');
 
     // ── Contributor Posts (admin manages) ────────────────────────
     Route::get('admin/contributor-posts', [AdminContributorController::class, 'posts'])->name('admin.contributor.posts');

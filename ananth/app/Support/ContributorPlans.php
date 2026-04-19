@@ -2,6 +2,10 @@
 
 namespace App\Support;
 
+use App\Models\ContributorPlan;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
+
 final class ContributorPlans
 {
     public const FREE = 'free';
@@ -9,7 +13,9 @@ final class ContributorPlans
     public const GROWTH = 'growth_contributor';
     public const AUTHORITY = 'authority_contributor';
 
-    public static function all(): array
+    private static ?array $resolvedPlans = null;
+
+    public static function defaults(): array
     {
         return [
             self::FREE => [
@@ -42,9 +48,9 @@ final class ContributorPlans
                 'public' => true,
                 'name' => 'Starter Contributor',
                 'admin_name' => 'Starter Contributor',
-                'price' => 50,
+                'price' => 0,
                 'currency' => 'USD',
-                'price_label' => '$50',
+                'price_label' => '$0',
                 'duration_months' => 3,
                 'duration_label' => '3 months',
                 'max_posts' => 3,
@@ -58,7 +64,7 @@ final class ContributorPlans
                 ],
                 'checkout_name' => 'Starter Contributor Access',
                 'checkout_description' => 'Three-month Expert Desk access with up to 3 article submissions.',
-                'success_label' => 'Starter Contributor - $50',
+                'success_label' => 'Starter Contributor - $0',
                 'success_note' => 'Your Starter Contributor access is active for 3 months and includes up to 3 article submissions.',
                 'renew_cta' => 'Renew or Upgrade',
             ],
@@ -67,9 +73,9 @@ final class ContributorPlans
                 'public' => true,
                 'name' => 'Growth Contributor',
                 'admin_name' => 'Growth Contributor',
-                'price' => 80,
+                'price' => 50,
                 'currency' => 'USD',
-                'price_label' => '$80',
+                'price_label' => '$50',
                 'duration_months' => 6,
                 'duration_label' => '6 months',
                 'max_posts' => 8,
@@ -83,7 +89,7 @@ final class ContributorPlans
                 ],
                 'checkout_name' => 'Growth Contributor Access',
                 'checkout_description' => 'Six-month Expert Desk access with up to 8 article submissions.',
-                'success_label' => 'Growth Contributor - $80',
+                'success_label' => 'Growth Contributor - $50',
                 'success_note' => 'Your Growth Contributor access is active for 6 months and includes up to 8 article submissions. Extended promotional benefits are coordinated manually by the editorial team.',
                 'renew_cta' => 'Renew or Upgrade',
             ],
@@ -92,9 +98,9 @@ final class ContributorPlans
                 'public' => true,
                 'name' => 'Authority Contributor',
                 'admin_name' => 'Authority Contributor',
-                'price' => 120,
+                'price' => 80,
                 'currency' => 'USD',
-                'price_label' => '$120',
+                'price_label' => '$80',
                 'duration_months' => 12,
                 'duration_label' => '12 months',
                 'max_posts' => null,
@@ -108,11 +114,51 @@ final class ContributorPlans
                 ],
                 'checkout_name' => 'Authority Contributor Access',
                 'checkout_description' => 'Twelve-month Expert Desk access with unlimited fair-use submissions and homepage featured eligibility.',
-                'success_label' => 'Authority Contributor - $120',
+                'success_label' => 'Authority Contributor - $80',
                 'success_note' => 'Your Authority Contributor access is active for 12 months, supports unlimited fair-use submissions, and makes approved posts eligible for homepage featured placement.',
                 'renew_cta' => 'Renew Authority Access',
             ],
         ];
+    }
+
+    public static function all(): array
+    {
+        if (static::$resolvedPlans !== null) {
+            return static::$resolvedPlans;
+        }
+
+        $plans = static::defaults();
+
+        try {
+            if (!Schema::hasTable('contributor_plans')) {
+                return static::$resolvedPlans = $plans;
+            }
+
+            $storedPlans = ContributorPlan::query()->get()->keyBy('code');
+
+            if ($storedPlans->isEmpty()) {
+                return static::$resolvedPlans = $plans;
+            }
+
+            foreach ($plans as $code => $defaultPlan) {
+                $storedPlan = $storedPlans->get($code);
+
+                if (!$storedPlan) {
+                    continue;
+                }
+
+                $plans[$code] = static::mergePlan($defaultPlan, $storedPlan->toSupportArray());
+            }
+        } catch (Throwable $exception) {
+            return static::$resolvedPlans = $plans;
+        }
+
+        return static::$resolvedPlans = $plans;
+    }
+
+    public static function clearCache(): void
+    {
+        static::$resolvedPlans = null;
     }
 
     public static function publicPlans(): array
@@ -177,6 +223,11 @@ final class ContributorPlans
         return (int) static::get($code)['price'];
     }
 
+    public static function isComplimentary(?string $code): bool
+    {
+        return static::price($code) <= 0;
+    }
+
     public static function currency(?string $code): string
     {
         return (string) static::get($code)['currency'];
@@ -215,5 +266,20 @@ final class ContributorPlans
     public static function hasHomepageFeature(?string $code): bool
     {
         return (bool) static::get($code)['homepage_feature'];
+    }
+
+    private static function mergePlan(array $defaultPlan, array $storedPlan): array
+    {
+        if (array_key_exists('highlights', $storedPlan) && is_array($storedPlan['highlights'])) {
+            $storedPlan['highlights'] = array_values(array_filter(
+                array_map(static fn ($item) => trim((string) $item), $storedPlan['highlights']),
+                static fn (string $item): bool => $item !== ''
+            ));
+        }
+
+        return array_replace(
+            $defaultPlan,
+            array_filter($storedPlan, static fn ($value) => $value !== null)
+        );
     }
 }

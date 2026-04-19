@@ -165,7 +165,7 @@ class AdminController extends Controller
         $user->status = $request->account_type === 'contributor' ? 'approved' : 'approved';
         $user->contributor_plan = $request->account_type === 'contributor' ? $selectedPlan : null;
         $user->payment_status = $request->account_type === 'contributor'
-            ? ($selectedPlan === ContributorPlans::FREE ? 'complimentary' : 'paid')
+            ? (ContributorPlans::isComplimentary($selectedPlan) ? 'complimentary' : 'paid')
             : null;
         $user->activated_at = $request->account_type === 'contributor' ? now() : null;
         $user->designation = $request->designation;
@@ -246,7 +246,7 @@ class AdminController extends Controller
         $updateUser->status = $request->account_type === 'contributor' ? 'approved' : $updateUser->status;
         $updateUser->contributor_plan = $request->account_type === 'contributor' ? $selectedPlan : null;
         $updateUser->payment_status = $request->account_type === 'contributor'
-            ? ($selectedPlan === ContributorPlans::FREE ? 'complimentary' : 'paid')
+            ? (ContributorPlans::isComplimentary($selectedPlan) ? 'complimentary' : 'paid')
             : null;
         $updateUser->activated_at = $request->account_type === 'contributor'
             ? (($wasContributor && $previousPlan === $selectedPlan && $updateUser->activated_at) ? $updateUser->activated_at : now())

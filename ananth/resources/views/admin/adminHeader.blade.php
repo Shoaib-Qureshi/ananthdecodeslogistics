@@ -34,6 +34,7 @@
                 <li class="{{ request()->is('admin/registrations*') ? 'active_tab' : '' }}" style="border-top:1px solid rgba(148, 163, 184, 0.18);margin-top:.5rem;padding-top:.5rem;">
                     <a href="/admin/registrations"><i class="fas fa-user-plus"></i>Contributor Registrations</a>
                 </li>
+                <li class="{{ request()->is('admin/contributor-plans*') ? 'active_tab' : '' }}"><a href="/admin/contributor-plans"><i class="fas fa-tags"></i>Contributor Plans</a></li>
                 <li class="{{ request()->is('admin/contributor-posts*') ? 'active_tab' : '' }}"><a href="/admin/contributor-posts"><i class="fas fa-newspaper"></i>Contributor Posts</a></li>
             </ul>
         </div>

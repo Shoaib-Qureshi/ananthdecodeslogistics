@@ -63,14 +63,14 @@ class ContributorRegistrationController extends Controller
             'plan' => ['required', Rule::in(ContributorPlans::publicPlanCodes())],
         ]);
 
-        if (!$this->razorpayConfigured()) {
+        $planCode = ContributorPlans::normalize($request->plan, ContributorPlans::STARTER);
+        $plan = ContributorPlans::get($planCode, ContributorPlans::STARTER);
+
+        if ((int) $plan['price'] > 0 && !$this->razorpayConfigured()) {
             return back()->withErrors([
                 'plan' => 'Razorpay payment is not configured yet. Please contact the administrator.',
             ])->withInput();
         }
-
-        $planCode = ContributorPlans::normalize($request->plan, ContributorPlans::STARTER);
-        $plan = ContributorPlans::get($planCode, ContributorPlans::STARTER);
 
         $payment = ContributorPayment::create([
             'name' => $request->name,
@@ -82,8 +82,18 @@ class ContributorRegistrationController extends Controller
             'plan' => $planCode,
             'amount' => $plan['price'],
             'currency' => $plan['currency'],
-            'status' => 'pending',
+            'status' => (int) $plan['price'] > 0 ? 'pending' : 'paid',
+            'activated_at' => (int) $plan['price'] > 0 ? null : now(),
         ]);
+
+        if ((int) $plan['price'] <= 0) {
+            $payment = $this->finalizePaidContributor($payment, []);
+
+            session(['new_contributor_user_id' => $payment->user_id]);
+
+            return redirect()->route('contributor.set-password')
+                ->with('success', 'Your contributor access is ready. Set your password to continue.');
+        }
 
         $order = $this->createRazorpayOrder($payment);
 
@@ -272,7 +282,7 @@ class ContributorRegistrationController extends Controller
         $user->update([
             'status' => 'approved',
             'contributor_plan' => $planCode,
-            'payment_status' => $user->payment_status ?: ($planCode === ContributorPlans::FREE ? 'complimentary' : 'paid'),
+            'payment_status' => $user->payment_status ?: (ContributorPlans::isComplimentary($planCode) ? 'complimentary' : 'paid'),
         ]);
 
         Password::sendResetLink(['email' => $user->email]);
@@ -488,7 +498,7 @@ class ContributorRegistrationController extends Controller
                 'user_role' => 'guest',
                 'status' => 'approved',
                 'contributor_plan' => $planCode,
-                'payment_status' => 'paid',
+                'payment_status' => $this->paymentStatusForAmount((int) $payment->amount),
                 'activated_at' => now(),
                 'designation' => $payment->designation,
                 'intro' => $payment->intro,
@@ -498,7 +508,7 @@ class ContributorRegistrationController extends Controller
             $user->update([
                 'status' => 'approved',
                 'contributor_plan' => $planCode,
-                'payment_status' => 'paid',
+                'payment_status' => $this->paymentStatusForAmount((int) $payment->amount),
                 'activated_at' => now(),
                 'designation' => $payment->designation ?: $user->designation,
                 'intro' => $payment->intro ?: $user->intro,
@@ -544,6 +554,11 @@ class ContributorRegistrationController extends Controller
                 'error' => $exception->getMessage(),
             ]);
         }
+    }
+
+    private function paymentStatusForAmount(int $amount): string
+    {
+        return $amount > 0 ? 'paid' : 'complimentary';
     }
 
     private function generateUniqueUsername(string $baseUsername): string

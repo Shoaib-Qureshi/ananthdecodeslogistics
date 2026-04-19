@@ -75,6 +75,7 @@
             padding: .2rem .6rem;
             border-radius: 20px;
             width: fit-content;
+            margin: 0 auto;
         }
 
         .sidebar-nav {

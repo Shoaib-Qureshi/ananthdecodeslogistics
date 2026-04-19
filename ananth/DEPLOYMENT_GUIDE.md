@@ -285,3 +285,31 @@ If you encounter any issues:
 1. Check Laravel logs: `tail -f storage/logs/laravel.log`
 2. Contact Hostinger support for server-specific issues
 3. Verify .env configuration matches production requirements
+
+
+
+
+
+
+
+
+
+
+
+cd ~
+
+rm -rf ananthdecodeslogistics-temp
+git clone https://github.com/Shoaib-Qureshi/ananthdecodeslogistics.git ananthdecodeslogistics-temp
+
+cp -a ananthdecodeslogistics-temp/ananth/. /home/u644731106/domains/ananthdecodeslogistics.com/ananth/
+cp -a ananthdecodeslogistics-temp/public_html/. /home/u644731106/domains/ananthdecodeslogistics.com/public_html/
+
+cd /home/u644731106/domains/ananthdecodeslogistics.com/ananth
+php artisan migrate --force
+php artisan optimize:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+cd ~
+rm -rf ananthdecodeslogistics-temp

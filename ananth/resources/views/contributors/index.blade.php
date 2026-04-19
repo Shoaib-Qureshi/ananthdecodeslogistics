@@ -1,6 +1,6 @@
 @extends('layouts.front')
 @section('title', 'The Expert Desk - Ananth Decodes Logistics')
-@section('description', 'Expert logistics and supply chain articles written by approved contributors on The Expert Desk.')
+@section('description', 'A multi-domain platform where verified experts share real-world insights across logistics, supply chain, finance, technology, and beyond.')
 @section('img', asset('img/site-banner.jpg'))
 @section('url', route('contributors.index'))
 
@@ -102,10 +102,12 @@
         <div class="row">
             <div class="col-12">
                 <div class="headingMain text-center">
-                    <p>Expert perspectives</p>
+                    <p>Expert Perspectives</p>
                     <h1>The Expert Desk</h1>
-                    <p style="max-width:560px;margin:1rem auto 0;opacity:.85;">
-                        Real-world insights from approved logistics and supply chain professionals.
+                    <p style="max-width:580px;margin:1rem auto 0;opacity:.85;">
+                        A multi-domain platform where verified experts share real-world insights.
+                        Covering logistics, supply chain, finance, technology, and beyond.
+                        Built to help you think better, decide faster, and grow stronger.
                     </p>
                 </div>
             </div>
