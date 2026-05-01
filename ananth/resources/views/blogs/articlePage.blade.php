@@ -67,21 +67,21 @@
                         ])
 
                         @php
-                            $profileImage = $founderProfile->image ?? null;
-                            $profileName = $founderProfile->heading ?? ($author->name ?? '');
-                            $profileTitle = $founderProfile->subheading ?? ($author->designation ?? '');
-                            $profileContent = $founderProfile->content ?? ($author->intro ?? '');
+                            $profileImage = $founderProfile->photo ?? null;
+                            $profileName = $founderProfile->name ?? ($author->name ?? '');
+                            $profileTitle = $founderProfile->title ?? ($author->designation ?? '');
+                            $profileContent = $founderProfile->bio ?? ($author->intro ?? '');
                         @endphp
                         <div class="overviewCard authorCard">
                             <div class="founderImg">
-                                <img src="{{ $profileImage ? asset($profileImage) : (isset($author->profile_pic) ? asset('img/site/' . $author->profile_pic) : '/img/site/blank-picture.webp') }}" alt="{{ $profileName }}">
+                                <img src="{{ $profileImage ? (Str::startsWith($profileImage, ['img/', 'media/']) ? asset($profileImage) : asset('storage/' . $profileImage)) : (isset($author->profile_pic) ? asset('img/site/' . $author->profile_pic) : '/img/site/blank-picture.webp') }}" alt="{{ $profileName }}">
                                 <div>
                                     <h4>{{ $profileName }}</h4>
                                     <span>{{ $profileTitle }}</span>
                                 </div>
                             </div>
                             @if($profileContent)
-                                <p>{!! nl2br(e($profileContent)) !!}</p>
+                                <p>{!! $profileContent !!}</p>
                             @endif
                             <div class="footerSocial">
                                 <ul>

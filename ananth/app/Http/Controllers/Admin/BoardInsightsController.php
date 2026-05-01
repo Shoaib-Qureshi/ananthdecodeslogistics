@@ -13,6 +13,7 @@ use Image;
 
 use App\Models\User;
 use App\Models\BoardInsights;
+use App\Models\PageBanner;
 
 class BoardInsightsController extends Controller
 {
@@ -78,6 +79,7 @@ class BoardInsightsController extends Controller
 
         return view('front.insightList', [
             'insightList' => $insightList,
+            'banner' => PageBanner::forKey('board_insights'),
         ]);
     }
 

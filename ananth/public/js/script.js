@@ -16,7 +16,9 @@ function closeDropdownMenu() {
 }
 
 function toggleHamburger() {
-    navMenu.classList.toggle("show");
+    if (navMenu) {
+        navMenu.classList.toggle("show");
+    }
 }
 
 dropdownBtn.forEach((btn) => {
@@ -62,12 +64,18 @@ document.addEventListener("keydown", (e) => {
 });
 
 // toggle hamburger menu
-hamburgerBtn.addEventListener("click", toggleHamburger);
+if (hamburgerBtn) {
+    hamburgerBtn.addEventListener("click", toggleHamburger);
+}
 
 window.addEventListener('scroll', function () {
     const header = document.getElementById('nav-menu');
     const menuLinks = document.querySelectorAll('.mainColor');
     const scrollPosition = window.scrollY;
+
+    if (!header) {
+        return;
+    }
 
     if (scrollPosition >= 150) {
         header.style.backgroundColor = '#ffffff';

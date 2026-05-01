@@ -16,9 +16,13 @@ use App\Models\BlogCategories;
 use App\Models\ContributorPost;
 use App\Models\Contact;
 use App\Models\TeamMember;
-use App\Models\HomePage;
-use App\Models\AboutPage;
 use App\Models\Milestone;
+use App\Models\HomePageSetting;
+use App\Models\AboutPageSetting;
+use App\Models\Founder;
+use App\Models\FounderCredential;
+use App\Models\ServiceCard;
+use App\Models\ExpertDeskPillar;
 use App\Mail\ContactSubmissionAdminNotification;
 
 class HomeController extends Controller
@@ -27,55 +31,30 @@ class HomeController extends Controller
 
     public function homePage()
     {
-        $featured = Blogs::editorialByAnanth()
-            ->where([['status', 1], ['slug', $this->featuredSlug]])
-            ->first();
+        $settings    = HomePageSetting::first();
+        $credentials = FounderCredential::orderBy('sort_order')->get();
+        $services    = ServiceCard::where('visible', true)->orderBy('sort_order')->get();
+        $pillars     = ExpertDeskPillar::orderBy('sort_order')->get();
+        $featured    = Blogs::editorialByAnanth()
+                            ->where('status', 1)
+                            ->orderBy('created_at', 'desc')
+                            ->limit(3)
+                            ->get();
 
-        $latestLimit = $featured ? 2 : 3;
+        $contributorPosts = ContributorPost::with(['author', 'category'])
+                            ->published()
+                            ->orderByDesc('is_featured')
+                            ->latest('published_at')
+                            ->limit(3)
+                            ->get();
 
-        $latest = Blogs::editorialByAnanth()
-            ->where('status', 1)
-            ->when($featured, fn($q) => $q->where('id', '!=', $featured->id))
-            ->orderBy('created_at', 'desc')
-            ->limit($latestLimit)
-            ->get();
-
-        // Fallback: if featured missing, pick the newest and re-run latest list to avoid duplicates
-        if (!$featured) {
-            $featured = Blogs::editorialByAnanth()
-                ->where('status', 1)
-                ->orderBy('created_at', 'desc')
-                ->first();
-            $latest = Blogs::editorialByAnanth()
-                ->where('status', 1)
-                ->when($featured, fn($q) => $q->where('id', '!=', $featured->id))
-                ->orderBy('created_at', 'desc')
-                ->limit($latestLimit)
-                ->get();
-        }
-        $homeContent = HomePage::all()->keyBy('section_key');
-        $featuredContributorPosts = ContributorPost::with(['author', 'category'])
-            ->published()
-            ->where('is_featured', true)
-            ->latest('published_at')
-            ->take(3)
-            ->get();
-        $pageMeta = $homeContent->get('page_meta');
-
-        return view('front.homePage', [
-            'latest' => $latest,
-            'featured' => $featured,
-            'homeContent' => $homeContent,
-            'featuredContributorPosts' => $featuredContributorPosts,
-            'seo' => [
-                'title' => $pageMeta->meta_title ?? 'Ananth Decodes Logistics',
-                'description' => $pageMeta->meta_description ?? 'Ananthakrishnan J is a seasoned executive and strategic leader with over 25 years of distinguished experience in transport, logistics, and integrated facility management.',
-                'keywords' => $pageMeta->meta_keywords ?? null,
-                'canonical' => $pageMeta->canonical_url ?? url('/'),
-                'image' => $this->publicAssetUrl($pageMeta->og_image ?? null, asset('img/site-banner.jpg')),
-                'robots' => $this->robotsContent($pageMeta->robots_index ?? true, $pageMeta->robots_follow ?? true),
-                'schema' => $pageMeta->schema_json_ld ?? null,
-            ],
+        return view('home', compact('settings', 'credentials', 'services', 'pillars', 'featured', 'contributorPosts'))->with('seo', [
+            'title' => $settings?->meta_title ?: ($settings?->hero_heading ?? 'Ananth Decodes Logistics'),
+            'description' => $settings?->meta_description ?: ($settings?->hero_subheading ?? 'Logistics insights, strategy, and thought-leadership by Dr. Ananthakrishnan Janardhanan.'),
+            'canonical' => $settings?->canonical_url ?: url('/'),
+            'image' => $this->publicAssetUrl($settings?->og_image ?: $settings?->hero_image, asset('img/site/About-us-banner.jpg')),
+            'robots' => $this->robotsContent((bool) ($settings?->robots_index ?? true), (bool) ($settings?->robots_follow ?? true)),
+            'schema' => $settings?->schema_json_ld,
         ]);
     }
 
@@ -101,24 +80,17 @@ class HomeController extends Controller
 
     public function aboutUs()
     {
-        $members = TeamMember::orderBy('position', 'asc')->get();
-        $aboutContent = AboutPage::all()->keyBy('section_key');
-        $milestones = Milestone::where('status', 1)->orderBy('position', 'asc')->get();
-        $pageMeta = $aboutContent->get('page_meta');
+        $settings = AboutPageSetting::first();
+        $founders = Founder::where('visible', true)->orderBy('sort_order')->get();
+        $services = ServiceCard::where('visible', true)->orderBy('sort_order')->get();
 
-        return view('front.aboutUs', [
-            'members' => $members,
-            'aboutContent' => $aboutContent,
-            'milestones' => $milestones,
-            'seo' => [
-                'title' => $pageMeta->meta_title ?? 'About Us — Ananth Decodes Logistics',
-                'description' => $pageMeta->meta_description ?? 'Learn more about Ananth Decodes Logistics, our founder, and our strategic vision in logistics and transport.',
-                'keywords' => $pageMeta->meta_keywords ?? null,
-                'canonical' => $pageMeta->canonical_url ?? url('about-us'),
-                'image' => $this->publicAssetUrl($pageMeta->og_image ?? null, asset('img/site-banner.jpg')),
-                'robots' => $this->robotsContent($pageMeta->robots_index ?? true, $pageMeta->robots_follow ?? true),
-                'schema' => $pageMeta->schema_json_ld ?? null,
-            ],
+        return view('about', compact('settings', 'founders', 'services'))->with('seo', [
+            'title' => $settings?->meta_title ?: (($settings?->hero_heading ?? 'About') . ' - Ananth Decodes Logistics'),
+            'description' => $settings?->meta_description ?: ($settings?->hero_subheading ?? 'Meet the team behind Ananth Decodes Logistics Private Limited.'),
+            'canonical' => $settings?->canonical_url ?: url('/about'),
+            'image' => $this->publicAssetUrl($settings?->og_image ?: $settings?->hero_image, asset('img/site/About-us-banner.jpg')),
+            'robots' => $this->robotsContent((bool) ($settings?->robots_index ?? true), (bool) ($settings?->robots_follow ?? true)),
+            'schema' => $settings?->schema_json_ld,
         ]);
     }
 
@@ -169,7 +141,7 @@ class HomeController extends Controller
 
         return Str::startsWith($path, ['http://', 'https://'])
             ? $path
-            : asset($path);
+            : (Str::startsWith($path, ['img/', 'media/']) ? asset($path) : asset('storage/' . $path));
     }
 
     private function robotsContent(bool $index, bool $follow): string

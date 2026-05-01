@@ -30,6 +30,7 @@
                 <li class="{{ request()->is('admin/members-list*') || request()->is('admin/edit-member/*') ? 'active_tab' : '' }}"><a href="/admin/members-list/"><i class="fas fa-users"></i>Manage Members</a></li>
                 <li class="{{ request()->is('admin/edit-home-page*') ? 'active_tab' : '' }}"><a href="/admin/edit-home-page/"><i class="fas fa-home"></i>Edit Home Page</a></li>
                 <li class="{{ request()->is('admin/edit-about-page*') ? 'active_tab' : '' }}"><a href="/admin/edit-about-page/"><i class="fas fa-info-circle"></i>Edit About Page</a></li>
+                <li class="{{ request()->is('admin/page-banners*') ? 'active_tab' : '' }}"><a href="/admin/page-banners/"><i class="fas fa-image"></i>Page Banners</a></li>
                 <li class="{{ request()->is('admin/manage-milestones*') || request()->is('admin/add-milestone*') || request()->is('admin/edit-milestone/*') ? 'active_tab' : '' }}"><a href="/admin/manage-milestones/"><i class="fas fa-trophy"></i>Manage Milestones</a></li>
                 <li class="{{ request()->is('admin/registrations*') ? 'active_tab' : '' }}" style="border-top:1px solid rgba(148, 163, 184, 0.18);margin-top:.5rem;padding-top:.5rem;">
                     <a href="/admin/registrations"><i class="fas fa-user-plus"></i>Contributor Registrations</a>

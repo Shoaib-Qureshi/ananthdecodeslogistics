@@ -9,7 +9,8 @@ use Illuminate\Database\QueryException;
 use App\Models\User;
 use App\Models\Blogs;
 use App\Models\BlogCategories;
-use App\Models\AboutPage;
+use App\Models\Founder;
+use App\Models\PageBanner;
 use Illuminate\Support\Str;
 use App\Models\BookReview;
 
@@ -62,7 +63,7 @@ class ArticleController extends Controller
         
         $related = Blogs::where([['status', 1], ['visibility', 1]])->orderBy('created_at', 'desc')->limit(9)->get();
         $author = User::where('id', $article->user_id)->first();
-        $founderProfile = AboutPage::where('section_key', 'founder_profile')->first();
+        $founderProfile = Founder::where('visible', true)->orderBy('sort_order')->first();
         return view('blogs.articlePage', [
             'article' => $article,
             'related' => $related,
@@ -147,7 +148,8 @@ class ArticleController extends Controller
     {
         $listBook = BookReview::where('status', 1)->orderBy('created_at', 'desc')->get();
         return view('reviews.bookReviews', [
-            'listBook' => $listBook
+            'listBook' => $listBook,
+            'banner' => PageBanner::forKey('book_reviews'),
         ]);
     }
 
@@ -170,7 +172,7 @@ class ArticleController extends Controller
 
         return Str::startsWith($path, ['http://', 'https://'])
             ? $path
-            : asset($path);
+            : (Str::startsWith($path, ['img/', 'media/']) ? asset($path) : asset('storage/' . $path));
     }
 
     private function robotsContent(bool $index, bool $follow): string

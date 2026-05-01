@@ -12,37 +12,32 @@
             background-color: var(--white) !important;
         }
     </style>
-    <section class="gradientBg bothPadding">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-7">
-                    <div class="headingMain">
-                        <h1>Book Reviews</h1>
-                        <p>Discover insightful summaries and honest opinions on a wide range of books. Whether you're
-                            looking for your next great read or just curious about a title, our reviews offer thoughtful
-                            reflections to guide your reading journey.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section class="bookListing">
-        <div class="container">
-            <div class="row">
+    @include('partials.page-banner', [
+        'banner' => $banner ?? null,
+        'fallbackHeading' => 'Book Reviews',
+        'fallbackSubheading' => 'Discover thoughtful reviews and practical reading takeaways for logistics and leadership-minded readers.',
+    ])
+    <section class="adl-resource-section">
+        <div class="adl-resource-container">
+            <div class="adl-resource-grid">
                  @if (count($listBook) > 0)
                     @foreach ($listBook as $item)
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="bookCard">
-                                <img src="{{ '/img/thumbnail/' . $item->cover }}" alt="{{ $item->name }}">
-                                <div class="bookCardMeta">
-                                    <h3><a href="/book-review/{{ $item->slug }}/">{{ $item->name }}</a></h3>
-                                    <p>by <span>{{ $item->author }}</span></p>
-                                </div>
+                        @php
+                            $cover = $item->cover ? asset('img/thumbnail/' . $item->cover) : asset('img/site-banner.jpg');
+                        @endphp
+                        <a class="adl-resource-card" href="/book-review/{{ $item->slug }}/" title="{{ $item->name }}">
+                            <div class="adl-resource-card__media">
+                                <img src="{{ $cover }}" alt="{{ $item->name }}" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('img/site-banner.jpg') }}';">
                             </div>
-                        </div>
+                            <div class="adl-resource-card__body">
+                                <h3>{{ $item->name }}</h3>
+                                <p>by {{ $item->author }}</p>
+                                <span class="adl-resource-card__cta">Read Review <i class="bx bx-right-arrow-alt" aria-hidden="true"></i></span>
+                            </div>
+                        </a>
                     @endforeach
                 @else
-                    <h3 class="text-center">No book reviews posted yet!</h3>
+                    <div class="adl-resource-empty">No book reviews posted yet.</div>
                 @endif
             </div>
         </div>

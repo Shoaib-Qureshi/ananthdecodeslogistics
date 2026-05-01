@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ContributorPost;
 use App\Models\Blogs;
 use App\Models\User;
+use App\Models\PageBanner;
 use Illuminate\Support\Str;
 
 class ContributorBlogController extends Controller
@@ -19,7 +20,9 @@ class ContributorBlogController extends Controller
             ->latest('published_at')
             ->paginate(10);
 
-        return view('contributors.index', compact('posts'));
+        $banner = PageBanner::forKey('expert_desk');
+
+        return view('contributors.index', compact('posts', 'banner'));
     }
 
     public function showContributor($slug)
@@ -80,7 +83,9 @@ class ContributorBlogController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('blog.index', compact('posts'));
+        $banner = PageBanner::forKey('blog');
+
+        return view('blog.index', compact('posts', 'banner'));
     }
 
     public function showBlog($slug)
@@ -140,7 +145,7 @@ class ContributorBlogController extends Controller
 
         return Str::startsWith($path, ['http://', 'https://'])
             ? $path
-            : asset($path);
+            : (Str::startsWith($path, ['img/', 'media/']) ? asset($path) : asset('storage/' . $path));
     }
 
     private function robotsContent(bool $index, bool $follow): string

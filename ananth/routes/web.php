@@ -68,6 +68,8 @@ Route::middleware([admin::class])->group(function () {
     Route::post('admin/update-home-page',[PageContentController::class,'updateHomePage'])->name('updateHomePage');
     Route::get('admin/edit-about-page',[PageContentController::class,'editAboutPage'])->name('editAboutPage');
     Route::post('admin/update-about-page',[PageContentController::class,'updateAboutPage'])->name('updateAboutPage');
+    Route::get('admin/page-banners',[PageContentController::class,'editPageBanners'])->name('admin.page-banners.edit');
+    Route::post('admin/page-banners',[PageContentController::class,'updatePageBanners'])->name('admin.page-banners.update');
     Route::get('admin/manage-milestones',[PageContentController::class,'manageMilestones'])->name('manageMilestones');
     Route::get('admin/add-milestone',[PageContentController::class,'addMilestone'])->name('addMilestone');
     Route::post('admin/save-milestone',[PageContentController::class,'saveMilestone'])->name('saveMilestone');
@@ -204,7 +206,8 @@ Route::get('contributor-login', function (\Illuminate\Http\Request $request) {
 
 // *********************** Front Routes ***********************
 Route::get('/',[HomeController::class,'homePage']);
-Route::get('about-us',[HomeController::class,'aboutUs']);
+Route::get('about-us', [HomeController::class, 'aboutUs']);
+Route::get('about',    [HomeController::class, 'aboutUs']);
 Route::get('privacy-policy',[HomeController::class,'privacyPolicy']);
 Route::get('terms-and-conditions',[HomeController::class,'termsConditions']);
 Route::get('contact-us',[HomeController::class,'contactUs']);
