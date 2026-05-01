@@ -26,6 +26,10 @@ dropdownBtn.forEach((btn) => {
         const dropdownIndex = e.currentTarget.dataset.dropdown;
         const dropdownElement = document.getElementById(dropdownIndex);
 
+        if (!dropdownElement) {
+            return;
+        }
+
         dropdownElement.classList.toggle("active");
         dropdown.forEach((drop) => {
             if (drop.id !== btn.dataset["dropdown"]) {
@@ -93,15 +97,17 @@ window.addEventListener('scroll', function () {
 });
 
 // ============== Header/Menu Js End ==================
-$(window).scroll(function () {
-    var scroll = $(window).scrollTop();
-    if (scroll > 150) {
-        $("#nav-menu").addClass("active");
-    }
-    else {
-        $("#nav-menu").removeClass("active");
-    }
-});
+if (window.jQuery) {
+    $(window).scroll(function () {
+        var scroll = $(window).scrollTop();
+        if (scroll > 150) {
+            $("#nav-menu").addClass("active");
+        }
+        else {
+            $("#nav-menu").removeClass("active");
+        }
+    });
+}
 
 // ========== 
 
