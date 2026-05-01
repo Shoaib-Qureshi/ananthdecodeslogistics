@@ -38,6 +38,11 @@
         .row-card{min-width:0;overflow:hidden;border:1px solid #d8e3f0;border-radius:14px;padding:16px;margin-bottom:12px;background:#fff}
         .row-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
         .row-card-head h5{margin:0;color:#0f172a;font-size:1rem;font-weight:800}
+        .row-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .admin-link-btn{display:inline-flex;align-items:center;gap:7px;border:1px solid #d8e3f0;border-radius:40px;background:#fff;color:#475569;padding:8px 12px;font-size:.82rem;font-weight:800;line-height:1;transition:background .2s,color .2s,border-color .2s}
+        .admin-link-btn:hover{background:#eff6ff;border-color:#bfdbfe;color:#2562E9}
+        .admin-link-btn.danger:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+        .section-actions{display:flex;justify-content:flex-end;margin-top:14px}
         .visibility-toggle{display:inline-flex!important;align-items:center;gap:8px;white-space:nowrap;color:#475569;font-size:.82rem;font-weight:800}
         .visibility-toggle input{position:absolute;opacity:0;pointer-events:none}
         .visibility-toggle span{position:relative;width:42px;height:24px;border-radius:999px;background:#cbd5e1;transition:background .2s}
@@ -139,18 +144,26 @@
                             </div>
                             <span class="section-chip">Repeatable rows</span>
                         </div>
+                        <div id="founderRows" data-next-index="{{ $founders->count() + 1 }}">
                         @foreach($founders->concat([new \App\Models\Founder]) as $index => $founder)
-                            <div class="row-card">
+                            <div class="row-card" data-founder-row>
                                 <div class="row-card-head">
                                     <h5>Founder {{ $index + 1 }}</h5>
-                                    <label class="visibility-toggle">
-                                        <input type="hidden" name="founders[{{ $index }}][visible]" value="0">
-                                        <input type="checkbox" name="founders[{{ $index }}][visible]" value="1" {{ old("founders.$index.visible", $founder->visible ?? true) ? 'checked' : '' }}>
-                                        <span aria-hidden="true"></span>
-                                        Visible
-                                    </label>
+                                    <div class="row-actions">
+                                        <button class="admin-link-btn danger" type="button" data-remove-founder>
+                                            <i class="fas fa-trash-alt"></i>
+                                            Remove
+                                        </button>
+                                        <label class="visibility-toggle">
+                                            <input type="hidden" name="founders[{{ $index }}][visible]" value="0">
+                                            <input type="checkbox" name="founders[{{ $index }}][visible]" value="1" {{ old("founders.$index.visible", $founder->visible ?? true) ? 'checked' : '' }}>
+                                            <span aria-hidden="true"></span>
+                                            Visible
+                                        </label>
+                                    </div>
                                 </div>
                                 <input type="hidden" name="founders[{{ $index }}][id]" value="{{ $founder->id }}">
+                                <input type="hidden" name="founders[{{ $index }}][_delete]" value="0" data-delete-flag>
                                 <div class="grid-2">
                                     <label>Eyebrow<input name="founders[{{ $index }}][eyebrow]" value="{{ old("founders.$index.eyebrow", $founder->eyebrow) }}"></label>
                                     <label>Name<input name="founders[{{ $index }}][name]" value="{{ old("founders.$index.name", $founder->name) }}"></label>
@@ -168,6 +181,13 @@
                                 <label>Bio<textarea class="wysiwyg" name="founders[{{ $index }}][bio]">{{ old("founders.$index.bio", $founder->bio) }}</textarea></label>
                             </div>
                         @endforeach
+                        </div>
+                        <div class="section-actions">
+                            <button class="admin-link-btn" type="button" id="addFounderCard">
+                                <i class="fas fa-plus"></i>
+                                Add Founder
+                            </button>
+                        </div>
                     </div>
 
                     <div class="section-box" id="purpose-section">
@@ -201,18 +221,26 @@
                             <label>Services Heading<input name="settings[services_heading]" value="{{ old('settings.services_heading', $settings->services_heading) }}"></label>
                         </div>
                         <label>Services Intro<textarea name="settings[services_intro]" rows="3">{{ old('settings.services_intro', $settings->services_intro) }}</textarea></label>
+                        <div id="aboutServiceRows" data-next-index="{{ $services->count() + 1 }}">
                         @foreach($services->concat([new \App\Models\ServiceCard]) as $index => $service)
-                            <div class="row-card">
+                            <div class="row-card" data-service-row>
                                 <div class="row-card-head">
                                     <h5>Service Card {{ $index + 1 }}</h5>
-                                    <label class="visibility-toggle">
-                                        <input type="hidden" name="services[{{ $index }}][visible]" value="0">
-                                        <input type="checkbox" name="services[{{ $index }}][visible]" value="1" {{ old("services.$index.visible", $service->visible ?? true) ? 'checked' : '' }}>
-                                        <span aria-hidden="true"></span>
-                                        Visible
-                                    </label>
+                                    <div class="row-actions">
+                                        <button class="admin-link-btn danger" type="button" data-remove-service>
+                                            <i class="fas fa-trash-alt"></i>
+                                            Remove
+                                        </button>
+                                        <label class="visibility-toggle">
+                                            <input type="hidden" name="services[{{ $index }}][visible]" value="0">
+                                            <input type="checkbox" name="services[{{ $index }}][visible]" value="1" {{ old("services.$index.visible", $service->visible ?? true) ? 'checked' : '' }}>
+                                            <span aria-hidden="true"></span>
+                                            Visible
+                                        </label>
+                                    </div>
                                 </div>
                                 <input type="hidden" name="services[{{ $index }}][id]" value="{{ $service->id }}">
+                                <input type="hidden" name="services[{{ $index }}][_delete]" value="0" data-delete-flag>
                                 <div class="grid-2">
                                     <label>Title<input name="services[{{ $index }}][title]" value="{{ old("services.$index.title", $service->title) }}"></label>
                                     <label>Status
@@ -227,6 +255,13 @@
                                 <label>Description<textarea name="services[{{ $index }}][description]" rows="3">{{ old("services.$index.description", $service->description) }}</textarea></label>
                             </div>
                         @endforeach
+                        </div>
+                        <div class="section-actions">
+                            <button class="admin-link-btn" type="button" id="addAboutServiceCard">
+                                <i class="fas fa-plus"></i>
+                                Add Service Card
+                            </button>
+                        </div>
                         <div class="row-card">
                             <label>Transparency Title<input name="settings[transparency_note_title]" value="{{ old('settings.transparency_note_title', $settings->transparency_note_title) }}"></label>
                             <label>Transparency Body<textarea class="wysiwyg" name="settings[transparency_note_body]">{{ old('settings.transparency_note_body', $settings->transparency_note_body) }}</textarea></label>
@@ -290,6 +325,160 @@
 @include('admin.adminFooter')
 <script src="/js/ckeditor.js"></script>
 <script>
+const founderRows = document.getElementById('founderRows');
+const addFounderCard = document.getElementById('addFounderCard');
+const aboutServiceRows = document.getElementById('aboutServiceRows');
+const addAboutServiceCard = document.getElementById('addAboutServiceCard');
+
+function removeRepeatableRow(row, renumberCallback) {
+    const idInput = row.querySelector('input[name$="[id]"]');
+    const deleteFlag = row.querySelector('[data-delete-flag]');
+    if (idInput && idInput.value && deleteFlag) {
+        deleteFlag.value = '1';
+        row.style.display = 'none';
+    } else {
+        row.remove();
+    }
+    if (renumberCallback) renumberCallback();
+}
+
+function renumberFounderRows() {
+    if (!founderRows) return;
+    Array.from(founderRows.querySelectorAll('[data-founder-row]'))
+        .filter(function (row) { return row.style.display !== 'none'; })
+        .forEach(function (row, index) {
+            const title = row.querySelector('.row-card-head h5');
+            const sortInput = row.querySelector('input[name$="[sort_order]"]');
+            if (title) title.textContent = 'Founder ' + (index + 1);
+            if (sortInput && !sortInput.value) sortInput.value = index;
+        });
+}
+
+function bindFounderRemove(row) {
+    const removeButton = row.querySelector('[data-remove-founder]');
+    if (!removeButton) return;
+    removeButton.addEventListener('click', function () {
+        removeRepeatableRow(row, renumberFounderRows);
+    });
+}
+
+if (founderRows) {
+    founderRows.querySelectorAll('[data-founder-row]').forEach(bindFounderRemove);
+}
+
+if (founderRows && addFounderCard) {
+    addFounderCard.addEventListener('click', function () {
+        const index = Number(founderRows.dataset.nextIndex || 0);
+        founderRows.dataset.nextIndex = String(index + 1);
+        const row = document.createElement('div');
+        row.className = 'row-card';
+        row.setAttribute('data-founder-row', '');
+        row.innerHTML = `
+            <div class="row-card-head">
+                <h5>Founder</h5>
+                <div class="row-actions">
+                    <button class="admin-link-btn danger" type="button" data-remove-founder>
+                        <i class="fas fa-trash-alt"></i>
+                        Remove
+                    </button>
+                    <label class="visibility-toggle">
+                        <input type="hidden" name="founders[${index}][visible]" value="0">
+                        <input type="checkbox" name="founders[${index}][visible]" value="1" checked>
+                        <span aria-hidden="true"></span>
+                        Visible
+                    </label>
+                </div>
+            </div>
+            <input type="hidden" name="founders[${index}][id]" value="">
+            <input type="hidden" name="founders[${index}][_delete]" value="0" data-delete-flag>
+            <div class="grid-2">
+                <label>Eyebrow<input name="founders[${index}][eyebrow]" value=""></label>
+                <label>Name<input name="founders[${index}][name]" value=""></label>
+                <label>Title<input name="founders[${index}][title]" value=""></label>
+                <label>Sort Order<input name="founders[${index}][sort_order]" type="number" value=""></label>
+                <label>Photo<input name="founders[${index}][photo]" type="file" accept="image/*"></label>
+                <label>Signature Image<input name="founders[${index}][signature_image]" type="file" accept="image/*"></label>
+            </div>
+            <label>Bio<textarea class="wysiwyg" name="founders[${index}][bio]"></textarea></label>
+        `;
+        founderRows.appendChild(row);
+        bindFounderRemove(row);
+        renumberFounderRows();
+        const textarea = row.querySelector('.wysiwyg');
+        if (textarea && window.ClassicEditor) {
+            ClassicEditor.create(textarea, { ckfinder: { uploadUrl: "{{ '/admin/image_upload?_token=' . csrf_token() }}" } }).catch(console.error);
+        }
+    });
+}
+
+function renumberAboutServiceRows() {
+    if (!aboutServiceRows) return;
+    Array.from(aboutServiceRows.querySelectorAll('[data-service-row]'))
+        .filter(function (row) { return row.style.display !== 'none'; })
+        .forEach(function (row, index) {
+            const title = row.querySelector('.row-card-head h5');
+            const sortInput = row.querySelector('input[name$="[sort_order]"]');
+            if (title) title.textContent = 'Service Card ' + (index + 1);
+            if (sortInput && !sortInput.value) sortInput.value = index;
+        });
+}
+
+function bindAboutServiceRemove(row) {
+    const removeButton = row.querySelector('[data-remove-service]');
+    if (!removeButton) return;
+    removeButton.addEventListener('click', function () {
+        removeRepeatableRow(row, renumberAboutServiceRows);
+    });
+}
+
+if (aboutServiceRows) {
+    aboutServiceRows.querySelectorAll('[data-service-row]').forEach(bindAboutServiceRemove);
+}
+
+if (aboutServiceRows && addAboutServiceCard) {
+    addAboutServiceCard.addEventListener('click', function () {
+        const index = Number(aboutServiceRows.dataset.nextIndex || 0);
+        aboutServiceRows.dataset.nextIndex = String(index + 1);
+        const row = document.createElement('div');
+        row.className = 'row-card';
+        row.setAttribute('data-service-row', '');
+        row.innerHTML = `
+            <div class="row-card-head">
+                <h5>Service Card</h5>
+                <div class="row-actions">
+                    <button class="admin-link-btn danger" type="button" data-remove-service>
+                        <i class="fas fa-trash-alt"></i>
+                        Remove
+                    </button>
+                    <label class="visibility-toggle">
+                        <input type="hidden" name="services[${index}][visible]" value="0">
+                        <input type="checkbox" name="services[${index}][visible]" value="1" checked>
+                        <span aria-hidden="true"></span>
+                        Visible
+                    </label>
+                </div>
+            </div>
+            <input type="hidden" name="services[${index}][id]" value="">
+            <input type="hidden" name="services[${index}][_delete]" value="0" data-delete-flag>
+            <div class="grid-2">
+                <label>Title<input name="services[${index}][title]" value=""></label>
+                <label>Status
+                    <select name="services[${index}][status]">
+                        <option value="active" selected>Active</option>
+                        <option value="coming_soon">Coming Soon</option>
+                    </select>
+                </label>
+                <label>Link URL<input name="services[${index}][link_url]" value=""></label>
+                <label>Sort Order<input name="services[${index}][sort_order]" type="number" value=""></label>
+            </div>
+            <label>Description<textarea name="services[${index}][description]" rows="3"></textarea></label>
+        `;
+        aboutServiceRows.appendChild(row);
+        bindAboutServiceRemove(row);
+        renumberAboutServiceRows();
+    });
+}
+
 const editorNavLinks = Array.from(document.querySelectorAll('.editor-nav a[href^="#"]'));
 const editorSections = editorNavLinks
     .map(function (link) { return document.querySelector(link.getAttribute('href')); })

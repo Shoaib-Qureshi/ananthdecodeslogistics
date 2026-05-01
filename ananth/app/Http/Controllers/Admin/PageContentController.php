@@ -195,6 +195,7 @@ class PageContentController extends Controller
             'credentials.*.id' => 'nullable|integer|exists:founder_credentials,id',
             'credentials.*.credential' => 'nullable|string|max:500',
             'credentials.*.sort_order' => 'nullable|integer',
+            'credentials.*._delete' => 'nullable|boolean',
             'services' => 'nullable|array',
             'services.*.id' => 'nullable|integer|exists:service_cards,id',
             'services.*.title' => 'nullable|string|max:255',
@@ -204,11 +205,13 @@ class PageContentController extends Controller
             'services.*.link_url' => 'nullable|string|max:255',
             'services.*.sort_order' => 'nullable|integer',
             'services.*.visible' => 'nullable|boolean',
+            'services.*._delete' => 'nullable|boolean',
             'pillars' => 'nullable|array',
             'pillars.*.id' => 'nullable|integer|exists:expert_desk_pillars,id',
             'pillars.*.title' => 'nullable|string|max:255',
             'pillars.*.body' => 'nullable|string|max:1000',
             'pillars.*.sort_order' => 'nullable|integer',
+            'pillars.*._delete' => 'nullable|boolean',
             'site' => 'nullable|array',
             'site.*' => 'nullable',
             'site.footer_logo' => 'nullable|image|max:2048',
@@ -231,6 +234,7 @@ class PageContentController extends Controller
             'founders.*.visible' => 'nullable|boolean',
             'founders.*.photo' => 'nullable|image|max:4096',
             'founders.*.signature_image' => 'nullable|image|max:2048',
+            'founders.*._delete' => 'nullable|boolean',
             'services' => 'nullable|array',
             'services.*.id' => 'nullable|integer|exists:service_cards,id',
             'services.*.title' => 'nullable|string|max:255',
@@ -240,6 +244,7 @@ class PageContentController extends Controller
             'services.*.link_url' => 'nullable|string|max:255',
             'services.*.sort_order' => 'nullable|integer',
             'services.*.visible' => 'nullable|boolean',
+            'services.*._delete' => 'nullable|boolean',
         ];
     }
 
@@ -256,6 +261,13 @@ class PageContentController extends Controller
     private function syncServices(array $items): void
     {
         foreach ($items as $item) {
+            if (!empty($item['_delete'])) {
+                if (!empty($item['id']) && ($service = ServiceCard::find($item['id']))) {
+                    $service->delete();
+                }
+                continue;
+            }
+
             if (empty($item['title']) && empty($item['description'])) {
                 continue;
             }
@@ -279,6 +291,13 @@ class PageContentController extends Controller
     private function syncFounders(Request $request, array $items): void
     {
         foreach ($items as $index => $item) {
+            if (!empty($item['_delete'])) {
+                if (!empty($item['id']) && ($founder = Founder::find($item['id']))) {
+                    $founder->delete();
+                }
+                continue;
+            }
+
             if (empty($item['name']) && empty($item['bio'])) {
                 continue;
             }
@@ -304,6 +323,13 @@ class PageContentController extends Controller
     private function syncSimpleRows(array $items, string $modelClass, array $columns, string $requiredColumn): void
     {
         foreach ($items as $item) {
+            if (!empty($item['_delete'])) {
+                if (!empty($item['id']) && ($model = $modelClass::find($item['id']))) {
+                    $model->delete();
+                }
+                continue;
+            }
+
             if (empty($item[$requiredColumn])) {
                 continue;
             }
