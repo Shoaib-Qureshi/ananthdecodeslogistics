@@ -31,6 +31,13 @@
                 <li class="{{ request()->is('admin/edit-home-page*') ? 'active_tab' : '' }}"><a href="/admin/edit-home-page/"><i class="fas fa-home"></i>Edit Home Page</a></li>
                 <li class="{{ request()->is('admin/edit-about-page*') ? 'active_tab' : '' }}"><a href="/admin/edit-about-page/"><i class="fas fa-info-circle"></i>Edit About Page</a></li>
                 <li class="{{ request()->is('admin/page-banners*') ? 'active_tab' : '' }}"><a href="/admin/page-banners/"><i class="fas fa-image"></i>Page Banners</a></li>
+                <li class="{{ request()->is('admin/gallery*') ? 'active_tab' : '' }}"><a href="/admin/gallery"><i class="fas fa-images"></i>Manage Gallery</a></li>
+                <li style="border-top:1px solid rgba(148,163,184,.22);margin-top:.55rem;padding-top:.7rem;color:#94a3b8;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;">Events</li>
+                <li class="{{ request()->is('admin/events') ? 'active_tab' : '' }}"><a href="/admin/events"><i class="fas fa-calendar-alt"></i>All Events</a></li>
+                <li class="{{ request()->is('admin/events/logisphere*') ? 'active_tab' : '' }}"><a href="/admin/events/logisphere/edit"><i class="fas fa-edit"></i>Edit Active Event</a></li>
+                <li class="{{ request()->is('admin/events/sponsor-packages*') ? 'active_tab' : '' }}"><a href="/admin/events/sponsor-packages"><i class="fas fa-handshake"></i>Event Sponsors</a></li>
+                <li class="{{ request()->is('admin/events/registrations*') ? 'active_tab' : '' }}"><a href="/admin/events/registrations"><i class="fas fa-clipboard-list"></i>Event Registrations</a></li>
+                <li class="{{ request()->is('admin/events/sponsor-payments*') ? 'active_tab' : '' }}"><a href="/admin/events/sponsor-payments"><i class="fas fa-credit-card"></i>Sponsor Payments</a></li>
                 <li class="{{ request()->is('admin/manage-milestones*') || request()->is('admin/add-milestone*') || request()->is('admin/edit-milestone/*') ? 'active_tab' : '' }}"><a href="/admin/manage-milestones/"><i class="fas fa-trophy"></i>Manage Milestones</a></li>
                 <li class="{{ request()->is('admin/registrations*') ? 'active_tab' : '' }}" style="border-top:1px solid rgba(148, 163, 184, 0.18);margin-top:.5rem;padding-top:.5rem;">
                     <a href="/admin/registrations"><i class="fas fa-user-plus"></i>Contributor Registrations</a>

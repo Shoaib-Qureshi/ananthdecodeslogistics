@@ -31,7 +31,7 @@
         <div class="w-full">
             <div class="max-w-4xl">
                 @if($settings?->hero_eyebrow)
-                    <p class="inline-flex items-center gap-3 rounded-full bg-white/92 border border-border px-4 py-2 mb-7 reveal text-steel text-xs font-semibold uppercase">
+                    <p style="background-color: white;" class="inline-flex items-center gap-3 rounded-full bg-white/92 border border-border px-4 py-2 mb-7 reveal text-cta text-xs font-semibold uppercase">
                         <i class="bx bx-compass text-base text-cta" aria-hidden="true"></i>
                         {{ $settings->hero_eyebrow }}
                     </p>
@@ -54,7 +54,7 @@
         <div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-14 items-start">
             <div class="reveal lg:sticky lg:top-28">
                 @if($settings?->intro_eyebrow)
-                    <p class="section-kicker text-steel text-xs font-semibold uppercase mb-5">{{ $settings->intro_eyebrow }}</p>
+                    <p class="section-kicker text-cta text-xs font-semibold uppercase mb-5">{{ $settings->intro_eyebrow }}</p>
                 @endif
                 <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl text-navy leading-tight mb-6">{{ $settings?->intro_heading }}</h2>
                 <p class="text-muted leading-7 max-w-md">A focused point of view on logistics, leadership, and supply chain change.</p>
@@ -73,7 +73,7 @@
                         <p class="text-navy text-sm font-semibold">Operations</p>
                     </div>
                     <div class="bg-white/80 border border-border rounded-lg p-4">
-                        <i class="bx bx-bulb text-2xl text-steel mb-2 block" aria-hidden="true"></i>
+                        <i class="bx bx-bulb text-2xl text-cta mb-2 block" aria-hidden="true"></i>
                         <p class="text-navy text-sm font-semibold">Perspective</p>
                     </div>
                 </div>
@@ -86,7 +86,7 @@
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
         <div class="max-w-3xl mx-auto text-center mb-14 reveal">
             <div>
-                <p class="section-kicker text-steel text-xs font-semibold uppercase mb-4">The People Behind ADL</p>
+                <p class="section-kicker text-cta text-xs font-semibold uppercase mb-4">The People Behind ADL</p>
                 <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl text-navy mb-5">Our Leadership</h2>
                 <p class="text-muted text-lg leading-8">The platform is shaped by industry experience, editorial clarity, and a practical understanding of how logistics decisions are made.</p>
             </div>
@@ -100,15 +100,15 @@
                             @if($founder->photo)
                                 <img src="{{ Storage::url($founder->photo) }}" alt="{{ $founder->name }}" class="w-full h-full object-cover" loading="lazy">
                             @else
-                                <div class="w-full h-full flex items-center justify-center text-steel text-7xl"><i class="bx bx-user"></i></div>
+                                <div class="w-full h-full flex items-center justify-center text-cta text-7xl"><i class="bx bx-user"></i></div>
                             @endif
                         </div>
                     </div>
 
                     <div class="{{ $index % 2 ? 'lg:[direction:ltr]' : '' }}">
-                        @if($founder->eyebrow)<p class="text-steel text-xs font-semibold uppercase mb-4">{{ $founder->eyebrow }}</p>@endif
+                        @if($founder->eyebrow)<p class="text-cta text-xs font-semibold uppercase mb-4">{{ $founder->eyebrow }}</p>@endif
                         <h3 class="font-heading text-3xl sm:text-4xl lg:text-5xl text-navy mb-3 leading-tight">{{ $founder->name }}</h3>
-                        <p class="text-steel text-sm font-semibold mb-6">{{ $founder->title }}</p>
+                        <p class="text-cta text-sm font-semibold mb-6">{{ $founder->title }}</p>
                         <div class="text-body text-base lg:text-lg leading-8 prose max-w-none">{!! $founder->bio !!}</div>
                         @if($founder->signature_image)
                             <img src="{{ Storage::url($founder->signature_image) }}" alt="{{ $founder->name }} signature" class="h-12 opacity-70 mt-8" loading="lazy">
@@ -125,7 +125,7 @@
 <section class="py-20 lg:py-28 bg-softbg border-y border-border/70" aria-label="Vision Mission Values">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
         <div class="max-w-3xl mb-12 reveal">
-            <p class="section-kicker text-steel text-xs font-semibold uppercase mb-4">Our Purpose</p>
+            <p class="section-kicker text-cta text-xs font-semibold uppercase mb-4">Our Purpose</p>
             <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl text-navy">Why We Exist</h2>
         </div>
 
@@ -150,7 +150,7 @@
 <section class="py-20 lg:py-28 bg-[linear-gradient(180deg,#FFFFFF_0%,#EFF6FF_100%)]" aria-label="Services">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
         <div class="max-w-3xl mb-12 reveal">
-            @if($settings?->services_eyebrow)<p class="section-kicker text-steel text-xs font-semibold uppercase mb-4">{{ $settings->services_eyebrow }}</p>@endif
+            @if($settings?->services_eyebrow)<p class="section-kicker text-cta text-xs font-semibold uppercase mb-4">{{ $settings->services_eyebrow }}</p>@endif
             <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl text-navy mb-4">{{ $settings?->services_heading }}</h2>
             <p class="text-muted text-lg leading-relaxed">{{ $settings?->services_intro }}</p>
         </div>
@@ -178,7 +178,7 @@
 
         @if($settings?->transparency_note_title)
             <aside class="border border-border bg-white px-6 lg:px-8 py-7 rounded-xl reveal">
-                <p class="text-steel text-xs font-semibold uppercase mb-3">Transparency Note</p>
+                <p class="text-cta text-xs font-semibold uppercase mb-3">Transparency Note</p>
                 <h4 class="text-navy font-semibold mb-3">{{ $settings->transparency_note_title }}</h4>
                 <div class="text-body text-sm leading-7 mb-3 prose max-w-none">{!! $settings->transparency_note_body !!}</div>
                 @if($settings->transparency_note_disclaimer)<p class="text-muted text-xs italic">{{ $settings->transparency_note_disclaimer }}</p>@endif

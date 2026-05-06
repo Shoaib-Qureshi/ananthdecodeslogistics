@@ -3083,3 +3083,8 @@ section.bothPadding.writeForUsSection {
         justify-content: center;
     }
 }
+footer#adl-footer
+ {
+    margin-top: 3.5rem;
+}
+

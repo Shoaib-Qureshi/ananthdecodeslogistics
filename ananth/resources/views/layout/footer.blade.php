@@ -56,6 +56,8 @@
                                 'About Us' => '/about-us',
                                 'Blog' => '/blog',
                                 'The Expert Desk' => route('contributors.index'),
+                                'Events' => '/events/conference',
+                                'Gallery' => '/gallery',
                             ] as $label => $url)
                             <li><a href="{{ $url }}" class="text-white/70 hover:text-white transition-colors duration-200">{{ $label }}</a></li>
                             @endforeach

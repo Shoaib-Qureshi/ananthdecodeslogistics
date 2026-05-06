@@ -117,8 +117,8 @@
     </style>
 
     <section class="articleFaqSection" id="{{ $sectionId ?? 'article-faqs' }}">
-        <h2>Frequently Asked Questions</h2>
-        <p class="articleFaqIntro">Quick answers related to this article.</p>
+        <h2>{{ $faqTitle ?? 'Frequently Asked Questions' }}</h2>
+        <p class="articleFaqIntro">{{ $faqIntro ?? 'Quick answers related to this article.' }}</p>
 
         <div class="articleFaqList">
             @foreach ($faqCollection as $index => $faqItem)

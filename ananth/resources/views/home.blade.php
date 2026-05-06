@@ -25,6 +25,8 @@
 @php
     $heroImage = $settings?->hero_image ? Storage::url($settings->hero_image) : asset('img/site/About-us-banner.jpg');
     $heroHeading = trim(strip_tags(html_entity_decode($settings?->hero_heading ?? 'Your Journey in Logistics, Made Simpler.', ENT_QUOTES, 'UTF-8')));
+    $siteSettings = \App\Models\SiteSetting::first();
+    $founderLinkedIn = $siteSettings?->social_linkedin ?: 'https://www.linkedin.com/in/ananthakrishnan-janardhanan/';
 @endphp
 
 {{-- ═══════════════════════════════════════════════
@@ -128,7 +130,7 @@
                     @endforeach
                 </ul>
             @endif
-            <a href="{{ $settings?->founder_cta_link ?? '/about' }}" class="inline-flex items-center gap-2 text-cta font-semibold hover:text-steel transition-colors">
+            <a href="{{ $founderLinkedIn }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-cta font-semibold hover:text-steel transition-colors">
                 {{ $settings?->founder_cta_label ?? 'Know More About Dr. Ananth' }}
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12"/></svg>
             </a>
@@ -193,6 +195,15 @@
             </article>
             @endforeach
         </div>
+
+        @if($aboutSettings?->transparency_note_title)
+            <aside class="border border-border bg-white px-6 lg:px-8 py-7 rounded-xl reveal mt-10">
+                <p class="text-cta text-xs font-semibold uppercase mb-3">Transparency Note</p>
+                <h4 class="text-navy font-semibold mb-3">{{ $aboutSettings->transparency_note_title }}</h4>
+                <div class="text-body text-sm leading-7 mb-3 prose max-w-none">{!! $aboutSettings->transparency_note_body !!}</div>
+                @if($aboutSettings->transparency_note_disclaimer)<p class="text-muted text-xs italic">{{ $aboutSettings->transparency_note_disclaimer }}</p>@endif
+            </aside>
+        @endif
 
     </div>
 </section>
@@ -275,15 +286,15 @@
 {{-- ═══════════════════════════════════════════════
      THE EXPERT DESK — CTA split
 ═══════════════════════════════════════════════ --}}
-<section class="py-20 lg:py-28 bg-[linear-gradient(180deg,#FFFFFF_0%,#EFF6FF_100%)] border-y border-border/70" aria-label="Authority Contributor Posts">
+<section class="py-20 lg:py-28 bg-[linear-gradient(180deg,#FFFFFF_0%,#EFF6FF_100%)] border-t border-border/70" aria-label="Authority Contributor Posts">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-12 reveal">
             <div>
-                <p class="section-kicker text-teal text-xs font-semibold uppercase mb-4">The Expert Desk</p>
+                <p class="section-kicker text-cta text-xs font-semibold uppercase mb-4">The Expert Desk</p>
                 <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl text-navy mb-2">Authority Contributors</h2>
                 <p class="text-muted max-w-xl">Perspectives from logistics professionals, supply chain experts, and industry thought leaders.</p>
             </div>
-            <a href="{{ route('contributors.index') }}" class="inline-flex items-center justify-center bg-teal text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-steel transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2">
+            <a href="{{ route('contributors.index') }}" class="inline-flex items-center justify-center text-white text-sm font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" style="background:#2562E9" onmouseover="this.style.background='#1a4fc4'" onmouseout="this.style.background='#2562E9'">
                 View All Contributions
             </a>
         </div>
@@ -292,7 +303,7 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($contributorPosts as $post)
             <article class="reveal">
-                <a href="{{ route('contributors.show', $post->slug) }}" class="group block h-full bg-white rounded-xl overflow-hidden border border-border hover:border-teal/35 hover:shadow-[0_18px_50px_rgba(15,23,42,0.12)] hover:-translate-y-1 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2">
+                <a href="{{ route('contributors.show', $post->slug) }}" class="group block h-full bg-white rounded-xl overflow-hidden border border-border hover:border-cta/35 hover:shadow-[0_18px_50px_rgba(15,23,42,0.12)] hover:-translate-y-1 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-cta focus-visible:ring-offset-2">
                     <div class="relative aspect-[16/9] bg-softbg overflow-hidden">
                         <img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.onerror=null;this.src='{{ asset(\App\Models\ContributorPost::DEFAULT_FEATURED_IMAGE) }}';">
                         <div class="absolute inset-0 bg-gradient-to-t from-navy/55 via-navy/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
@@ -303,10 +314,10 @@
 
                     <div class="p-6 flex flex-col min-h-[260px]">
                     @if($post->category)
-                        <p class="inline-block text-xs font-semibold text-teal bg-teal/10 border border-teal/20 px-2.5 py-1 rounded-full mb-3 self-start">{{ $post->category->name }}</p>
+                        <p class="inline-block text-xs font-semibold text-cta bg-cta/10 border border-cta/20 px-2.5 py-1 rounded-full mb-3 self-start">{{ $post->category->name }}</p>
                     @endif
 
-                    <h3 class="font-heading text-xl text-navy leading-snug mb-3 group-hover:text-teal transition-colors">{{ $post->title }}</h3>
+                    <h3 class="font-heading text-xl text-navy leading-snug mb-3 group-hover:text-cta transition-colors">{{ $post->title }}</h3>
 
                     @if($post->excerpt)
                         <p class="text-muted text-sm leading-relaxed mb-5">{{ Str::limit($post->excerpt, 118) }}</p>
@@ -328,7 +339,7 @@
                         <p class="text-xs text-muted flex-shrink-0">{{ $post->published_at?->format('d M Y') }}</p>
                     </div>
 
-                    <div class="inline-flex items-center gap-1.5 mt-4 text-teal text-sm font-semibold">
+                    <div class="inline-flex items-center gap-1.5 mt-4 text-cta text-sm font-semibold">
                         Read Article
                         <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12"/></svg>
                     </div>
@@ -349,12 +360,12 @@
 {{-- ═══════════════════════════════════════════════
      BOARD INSIGHTS
 ═══════════════════════════════════════════════ --}}
-<section class="py-20 lg:py-28 bg-softbg border-y border-border/70" aria-label="Board Insights">
+<section class="py-20 lg:py-28 bg-[linear-gradient(180deg,#EFF6FF_0%,#FFFFFF_100%)]" aria-label="Board Insights">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
         <div class="grid lg:grid-cols-[1.05fr_.95fr] gap-10 lg:gap-14 items-center">
             <div class="reveal">
                 @if($settings?->boardinsights_eyebrow)
-                    <p class="section-kicker text-steel text-xs font-semibold uppercase mb-5">{{ $settings->boardinsights_eyebrow }}</p>
+                    <p class="section-kicker text-cta text-xs font-semibold uppercase mb-5">{{ $settings->boardinsights_eyebrow }}</p>
                 @endif
                 <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl text-navy mb-6 leading-tight">{{ $settings?->boardinsights_heading }}</h2>
                 <div class="text-body text-lg leading-8 mb-8 max-w-2xl">{!! $settings?->boardinsights_body !!}</div>
@@ -365,11 +376,11 @@
                         <p class="text-navy text-sm font-semibold">Market Signals</p>
                     </div>
                     <div class="border border-border bg-white px-4 py-4 rounded-lg">
-                        <i class="bx bx-shield-quarter text-2xl text-teal mb-3 block" aria-hidden="true"></i>
+                        <i class="bx bx-shield-quarter text-2xl text-cta mb-3 block" aria-hidden="true"></i>
                         <p class="text-navy text-sm font-semibold">Governance Lens</p>
                     </div>
                     <div class="border border-border bg-white px-4 py-4 rounded-lg">
-                        <i class="bx bx-briefcase-alt-2 text-2xl text-steel mb-3 block" aria-hidden="true"></i>
+                        <i class="bx bx-briefcase-alt-2 text-2xl text-cta mb-3 block" aria-hidden="true"></i>
                         <p class="text-navy text-sm font-semibold">Boardroom Context</p>
                     </div>
                 </div>

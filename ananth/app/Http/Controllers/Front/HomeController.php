@@ -23,6 +23,7 @@ use App\Models\Founder;
 use App\Models\FounderCredential;
 use App\Models\ServiceCard;
 use App\Models\ExpertDeskPillar;
+use App\Models\GalleryImage;
 use App\Mail\ContactSubmissionAdminNotification;
 
 class HomeController extends Controller
@@ -31,8 +32,9 @@ class HomeController extends Controller
 
     public function homePage()
     {
-        $settings    = HomePageSetting::first();
-        $credentials = FounderCredential::orderBy('sort_order')->get();
+        $settings      = HomePageSetting::first();
+        $aboutSettings = AboutPageSetting::first();
+        $credentials   = FounderCredential::orderBy('sort_order')->get();
         $services    = ServiceCard::where('visible', true)->orderBy('sort_order')->get();
         $pillars     = ExpertDeskPillar::orderBy('sort_order')->get();
         $featured    = Blogs::editorialByAnanth()
@@ -48,7 +50,7 @@ class HomeController extends Controller
                             ->limit(3)
                             ->get();
 
-        return view('home', compact('settings', 'credentials', 'services', 'pillars', 'featured', 'contributorPosts'))->with('seo', [
+        return view('home', compact('settings', 'aboutSettings', 'credentials', 'services', 'pillars', 'featured', 'contributorPosts'))->with('seo', [
             'title' => $settings?->meta_title ?: ($settings?->hero_heading ?? 'Ananth Decodes Logistics'),
             'description' => $settings?->meta_description ?: ($settings?->hero_subheading ?? 'Logistics insights, strategy, and thought-leadership by Dr. Ananthakrishnan Janardhanan.'),
             'canonical' => $settings?->canonical_url ?: url('/'),
@@ -71,6 +73,63 @@ class HomeController extends Controller
     public function contactUs()
     {
         return view('front.contactUs');
+    }
+
+    public function gallery()
+    {
+        $galleryItems = GalleryImage::where('visible', true)
+            ->orderBy('sort_order')
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn ($image) => [
+                'title' => $image->title,
+                'category' => $image->category ?: 'Gallery',
+                'image' => $image->imageUrl(),
+                'caption' => $image->caption ?: '',
+            ]);
+
+        if ($galleryItems->isEmpty()) {
+            $galleryItems = collect([
+            [
+                'title' => 'Supply Chain Strategy',
+                'category' => 'Boardroom',
+                'image' => asset('img/site/anantha-home-banner.jpg'),
+                'caption' => 'Strategy-led logistics conversations shaped for decision makers.',
+            ],
+            [
+                'title' => 'Operational Intelligence',
+                'category' => 'Logistics',
+                'image' => asset('img/site/generative-ai-is-used-transport-goods.jpg'),
+                'caption' => 'Modern mobility, freight, and data-led operational thinking.',
+            ],
+            [
+                'title' => 'Field Perspectives',
+                'category' => 'Expert Desk',
+                'image' => asset('img/site/truck-bg-img-1.webp'),
+                'caption' => 'Ideas from practitioners who understand execution at ground level.',
+            ],
+            [
+                'title' => 'Leadership Notes',
+                'category' => 'People',
+                'image' => asset('img/site/founder.jpeg'),
+                'caption' => 'Ananth Decodes Logistics through conversations, sessions, and industry notes.',
+            ],
+            [
+                'title' => 'Logistics Networks',
+                'category' => 'Infrastructure',
+                'image' => asset('img/site/Universal-Logistics-Customs-Brokerage-Services-2.jpeg'),
+                'caption' => 'Ports, customs, freight movement, and the networks behind growth.',
+            ],
+            [
+                'title' => 'Future Systems',
+                'category' => 'Innovation',
+                'image' => asset('img/site/anantha-logistics.webp'),
+                'caption' => 'Technology, resilience, and the next decade of supply chains.',
+            ],
+            ]);
+        }
+
+        return view('front.gallery', compact('galleryItems'));
     }
     
     public function disclaimer()

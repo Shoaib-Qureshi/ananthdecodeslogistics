@@ -14,6 +14,9 @@ use App\Http\Controllers\Contributor\GuestAuthController;
 use App\Http\Controllers\Contributor\GuestPostController;
 use App\Http\Controllers\Admin\AdminContributorController;
 use App\Http\Controllers\Front\ContributorBlogController;
+use App\Http\Controllers\Front\EventController as FrontEventController;
+use App\Http\Controllers\Admin\EventController as AdminEventController;
+use App\Http\Controllers\Admin\GalleryController as AdminGalleryController;
 use Illuminate\Support\Facades\Password;
 
 // ********************** SUPER ADMIN *****************************
@@ -70,6 +73,26 @@ Route::middleware([admin::class])->group(function () {
     Route::post('admin/update-about-page',[PageContentController::class,'updateAboutPage'])->name('updateAboutPage');
     Route::get('admin/page-banners',[PageContentController::class,'editPageBanners'])->name('admin.page-banners.edit');
     Route::post('admin/page-banners',[PageContentController::class,'updatePageBanners'])->name('admin.page-banners.update');
+    Route::get('admin/gallery',[AdminGalleryController::class,'index'])->name('admin.gallery.index');
+    Route::post('admin/gallery',[AdminGalleryController::class,'store'])->name('admin.gallery.store');
+    Route::post('admin/gallery/{galleryImage}',[AdminGalleryController::class,'update'])->name('admin.gallery.update');
+    Route::post('admin/gallery/{galleryImage}/delete',[AdminGalleryController::class,'destroy'])->name('admin.gallery.destroy');
+    // Multi-event management (must be before the {event} wildcard routes)
+    Route::get('admin/events',[AdminEventController::class,'index'])->name('admin.events.index');
+    Route::get('admin/events/create',[AdminEventController::class,'create'])->name('admin.events.create');
+    Route::post('admin/events',[AdminEventController::class,'store'])->name('admin.events.store');
+    Route::get('admin/events/{event}/edit',[AdminEventController::class,'editEvent'])->where('event','[0-9]+')->name('admin.events.event.edit');
+    Route::post('admin/events/{event}/edit',[AdminEventController::class,'updateEvent'])->where('event','[0-9]+')->name('admin.events.event.update');
+    Route::post('admin/events/{event}/activate',[AdminEventController::class,'activate'])->where('event','[0-9]+')->name('admin.events.event.activate');
+    Route::delete('admin/events/{event}',[AdminEventController::class,'destroy'])->where('event','[0-9]+')->name('admin.events.event.destroy');
+    // Legacy current-event edit
+    Route::get('admin/events/logisphere/edit',[AdminEventController::class,'edit'])->name('admin.events.edit');
+    Route::post('admin/events/logisphere/edit',[AdminEventController::class,'update'])->name('admin.events.update');
+    Route::get('admin/events/sponsor-packages',[AdminEventController::class,'packages'])->name('admin.events.packages');
+    Route::post('admin/events/sponsor-packages',[AdminEventController::class,'updatePackages'])->name('admin.events.packages.update');
+    Route::get('admin/events/registrations',[AdminEventController::class,'registrations'])->name('admin.events.registrations');
+    Route::post('admin/events/registrations/{registration}/status',[AdminEventController::class,'updateRegistrationStatus'])->name('admin.events.registrations.status');
+    Route::get('admin/events/sponsor-payments',[AdminEventController::class,'payments'])->name('admin.events.payments');
     Route::get('admin/manage-milestones',[PageContentController::class,'manageMilestones'])->name('manageMilestones');
     Route::get('admin/add-milestone',[PageContentController::class,'addMilestone'])->name('addMilestone');
     Route::post('admin/save-milestone',[PageContentController::class,'saveMilestone'])->name('saveMilestone');
@@ -204,6 +227,19 @@ Route::get('contributor-login', function (\Illuminate\Http\Request $request) {
     return redirect()->to($target, 301);
 });
 
+// *********************** Event Routes ************************
+Route::get('events/conference', [FrontEventController::class, 'conference'])->name('events.conference');
+Route::get('events/why-who', [FrontEventController::class, 'whyWho'])->name('events.why-who');
+Route::get('events/sponsorship', [FrontEventController::class, 'sponsorship'])->name('events.sponsorship');
+Route::get('events/faq', [FrontEventController::class, 'faq'])->name('events.faq');
+Route::get('events/register', [FrontEventController::class, 'register'])->name('events.register');
+Route::post('events/register', [FrontEventController::class, 'submitRegistration'])->name('events.register.submit');
+Route::get('events/sponsor-checkout/{package}', [FrontEventController::class, 'sponsorCheckout'])->name('events.sponsor.checkout');
+Route::post('events/sponsor-checkout/{package}', [FrontEventController::class, 'startSponsorCheckout'])->name('events.sponsor.checkout.start');
+Route::post('events/sponsor-payment/verify', [FrontEventController::class, 'verifySponsorPayment'])->name('events.sponsor.verify');
+Route::get('events/sponsor-payment/success', [FrontEventController::class, 'sponsorSuccess'])->name('events.sponsor.success');
+Route::get('events/sponsor-payment/cancel', [FrontEventController::class, 'sponsorCancel'])->name('events.sponsor.cancel');
+
 // *********************** Front Routes ***********************
 Route::get('/',[HomeController::class,'homePage']);
 Route::get('about-us', [HomeController::class, 'aboutUs']);
@@ -213,6 +249,7 @@ Route::get('terms-and-conditions',[HomeController::class,'termsConditions']);
 Route::get('contact-us',[HomeController::class,'contactUs']);
 Route::post('save-contact',[HomeController::class,'saveContact'])->name('saveContact');
 Route::get('disclaimer',[HomeController::class,'disclaimer']);
+Route::get('gallery',[HomeController::class,'gallery'])->name('gallery');
 Route::get('contribute-a-guest-post', function (\Illuminate\Http\Request $request) {
     $target = route('contributor.register');
 

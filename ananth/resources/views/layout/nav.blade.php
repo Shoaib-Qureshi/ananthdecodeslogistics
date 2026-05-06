@@ -206,9 +206,11 @@
                     </button>
                     <ul class="desktop-submenu"
                         role="menu" aria-label="Events submenu">
-                        <li role="none"><a href="/events/sponsorship" class="block px-4 py-2.5 text-sm text-body hover:text-navy hover:bg-cream transition-colors duration-150 cursor-pointer" role="menuitem">Sponsor &amp; Exhibitors</a></li>
+                        <li role="none"><a href="/events/conference" class="block px-4 py-2.5 text-sm text-body hover:text-navy hover:bg-cream transition-colors duration-150 cursor-pointer" role="menuitem">LogiSphere 2026</a></li>
                         <li role="none"><a href="/events/why-who" class="block px-4 py-2.5 text-sm text-body hover:text-navy hover:bg-cream transition-colors duration-150 cursor-pointer" role="menuitem">Why &amp; Who</a></li>
-                        <li role="none"><a href="/events/conference" class="block px-4 py-2.5 text-sm text-body hover:text-navy hover:bg-cream transition-colors duration-150 cursor-pointer" role="menuitem">Upcoming Networking Event</a></li>
+                        <li role="none"><a href="/events/register" class="block px-4 py-2.5 text-sm text-body hover:text-navy hover:bg-cream transition-colors duration-150 cursor-pointer" role="menuitem">Register</a></li>
+                        <li role="none"><a href="/events/sponsorship" class="block px-4 py-2.5 text-sm text-body hover:text-navy hover:bg-cream transition-colors duration-150 cursor-pointer" role="menuitem">Sponsor &amp; Exhibitors</a></li>
+                        <li role="none"><a href="/events/faq" class="block px-4 py-2.5 text-sm text-body hover:text-navy hover:bg-cream transition-colors duration-150 cursor-pointer" role="menuitem">FAQ</a></li>
                     </ul>
                 </li>
 
@@ -287,9 +289,11 @@
                         </svg>
                     </button>
                     <ul class="hidden pl-4 mt-0.5 space-y-0.5">
-                        <li><a href="/events/sponsorship" class="block px-3 py-2 text-sm text-muted hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">Sponsor &amp; Exhibitors</a></li>
+                        <li><a href="/events/conference" class="block px-3 py-2 text-sm text-muted hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">LogiSphere 2026</a></li>
                         <li><a href="/events/why-who" class="block px-3 py-2 text-sm text-muted hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">Why &amp; Who</a></li>
-                        <li><a href="/events/conference" class="block px-3 py-2 text-sm text-muted hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">Upcoming Networking Event</a></li>
+                        <li><a href="/events/register" class="block px-3 py-2 text-sm text-muted hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">Register</a></li>
+                        <li><a href="/events/sponsorship" class="block px-3 py-2 text-sm text-muted hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">Sponsor &amp; Exhibitors</a></li>
+                        <li><a href="/events/faq" class="block px-3 py-2 text-sm text-muted hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">FAQ</a></li>
                     </ul>
                 </li>
 
