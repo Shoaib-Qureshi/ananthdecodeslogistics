@@ -154,7 +154,7 @@ class BlogController extends Controller
 
     public function editBlog($id)
     {
-        $editBlog = Blogs::find($id);
+        $editBlog = Blogs::findOrFail($id);
         $category = $this->getDefaultCategories();
         $users = User::all();
         return view('admin/editBlog', [
@@ -235,7 +235,7 @@ class BlogController extends Controller
 
     public function deleteBlog($id)
     {
-        $post_data = Blogs::find($id);
+        $post_data = Blogs::findOrFail($id);
         $post_data->delete();
         return redirect('admin/live-blogs')->with('message', 'Article Successfully Deleted!');
     }
@@ -260,6 +260,17 @@ class BlogController extends Controller
 
     public function saveBookReview(Request $request)
     {
+        $request->validate([
+            'name'              => 'required|string|max:255',
+            'author'            => 'nullable|string|max:255',
+            'genre'             => 'nullable|string|max:255',
+            'published'         => 'nullable|string|max:100',
+            'short_description' => 'nullable|string|max:500',
+            'detail_review'     => 'nullable|string',
+            'buy_link'          => 'nullable|url|max:2000',
+            'cover'             => 'nullable|image|max:4096',
+        ]);
+
         $addBook = new BookReview();
         $addBook->name = $request->name;
         $addBook->slug = Str::slug($request->input('name'));
@@ -293,7 +304,7 @@ class BlogController extends Controller
 
     public function editBookReview($id)
     {
-        $editBook = BookReview::find($id);
+        $editBook = BookReview::findOrFail($id);
         return view('admin/editBookReview', [
             'editBook' => $editBook,
         ]);
@@ -302,7 +313,20 @@ class BlogController extends Controller
 
     public function updatedBookReview(Request $request, $id)
     {
-        $updateBook = BookReview::find($request->id);;
+        $request->validate([
+            'name'              => 'required|string|max:255',
+            'slug'              => 'required|string|max:255',
+            'author'            => 'nullable|string|max:255',
+            'genre'             => 'nullable|string|max:255',
+            'published'         => 'nullable|string|max:100',
+            'short_description' => 'nullable|string|max:500',
+            'detail_review'     => 'nullable|string',
+            'buy_link'          => 'nullable|url|max:2000',
+            'cover'             => 'nullable|image|max:4096',
+            'status'            => 'nullable|in:0,1',
+        ]);
+
+        $updateBook = BookReview::findOrFail($id);
         $updateBook->name = $request->name;
         $updateBook->slug = $request->slug;
         $updateBook->author = $request->author;

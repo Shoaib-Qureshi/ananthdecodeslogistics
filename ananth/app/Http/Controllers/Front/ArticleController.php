@@ -104,7 +104,7 @@ class ArticleController extends Controller
     {
         $category = BlogCategories::where('category_slug', $slug)->first();
         if(is_null($category)){
-            return view('errors.404');
+            return response()->view('errors.404', [], 404);
         }
         $featuredSlug = 'from-the-desk-the-vision-behind-this-platform-and-distinguished-opportunities-for-you';
         $featured = Blogs::where([
@@ -131,7 +131,7 @@ class ArticleController extends Controller
     {
         $author = User::where('username', $slug)->first();
         if(is_null($author)){
-            return view('errors.404');
+            return response()->view('errors.404', [], 404);
         }
         $blogs = Blogs::leftJoin('users', 'users.id', 'blogs.user_id')->select('blogs.*', 'users.name')->where([['blogs.user_id', $author->id], ['blogs.status', 1], ['blogs.visibility', 1]])->orderBy('blogs.created_at', 'desc')->paginate(6);
         
@@ -157,7 +157,7 @@ class ArticleController extends Controller
     {
         $bookDetail = BookReview::where([['slug', $slug],['status', 1]])->first();
         if(is_null($bookDetail)){
-            return view('errors.404');
+            return response()->view('errors.404', [], 404);
         }
         return view('reviews.reviewPage', [
             'bookDetail' => $bookDetail

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\CheckUserLog;
 use App\Http\Controllers\Front\HomeController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Auth\AuthController;
@@ -23,8 +22,9 @@ use Illuminate\Support\Facades\Password;
 Route::get('admin/adl-login',[AdminController::class,'showAdminLogin'])->name('showAdminLogin');
 Route::post('admin/admin-login',[AdminController::class,'login'])->name('adminloginRequest');
 Route::post('admin/logout',[AdminController::class,'logOut'])->name('adminLogout');
+Route::get('admin', fn() => redirect()->route('showAdminLogin'));
 
-Route::middleware([admin::class])->group(function () {
+Route::middleware(['admin'])->group(function () {
     Route::get('admin/dashboard',[AdminController::class,'showDashboard'])->name('admin.dashboard');
     Route::get('admin/profile',[AdminController::class,'editProfile'])->name('admin.profile.edit');
     Route::post('admin/profile',[AdminController::class,'updateProfile'])->name('admin.profile.update');
@@ -227,6 +227,9 @@ Route::get('contributor-login', function (\Illuminate\Http\Request $request) {
     return redirect()->to($target, 301);
 });
 
+Route::get('login', fn() => redirect()->route('contributor.login'));
+Route::get('signup', fn() => redirect()->route('contributor.register'));
+
 // *********************** Event Routes ************************
 Route::get('events/conference', [FrontEventController::class, 'conference'])->name('events.conference');
 Route::get('events/why-who', [FrontEventController::class, 'whyWho'])->name('events.why-who');
@@ -273,4 +276,8 @@ Route::get('book-review/{slug}',[ArticleController::class,'reviewPage']);
 Route::get('google/redirect', [AuthController::class, 'redirectToGoogle']);
 Route::get('google/callback', [AuthController::class, 'handleGoogleCallback']);
 
-Route::get('{slug}',[ArticleController::class,'articlePage'])->name('articlePage');
+Route::get('{slug}',[ArticleController::class,'articlePage'])
+    ->where('slug', '[A-Za-z0-9\-]+')
+    ->name('articlePage');
+
+Route::fallback(fn() => response()->view('errors.404', [], 404));

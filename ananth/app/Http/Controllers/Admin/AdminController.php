@@ -54,7 +54,6 @@ class AdminController extends Controller
         ])->validate();
         $email = $request->email;
         $password = $request->password;
-        $hash_pass = Hash::make($password);
         if (Auth::attempt(['email' => $email, 'password' => $password]))
         {
             $request->session()->regenerate();
@@ -216,7 +215,7 @@ class AdminController extends Controller
 
     public function editUser($id)
     {
-        $editUser = User::find($id);
+        $editUser = User::findOrFail($id);
         return view('admin.editUser', [
             'editUser' => $editUser,
             'contributorPlans' => ContributorPlans::adminSelectablePlans(),
@@ -234,7 +233,7 @@ class AdminController extends Controller
             'contributor_plan' => ['nullable', Rule::in(ContributorPlans::adminSelectableCodes())],
         ]);
 
-        $updateUser = User::find($id);
+        $updateUser = User::findOrFail($id);
         $wasContributor = $updateUser->user_role === 'guest';
         $previousPlan = $updateUser->contributorPlanCode();
         $selectedPlan = ContributorPlans::normalize($request->contributor_plan, ContributorPlans::FREE);
@@ -402,7 +401,7 @@ class AdminController extends Controller
 
     public function editMember($id)
     {
-        $editMember = TeamMember::find($id);
+        $editMember = TeamMember::findOrFail($id);
         return view('admin.editMember', [
             'editMember' => $editMember
         ]);
@@ -410,7 +409,17 @@ class AdminController extends Controller
 
     public function updateMember(Request $request, $id)
     {
-        $updateMember = TeamMember::find($id);
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'designation' => 'required|string|max:255',
+            'insta'       => 'nullable|string|max:255',
+            'linkedin'    => 'nullable|string|max:255',
+            'twitter'     => 'nullable|string|max:255',
+            'position'    => 'nullable|integer|min:0',
+            'image'       => 'nullable|image|max:4096',
+        ]);
+
+        $updateMember = TeamMember::findOrFail($id);
         $updateMember->name = $request->name;
         $updateMember->designation = $request->designation;
         $updateMember->insta = $request->insta;
@@ -442,7 +451,7 @@ class AdminController extends Controller
 
     public function deleteMember($id)
     {
-        $deleteMember = TeamMember::find($id);
+        $deleteMember = TeamMember::findOrFail($id);
         $deleteMember->delete();
         return redirect('admin/members-list')->with('message', 'Member Successfully Deleted!');
 

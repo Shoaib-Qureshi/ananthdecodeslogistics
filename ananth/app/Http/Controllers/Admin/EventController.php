@@ -328,7 +328,7 @@ class EventController extends Controller
             'event.venue_address'           => 'nullable|string|max:1000',
             'event.venue_map_embed'         => 'nullable|string|max:2000',
             'event.format'                  => 'nullable|string|max:120',
-            'event.hero_image'              => 'nullable|string|max:500',
+            'event.hero_image'              => ['nullable', 'string', 'max:2000', 'not_regex:/<[^>]+>/'],
             'event.welcome_note'            => 'nullable|string|max:4000',
             'event.about'                   => 'nullable|string|max:8000',
             'event.why_now'                 => 'nullable|string|max:5000',

@@ -24,11 +24,16 @@ class BoardInsightsController extends Controller
 
     public function saveInsight(Request $request)
     {
+        $request->validate([
+            'title'   => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
         $addInsight = new BoardInsights();
         $addInsight->title = $request->title;
         $addInsight->slug = Str::slug($request->input('title'));
         $addInsight->content = $request->content;
-	    $addInsight->save();
+        $addInsight->save();
         return redirect('admin/live-insights')->with('message', 'Board Insight Published As Draft!');
     }
 
@@ -46,7 +51,7 @@ class BoardInsightsController extends Controller
 
     public function editInsight($id)
     {
-        $editInsight = BoardInsights::find($id);
+        $editInsight = BoardInsights::findOrFail($id);
         return view('admin.editInsight', [
             'editInsight' => $editInsight,
         ]);
@@ -54,9 +59,16 @@ class BoardInsightsController extends Controller
 
     public function updateInsight(Request $request, $id)
     {
-        $updateInsight = BoardInsights::find($request->id);
+        $request->validate([
+            'title'   => 'required|string|max:255',
+            'slug'    => 'required|string|max:255',
+            'content' => 'required|string',
+            'status'  => 'nullable|in:0,1',
+        ]);
+
+        $updateInsight = BoardInsights::findOrFail($id);
         $updateInsight->title = $request->title;
-        $updateInsight->slug = $request->slug;        
+        $updateInsight->slug = $request->slug;
         $updateInsight->content = $request->content;
         $updateInsight->status = $request->status;
         $updateInsight->save();
@@ -65,7 +77,7 @@ class BoardInsightsController extends Controller
 
     public function deleteInsight($id)
     {
-        $deleteInsight = BoardInsights::find($id);
+        $deleteInsight = BoardInsights::findOrFail($id);
         $deleteInsight->delete();
         return redirect('admin/live-insights')->with('message', 'Board Insight Successfully Deleted!');
     }
@@ -88,7 +100,7 @@ class BoardInsightsController extends Controller
         $insightDetails = BoardInsights::where([['slug', $slug], ['status', 1]])->first();
         
         if(is_null($insightDetails)){
-            return view('errors.404');
+            return response()->view('errors.404', [], 404);
         }
 
         $plainText = strip_tags($insightDetails->content);

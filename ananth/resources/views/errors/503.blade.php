@@ -1,0 +1,2 @@
+@extends('errors.500')
+
