@@ -94,6 +94,7 @@
                                 <h4>Detailed Review</h4>
                                 <textarea name="detail_review" id="ckeditor">{{ $editBook->detail_review }}</textarea>
                             </div>
+                            @include('admin.partials.seo-fields', ['seoModel' => $editBook])
                         </div>
                         <button type="submit">Update Book Review</button>
                     </form>

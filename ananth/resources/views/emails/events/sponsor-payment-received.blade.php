@@ -24,7 +24,7 @@
                 <div class="row"><span class="label">Payment ID</span><span class="value">{{ $payment->razorpay_payment_id }}</span></div>
             </div>
             <p>The event team will contact you with sponsor coordination details and branding requirements.</p>
-            <p class="muted">A PDF sponsorship invoice is attached to this email. GST-specific fields can be added once final GST details are provided.</p>
+            <p class="muted">A PDF sponsorship invoice is attached to this email with Ananth Decodes Logistics GSTIN 29ABFCA6103M1ZI.</p>
         </div>
         <div class="footer">Ananth Decodes Logistics</div>
     </div>

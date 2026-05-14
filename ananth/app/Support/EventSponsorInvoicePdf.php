@@ -6,6 +6,8 @@ use App\Models\EventSponsorPayment;
 
 class EventSponsorInvoicePdf
 {
+    private const COMPANY_GSTIN = '29ABFCA6103M1ZI';
+
     public static function invoiceNumber(EventSponsorPayment $payment): string
     {
         $date = optional($payment->paid_at ?: $payment->created_at)->format('Ymd') ?: now()->format('Ymd');
@@ -31,7 +33,7 @@ class EventSponsorInvoicePdf
 
         $items = [
             ['Sponsorship Package', $packageName, $currency . ' ' . number_format((float) $payment->base_amount, 2)],
-            ['Tax / GST', 'Placeholder tax line, configurable later', $currency . ' ' . number_format((float) $payment->tax_amount, 2)],
+            [$payment->tax_label ?: 'GST', 'GSTIN: ' . self::COMPANY_GSTIN, $currency . ' ' . number_format((float) $payment->tax_amount, 2)],
         ];
 
         $draw = [];
@@ -43,7 +45,8 @@ class EventSponsorInvoicePdf
 
         self::text($draw, 'ANANTH DECODES LOGISTICS', 52, 796, 10, [147, 197, 253], true);
         self::text($draw, 'LogiSphere Sponsorship Invoice', 52, 772, 21, [255, 255, 255], true);
-        self::text($draw, 'System generated invoice for sponsorship payment confirmation.', 52, 752, 10, [203, 213, 225]);
+        self::text($draw, 'GSTIN: ' . self::COMPANY_GSTIN, 52, 752, 10, [203, 213, 225], true);
+        self::text($draw, 'System generated invoice for sponsorship payment confirmation.', 52, 736, 9, [203, 213, 225]);
 
         self::text($draw, 'INVOICE NO', 68, 728, 8, [100, 116, 139], true);
         self::text($draw, $invoiceNo, 68, 710, 12, [15, 23, 42], true);
@@ -58,7 +61,8 @@ class EventSponsorInvoicePdf
         self::text($draw, 'Contact: ' . self::short($payment->contact_name, 30), 68, 584, 9, [71, 85, 105]);
         self::text($draw, 'Email: ' . self::short($payment->email, 34), 68, 568, 9, [71, 85, 105]);
         self::text($draw, 'Phone: ' . ($payment->phone ?: 'Not provided'), 68, 552, 9, [71, 85, 105]);
-        self::text($draw, 'Address: ' . self::short($payment->billing_address ?: 'Not provided', 42), 68, 536, 9, [71, 85, 105]);
+        self::text($draw, 'GSTIN: ' . self::short($payment->gst_number ?: 'Not provided', 34), 68, 536, 9, [71, 85, 105]);
+        self::text($draw, 'Address: ' . self::short($payment->billing_address ?: 'Not provided', 42), 68, 520, 9, [71, 85, 105]);
 
         self::sectionTitle($draw, 'EVENT', 320, 650);
         self::card($draw, 320, 518, 223, 114);
@@ -90,7 +94,7 @@ class EventSponsorInvoicePdf
         self::rect($draw, 52, 242, 491, 34, [255, 255, 255]);
         self::strokeRect($draw, 52, 242, 491, 34, [216, 227, 240]);
         self::text($draw, 'NOTE', 68, 263, 8, [37, 99, 235], true);
-        self::text($draw, 'GST statutory fields are placeholders for now and can be enabled once final GST details are provided.', 112, 263, 8, [71, 85, 105]);
+        self::text($draw, 'Supplier GSTIN: ' . self::COMPANY_GSTIN . '. Buyer GSTIN shown above when provided.', 112, 263, 8, [71, 85, 105]);
 
         self::line($draw, 52, 200, 543, 200, [216, 227, 240]);
         self::text($draw, 'Thank you for partnering with LogiSphere.', 52, 176, 12, [15, 23, 42], true);

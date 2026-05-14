@@ -48,6 +48,7 @@
                                 <h4>Content</h4>
                                 <textarea name="content" id="ckeditor"></textarea>
                             </div>
+                            @include('admin.partials.seo-fields')
                         </div>
                         <button type="submit">Publish Board Insight</button>
                     </form>

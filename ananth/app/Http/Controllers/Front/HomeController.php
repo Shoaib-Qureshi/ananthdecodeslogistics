@@ -24,6 +24,7 @@ use App\Models\FounderCredential;
 use App\Models\ServiceCard;
 use App\Models\ExpertDeskPillar;
 use App\Models\GalleryImage;
+use App\Models\PageBanner;
 use App\Mail\ContactSubmissionAdminNotification;
 
 class HomeController extends Controller
@@ -62,17 +63,23 @@ class HomeController extends Controller
 
     public function privacyPolicy()
     {
-        return view('front.privacyPolicy');
+        return view('front.privacyPolicy', [
+            'banner' => PageBanner::forKey('privacy_policy'),
+        ]);
     }
 
     public function termsConditions()
     {
-        return view('front.termsConditions');
+        return view('front.termsConditions', [
+            'banner' => PageBanner::forKey('terms_conditions'),
+        ]);
     } 
 
     public function contactUs()
     {
-        return view('front.contactUs');
+        return view('front.contactUs', [
+            'banner' => PageBanner::forKey('contact'),
+        ]);
     }
 
     public function gallery()
@@ -129,12 +136,17 @@ class HomeController extends Controller
             ]);
         }
 
-        return view('front.gallery', compact('galleryItems'));
+        return view('front.gallery', [
+            'galleryItems' => $galleryItems,
+            'banner' => PageBanner::forKey('gallery'),
+        ]);
     }
     
     public function disclaimer()
     {
-        return view('front.disclaimer');
+        return view('front.disclaimer', [
+            'banner' => PageBanner::forKey('disclaimer'),
+        ]);
     }
 
     public function aboutUs()

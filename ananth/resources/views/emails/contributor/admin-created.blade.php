@@ -15,14 +15,14 @@ body{font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px}
 
 <div class="header">
     <h2>Your Expert Desk account is ready!</h2>
-    <p>Ananth Decodes Logistics — The Expert Desk</p>
+    <p>Ananth Decodes Logistics - The Expert Desk</p>
 </div>
 
 <div class="body">
     <p>Hi <strong>{{ $user->name }}</strong>,</p>
     <p>
-        Your <strong>Expert Desk</strong> contributor account on Ananth Decodes Logistics has been set up by our team.
-        You can now set your password and start publishing your logistics insights.
+        Your <strong>Expert Desk</strong> contributor account on Ananth Decodes Logistics is ready.
+        Please set your password to access your contributor dashboard.
     </p>
 
     <div class="highlight">
@@ -34,13 +34,13 @@ body{font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px}
     <div class="steps">
         <strong>Getting started:</strong>
         <ol>
-            <li>Click the button below to set your password</li>
+            <li>Click the button below to create your password</li>
             <li>Log in to your Expert Desk dashboard</li>
             <li>Create and submit your first post</li>
         </ol>
     </div>
 
-    <a href="{{ $resetUrl }}" class="btn">Set Password &amp; Get Started</a>
+    <a href="{{ $resetUrl }}" class="btn">Create Password &amp; Get Started</a>
 
     <p class="note">This link expires in 60 minutes. If it expires, use the <a href="{{ route('password.request') }}" style="color:#e07b39;">forgot password</a> page to get a new one.</p>
 

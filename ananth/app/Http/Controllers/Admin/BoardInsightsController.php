@@ -27,12 +27,28 @@ class BoardInsightsController extends Controller
         $request->validate([
             'title'   => 'required|string|max:255',
             'content' => 'required|string',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:1000',
+            'canonical_url' => 'nullable|string|max:255',
+            'og_image' => 'nullable|string|max:255',
+            'robots_index' => 'nullable|in:0,1',
+            'robots_follow' => 'nullable|in:0,1',
+            'schema_json_ld' => 'nullable|string',
         ]);
 
         $addInsight = new BoardInsights();
         $addInsight->title = $request->title;
         $addInsight->slug = Str::slug($request->input('title'));
         $addInsight->content = $request->content;
+        $addInsight->meta_title = $request->meta_title;
+        $addInsight->meta_description = $request->meta_description;
+        $addInsight->meta_keywords = $request->meta_keywords;
+        $addInsight->canonical_url = $request->canonical_url;
+        $addInsight->og_image = $request->og_image;
+        $addInsight->robots_index = $request->input('robots_index', 1);
+        $addInsight->robots_follow = $request->input('robots_follow', 1);
+        $addInsight->schema_json_ld = $request->schema_json_ld;
         $addInsight->save();
         return redirect('admin/live-insights')->with('message', 'Board Insight Published As Draft!');
     }
@@ -64,6 +80,14 @@ class BoardInsightsController extends Controller
             'slug'    => 'required|string|max:255',
             'content' => 'required|string',
             'status'  => 'nullable|in:0,1',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:1000',
+            'canonical_url' => 'nullable|string|max:255',
+            'og_image' => 'nullable|string|max:255',
+            'robots_index' => 'nullable|in:0,1',
+            'robots_follow' => 'nullable|in:0,1',
+            'schema_json_ld' => 'nullable|string',
         ]);
 
         $updateInsight = BoardInsights::findOrFail($id);
@@ -71,6 +95,14 @@ class BoardInsightsController extends Controller
         $updateInsight->slug = $request->slug;
         $updateInsight->content = $request->content;
         $updateInsight->status = $request->status;
+        $updateInsight->meta_title = $request->meta_title;
+        $updateInsight->meta_description = $request->meta_description;
+        $updateInsight->meta_keywords = $request->meta_keywords;
+        $updateInsight->canonical_url = $request->canonical_url;
+        $updateInsight->og_image = $request->og_image;
+        $updateInsight->robots_index = $request->input('robots_index', 1);
+        $updateInsight->robots_follow = $request->input('robots_follow', 1);
+        $updateInsight->schema_json_ld = $request->schema_json_ld;
         $updateInsight->save();
         return redirect('admin/live-insights')->with('message', 'Board Insight Successfully Updated!');
     }
@@ -131,6 +163,15 @@ class BoardInsightsController extends Controller
             'readingTime' => $readingTime,
             'htmlContent' => $htmlContent,
             'tableOfContents' => $tableOfContents,
+            'seo' => [
+                'title' => $insightDetails->meta_title ?: $insightDetails->title,
+                'description' => $insightDetails->meta_description ?: Str::limit($plainText, 155),
+                'keywords' => $insightDetails->meta_keywords,
+                'canonical' => $insightDetails->canonical_url ?: url('board-insights/' . $insightDetails->slug),
+                'image' => $this->publicAssetUrl($insightDetails->og_image, asset('img/site-banner.jpg')),
+                'robots' => $this->robotsContent((bool) ($insightDetails->robots_index ?? true), (bool) ($insightDetails->robots_follow ?? true)),
+                'schema' => $insightDetails->schema_json_ld,
+            ],
         ]);
     }
 
@@ -144,5 +185,21 @@ class BoardInsightsController extends Controller
         $insight->reading_time = max(1, (int) ceil($wordCount / 175));
 
         return $insight;
+    }
+
+    private function publicAssetUrl(?string $path, string $fallback): string
+    {
+        if (!$path) {
+            return $fallback;
+        }
+
+        return Str::startsWith($path, ['http://', 'https://'])
+            ? $path
+            : (Str::startsWith($path, ['img/', 'media/']) ? asset($path) : asset('storage/' . $path));
+    }
+
+    private function robotsContent(bool $index, bool $follow): string
+    {
+        return ($index ? 'index' : 'noindex') . ',' . ($follow ? 'follow' : 'nofollow');
     }
 }

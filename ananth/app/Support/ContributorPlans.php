@@ -9,6 +9,7 @@ use Throwable;
 final class ContributorPlans
 {
     public const FREE = 'free';
+    public const FREE_ACCOUNT = 'free_account';
     public const STARTER = 'starter_contributor';
     public const GROWTH = 'growth_contributor';
     public const AUTHORITY = 'authority_contributor';
@@ -66,6 +67,31 @@ final class ContributorPlans
                 'checkout_description' => 'Three-month Expert Desk access with up to 3 article submissions.',
                 'success_label' => 'Starter Contributor - $0',
                 'success_note' => 'Your Starter Contributor access is active for 3 months and includes up to 3 article submissions.',
+                'renew_cta' => 'Renew or Upgrade',
+            ],
+            self::FREE_ACCOUNT => [
+                'code' => self::FREE_ACCOUNT,
+                'public' => false,
+                'name' => 'Free Account',
+                'admin_name' => 'Free Account',
+                'price' => 0,
+                'currency' => 'USD',
+                'price_label' => '$0',
+                'duration_months' => 3,
+                'duration_label' => '3 months',
+                'max_posts' => 3,
+                'post_limit_label' => 'Up to 3 articles',
+                'homepage_feature' => false,
+                'summary' => 'Hidden free contributor access for manually shared signup links.',
+                'highlights' => [
+                    'Admin approval required before posting',
+                    'Author profile with bio and credentials',
+                    'Reach a focused logistics audience',
+                ],
+                'checkout_name' => 'Free Account Contributor Access',
+                'checkout_description' => 'Hidden free Expert Desk access with admin approval before posting.',
+                'success_label' => 'Free Account - $0',
+                'success_note' => 'Your Free Account application has been received. Admin approval is required before you can access the contributor dashboard.',
                 'renew_cta' => 'Renew or Upgrade',
             ],
             self::GROWTH => [
@@ -164,7 +190,7 @@ final class ContributorPlans
     public static function publicPlans(): array
     {
         return array_filter(static::all(), static function (array $plan) {
-            return $plan['public'] === true;
+            return $plan['public'] === true && $plan['code'] !== self::FREE_ACCOUNT;
         });
     }
 
@@ -176,6 +202,16 @@ final class ContributorPlans
     public static function publicPlanCodes(): array
     {
         return array_keys(static::publicPlans());
+    }
+
+    public static function hiddenFreeSignupPlans(): array
+    {
+        return array_intersect_key(static::all(), array_flip([self::FREE_ACCOUNT]));
+    }
+
+    public static function hiddenFreeSignupPlanCodes(): array
+    {
+        return array_keys(static::hiddenFreeSignupPlans());
     }
 
     public static function adminSelectableCodes(): array

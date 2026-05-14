@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
@@ -80,6 +81,8 @@ class EventController extends Controller
         $payload['exhibitor_package_notes']= $this->lines($request->input('exhibitor_package_notes_text'));
         $payload['sponsor_benefits']       = $this->lines($request->input('sponsor_benefits_text'));
         $payload['sponsor_inclusions']     = $this->lines($request->input('sponsor_inclusions_text'));
+        $payload['interest_options']       = $this->interestOptions($request->input('interest_options_text'));
+        $payload['registration_steps']     = $this->registrationSteps($request->input('registration_steps_text'));
 
         $event->update($payload);
         $this->syncAgenda($event, $request->input('agenda', []));
@@ -128,6 +131,8 @@ class EventController extends Controller
         $payload['exhibitor_package_notes'] = $this->lines($request->input('exhibitor_package_notes_text'));
         $payload['sponsor_benefits']        = $this->lines($request->input('sponsor_benefits_text'));
         $payload['sponsor_inclusions']      = $this->lines($request->input('sponsor_inclusions_text'));
+        $payload['interest_options']        = $this->interestOptions($request->input('interest_options_text'));
+        $payload['registration_steps']      = $this->registrationSteps($request->input('registration_steps_text'));
         $payload['is_active']               = true;
 
         $event->update($payload);
@@ -201,7 +206,7 @@ class EventController extends Controller
 
     public function registrations(Request $request)
     {
-        $registrations = EventRegistration::query()
+        $registrations = EventRegistration::with('event')
             ->when($request->filled('type'), fn ($query) => $query->where('inquiry_type', $request->type))
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->status))
             ->latest()
@@ -342,6 +347,13 @@ class EventController extends Controller
             'event.sponsorship_eyebrow'     => 'nullable|string|max:120',
             'event.sponsorship_heading'     => 'nullable|string|max:180',
             'event.sponsorship_subheading'  => 'nullable|string|max:500',
+            'event.registration_eyebrow'     => 'nullable|string|max:120',
+            'event.registration_heading'     => 'nullable|string|max:180',
+            'event.registration_subheading'  => 'nullable|string|max:500',
+            'event.registration_panel_eyebrow' => 'nullable|string|max:120',
+            'event.registration_panel_heading' => 'nullable|string|max:180',
+            'event.registration_form_heading' => 'nullable|string|max:180',
+            'event.registration_form_subheading' => 'nullable|string|max:500',
             'event.contact_email'           => 'nullable|email|max:180',
             'event.contact_note'            => 'nullable|string|max:3000',
             'event.closing_note'            => 'nullable|string|max:4000',
@@ -358,6 +370,8 @@ class EventController extends Controller
             'exhibitor_package_notes_text'  => 'nullable|string',
             'sponsor_benefits_text'         => 'nullable|string',
             'sponsor_inclusions_text'       => 'nullable|string',
+            'interest_options_text'         => 'nullable|string|max:2000',
+            'registration_steps_text'       => 'nullable|string|max:3000',
             'agenda'                        => 'nullable|array',
             'agenda.*.id'                   => 'nullable|integer',
             'agenda.*.start_time'           => 'nullable|string|max:40',
@@ -402,5 +416,54 @@ class EventController extends Controller
 
             return ['traditional' => $parts[0], 'logisphere' => $parts[1]];
         }, preg_split('/\r\n|\r|\n/', (string) $text))));
+    }
+
+    private function interestOptions(?string $text): array
+    {
+        $options = [];
+
+        foreach (preg_split('/\r\n|\r|\n/', (string) $text) as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+
+            $parts = array_map('trim', explode('|', $line, 2));
+            if (count($parts) === 2) {
+                [$value, $label] = $parts;
+            } else {
+                $label = $parts[0];
+                $value = Str::slug($label, '_');
+            }
+
+            $value = Str::slug($value, '_');
+            if ($label === '' || $value === '') {
+                continue;
+            }
+
+            $options[$value] = ['value' => $value, 'label' => $label];
+        }
+
+        return array_values($options ?: Event::defaultInterestOptions());
+    }
+
+    private function registrationSteps(?string $text): array
+    {
+        $steps = [];
+
+        foreach (preg_split('/\r\n|\r|\n/', (string) $text) as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+
+            $parts = array_map('trim', explode('|', $line, 2));
+            $steps[] = [
+                'title' => $parts[0] ?? '',
+                'text' => $parts[1] ?? '',
+            ];
+        }
+
+        return $steps ?: Event::defaultRegistrationSteps();
     }
 }

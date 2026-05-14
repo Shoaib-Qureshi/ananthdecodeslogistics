@@ -12,18 +12,11 @@
             background-color: var(--white) !important;
         }
     </style>
-    <section class="gradientBg bothPadding">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-8 m-auto">
-                    <div class="headingMain text-center">
-                        <h1>Privacy Policy</h1>
-                        <p>Last Updated: 17 April, 2026</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    @include('partials.page-banner', [
+        'banner' => $banner ?? null,
+        'fallbackHeading' => 'Privacy Policy',
+        'fallbackSubheading' => 'Last Updated: 17 April, 2026',
+    ])
     <section class="bothPadding">
         <div class="container">
             <div class="row">

@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
@@ -62,7 +63,7 @@ class EventController extends Controller
     {
         $event = $this->event();
         $validated = $request->validate([
-            'inquiry_type' => 'required|in:delegate,speaker,sponsor,exhibitor',
+            'inquiry_type' => ['required', Rule::in(array_keys($event->interestOptionMap()))],
             'name' => 'required|string|max:160',
             'email' => 'required|email|max:180',
             'phone' => 'nullable|string|max:40',

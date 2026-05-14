@@ -10,7 +10,8 @@ header{position:sticky;top:0;background:var(--white)!important;z-index:100}
 
 /* Page shell */
 .apply-page{min-height:100vh;background:#f8fbff;padding:3rem 0 5rem}
-.apply-page .container{padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right))}
+.apply-page .container{width:100%;max-width:1200px;margin-left:auto;margin-right:auto;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right))}
+@media(min-width:640px){.apply-page .container{padding-left:max(1.5rem,env(safe-area-inset-left));padding-right:max(1.5rem,env(safe-area-inset-right))}}
 
 /* Two-column grid */
 .apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
@@ -173,7 +174,15 @@ header{position:sticky;top:0;background:var(--white)!important;z-index:100}
 @php
 $selectedPlan = old('plan', $defaultPlan);
 $popularPlan  = \App\Support\ContributorPlans::GROWTH;
+$isFreeSignup = $isFreeSignup ?? false;
+$submitRoute = $submitRoute ?? route('contributor.register.submit');
 @endphp
+
+@include('partials.page-banner', [
+    'banner' => $banner ?? null,
+    'fallbackHeading' => $isFreeSignup ? 'Request a Free Account' : 'Apply to The Expert Desk',
+    'fallbackSubheading' => $isFreeSignup ? 'Submit your contributor details for admin review before dashboard access is enabled.' : 'Choose your plan, tell us about your expertise, and start your contributor journey.',
+])
 
 <div class="apply-page">
 <div class="container">
@@ -229,7 +238,7 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
         @endif
 
         <div class="form-card">
-            <form method="POST" action="{{ route('contributor.register.submit') }}" id="apply-form">
+            <form method="POST" action="{{ $submitRoute }}" id="apply-form" data-free-signup="{{ $isFreeSignup ? '1' : '0' }}">
                 @csrf
 
                 {{-- Plan selector --}}
@@ -333,9 +342,11 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
                 <div class="submit-row">
                     <button type="submit" class="submit-btn" id="planSubmitBtn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11z"/></svg>
-                        <span>Continue to Payment</span>
+                        <span>{{ $isFreeSignup ? 'Request Free Account' : 'Continue to Payment' }}</span>
                     </button>
-                    <p class="submit-note">You'll be taken to secure Razorpay checkout. Access starts immediately after payment.</p>
+                    <p class="submit-note">
+                        {{ $isFreeSignup ? 'Admin approval is required before dashboard access and posting.' : "You'll be taken to secure Razorpay checkout. Access starts immediately after payment." }}
+                    </p>
                 </div>
 
             </form>
@@ -352,6 +363,8 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
 (function () {
     const rows = document.querySelectorAll('.plan-row');
     const submitLabel = document.querySelector('#planSubmitBtn span');
+    const form = document.getElementById('apply-form');
+    const isFreeSignup = form && form.dataset.freeSignup === '1';
 
     function sync() {
         rows.forEach(row => {
@@ -360,7 +373,9 @@ $popularPlan  = \App\Support\ContributorPlans::GROWTH;
             const sel   = input.checked;
             row.classList.toggle('is-selected', sel);
             if (sel && submitLabel) {
-                submitLabel.textContent = 'Continue with ' + name.textContent.trim();
+                submitLabel.textContent = isFreeSignup
+                    ? 'Request ' + name.textContent.trim()
+                    : 'Continue with ' + name.textContent.trim();
             }
         });
     }

@@ -64,6 +64,7 @@
                                 <h4>Content</h4>
                                 <textarea name="content" id="ckeditor">{{ $editInsight->content }}</textarea>
                             </div>
+                            @include('admin.partials.seo-fields', ['seoModel' => $editInsight])
                         </div>
                         <button type="submit">Update Board Insight</button>
                     </form>

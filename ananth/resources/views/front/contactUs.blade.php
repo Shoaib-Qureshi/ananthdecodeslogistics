@@ -12,20 +12,11 @@
             background-color: var(--white) !important;
         }
     </style>
-    <section class="gradientBg bothPadding">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-8 m-auto">
-                    <div class="headingMain text-center">
-                        <h1>Contact Us</h1>
-                        <p>Write us at <strong><a
-                                    href="mailto:connect@ananthdecodeslogistics.com">connect@ananthdecodeslogistics.com</a></strong>
-                            or fill the query form below!</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    @include('partials.page-banner', [
+        'banner' => $banner ?? null,
+        'fallbackHeading' => 'Contact Us',
+        'fallbackSubheading' => 'Write us at connect@ananthdecodeslogistics.com or fill the query form below.',
+    ])
     <section class="bothPadding">
         <div class="container">
             <div class="row">

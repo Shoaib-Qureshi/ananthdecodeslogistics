@@ -16,13 +16,13 @@ class AdminCreatedContributor extends Mailable
 
     public function __construct(User $user, string $resetUrl)
     {
-        $this->user     = $user;
+        $this->user = $user;
         $this->resetUrl = $resetUrl;
     }
 
     public function build()
     {
-        return $this->subject('Your Expert Desk account is ready — set your password to get started')
-                    ->view('emails.contributor.admin-created');
+        return $this->subject('Your Expert Desk account is ready - set your password to get started')
+            ->view('emails.contributor.admin-created');
     }
 }

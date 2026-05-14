@@ -9,4 +9,9 @@ class BoardInsights extends Model
 {
     use HasFactory;
     protected $table = 'board_insights';
+
+    protected $casts = [
+        'robots_index' => 'boolean',
+        'robots_follow' => 'boolean',
+    ];
 }

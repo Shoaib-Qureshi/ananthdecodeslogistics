@@ -9,4 +9,9 @@ class BookReview extends Model
 {
     use HasFactory;
     protected $table = 'book_reviews';
+
+    protected $casts = [
+        'robots_index' => 'boolean',
+        'robots_follow' => 'boolean',
+    ];
 }

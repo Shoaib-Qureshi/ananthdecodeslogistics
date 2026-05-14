@@ -11,7 +11,7 @@
 <body>
 @include('admin.adminHeader')
 <section class="main_section">
-    <div class="container-fluid">
+    <div class="container-fluid event-editor-shell">
         @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
         @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 
@@ -29,10 +29,33 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ $formAction ?? route('admin.events.update') }}" enctype="multipart/form-data">
+        <div class="event-admin-stats" aria-label="Event summary">
+            <div class="event-admin-stat">
+                <span>Date</span>
+                <strong>{{ optional($event->event_date)->format('d M Y') ?: 'Not set' }}</strong>
+            </div>
+            <div class="event-admin-stat">
+                <span>Location</span>
+                <strong>{{ $event->location ?: 'Not set' }}</strong>
+            </div>
+            <div class="event-admin-stat">
+                <span>Status</span>
+                <strong>{{ $event->is_active ? 'Active event' : 'Inactive' }}</strong>
+            </div>
+            <div class="event-admin-stat">
+                <span>Sponsor Currency</span>
+                <strong>{{ $event->activeCurrency() }}</strong>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ $formAction ?? route('admin.events.update') }}" enctype="multipart/form-data" data-event-editor-form>
             @csrf
-            <div class="event-admin-card">
-                <h3>Event Basics</h3>
+            <div class="event-admin-card" id="event-basics" data-editor-section data-default-open="true">
+                <div class="event-admin-row-head">
+                    <h3>Event Basics</h3>
+                    <button type="button" class="event-section-toggle" data-section-toggle aria-label="Collapse Event Basics" aria-expanded="true"></button>
+                </div>
+                <div data-collapsible-body>
                 <div class="event-admin-grid">
                     <label>Name <input name="event[name]" value="{{ old('event.name', $event->name) }}" required></label>
                     <label>Chapter <input name="event[chapter]" value="{{ old('event.chapter', $event->chapter) }}"></label>
@@ -69,23 +92,37 @@
                         </div>
                     @endif
                 </div>
+                </div>
             </div>
 
-            <nav class="event-page-nav" aria-label="Event page content shortcuts">
-                <a href="#event-main-page"><div><strong>Main Event Page</strong><span>/events/conference</span></div></a>
-                <a href="#event-why-page"><div><strong>Why & Who Page</strong><span>/events/why-who</span></div></a>
-                <a href="#event-sponsor-page"><div><strong>Sponsorship Page</strong><span>/events/sponsorship</span></div></a>
-            </nav>
+            <div class="event-editor-tools">
+                <nav class="event-page-nav" aria-label="Event page content shortcuts">
+                    <a href="#event-basics"><div><strong>Basics</strong><span>Core details</span></div></a>
+                    <a href="#event-main-page"><div><strong>Main Event Page</strong><span>/events/conference</span></div></a>
+                    <a href="#event-why-page"><div><strong>Why & Who Page</strong><span>/events/why-who</span></div></a>
+                    <a href="#event-register-page"><div><strong>Registration Page</strong><span>/events/register</span></div></a>
+                    <a href="#event-sponsor-page"><div><strong>Sponsorship Page</strong><span>/events/sponsorship</span></div></a>
+                    <a href="#event-settings"><div><strong>Settings & SEO</strong><span>Payment / metadata</span></div></a>
+                </nav>
+                <div class="event-editor-tools__actions">
+                    <button type="button" class="event-admin-btn" data-expand-all>Expand All</button>
+                    <button type="button" class="event-admin-btn" data-collapse-all>Collapse All</button>
+                </div>
+            </div>
 
             <div class="event-admin-divider"><span>Page Content Blocks</span></div>
 
-            <section class="event-page-block" id="event-main-page">
+            <section class="event-page-block" id="event-main-page" data-editor-section data-default-open="true">
                 <div class="event-page-block__head">
                     <div>
+                        <span class="event-section-kicker">Public page</span>
                         <h3>Main Event Page Content</h3>
                         <p>This content appears on the main LogiSphere event page: welcome note, about copy, and theme section.</p>
                     </div>
-                    <a class="event-page-link" href="{{ route('events.conference') }}" target="_blank">View page</a>
+                    <div class="event-page-block__tools">
+                        <button type="button" class="event-section-toggle" data-section-toggle aria-label="Collapse Main Event Page Content" aria-expanded="true"></button>
+                        <a class="event-page-link" href="{{ route('events.conference') }}" target="_blank">View page</a>
+                    </div>
                 </div>
                 <div class="event-page-block__body">
                     <label>Welcome Note <textarea name="event[welcome_note]">{{ old('event.welcome_note', $event->welcome_note) }}</textarea><span class="field-help">Shown near the top of the main event page.</span></label>
@@ -97,13 +134,17 @@
                 </div>
             </section>
 
-            <section class="event-page-block" id="event-why-page">
+            <section class="event-page-block" id="event-why-page" data-editor-section>
                 <div class="event-page-block__head blue">
                     <div>
+                        <span class="event-section-kicker">Audience page</span>
                         <h3>Why & Who Page Content</h3>
                         <p>This is the dedicated editor for /events/why-who. Hero text, comparison rows, Bengaluru rationale, and attendee profiles live here.</p>
                     </div>
-                    <a class="event-page-link" href="{{ route('events.why-who') }}" target="_blank">View page</a>
+                    <div class="event-page-block__tools">
+                        <button type="button" class="event-section-toggle" data-section-toggle aria-label="Expand Why & Who Page Content" aria-expanded="false"></button>
+                        <a class="event-page-link" href="{{ route('events.why-who') }}" target="_blank">View page</a>
+                    </div>
                 </div>
                 <div class="event-page-block__body">
                     <div class="event-admin-grid-3">
@@ -121,24 +162,65 @@
 
             <div class="event-admin-divider"><span>Schedule & FAQ</span></div>
 
-            <div class="event-admin-card">
+            <section class="event-page-block" id="event-register-page" data-editor-section>
+                <div class="event-page-block__head blue">
+                    <div>
+                        <span class="event-section-kicker">Lead capture</span>
+                        <h3>Registration Page Content</h3>
+                        <p>This controls the Interest Type dropdown on /events/register.</p>
+                    </div>
+                    <div class="event-page-block__tools">
+                        <button type="button" class="event-section-toggle" data-section-toggle aria-label="Expand Registration Page Content" aria-expanded="false"></button>
+                        <a class="event-page-link" href="{{ route('events.register') }}" target="_blank">View page</a>
+                    </div>
+                </div>
+                <div class="event-page-block__body">
+                    <div class="event-admin-grid-3">
+                        <label>Page Eyebrow <input name="event[registration_eyebrow]" value="{{ old('event.registration_eyebrow', $event->registration_eyebrow ?: 'Register') }}"></label>
+                        <label>Hero Heading <input name="event[registration_heading]" value="{{ old('event.registration_heading', $event->registration_heading ?: 'Register for LogiSphere') }}"></label>
+                        <label>Hero Subheading <textarea name="event[registration_subheading]">{{ old('event.registration_subheading', $event->registration_subheading ?: 'Share your interest as a delegate, speaker, sponsor, or exhibitor.') }}</textarea></label>
+                    </div>
+                    <div class="event-admin-grid">
+                        <label>Left Panel Eyebrow <input name="event[registration_panel_eyebrow]" value="{{ old('event.registration_panel_eyebrow', $event->registration_panel_eyebrow ?: 'Contact Information') }}"></label>
+                        <label>Left Panel Heading <input name="event[registration_panel_heading]" value="{{ old('event.registration_panel_heading', $event->registration_panel_heading ?: 'The event team will follow up.') }}"></label>
+                        <label>Form Heading <input name="event[registration_form_heading]" value="{{ old('event.registration_form_heading', $event->registration_form_heading ?: 'Register Interest') }}"></label>
+                        <label>Form Subheading <textarea name="event[registration_form_subheading]">{{ old('event.registration_form_subheading', $event->registration_form_subheading ?: 'Tell us how you want to participate in LogiSphere.') }}</textarea></label>
+                        <label>Register Interest Types
+                            <textarea name="interest_options_text">{{ old('interest_options_text', collect($event->interestOptions())->map(fn($option) => $option['value'] . ' | ' . $option['label'])->implode("\n")) }}</textarea>
+                            <span class="field-help">One per line. Use value | Label, for example delegate | Delegate.</span>
+                        </label>
+                        <label>Registration Steps
+                            <textarea name="registration_steps_text">{{ old('registration_steps_text', collect($event->registrationSteps())->map(fn($step) => ($step['title'] ?? '') . ' | ' . ($step['text'] ?? ''))->implode("\n")) }}</textarea>
+                            <span class="field-help">One per line. Use Title | Description.</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <div class="event-admin-card" id="event-agenda" data-editor-section>
                 <div class="event-admin-row-head">
                     <h3>Agenda</h3>
-                    <button type="button" class="event-admin-btn primary" data-add-agenda>Add Agenda Item</button>
+                    <div class="event-editor-tools__actions">
+                        <button type="button" class="event-section-toggle" data-section-toggle aria-label="Expand Agenda" aria-expanded="false"></button>
+                        <button type="button" class="event-admin-btn primary" data-add-agenda>Add Agenda Item</button>
+                    </div>
                 </div>
-                <div data-agenda-list>
+                <div data-agenda-list data-collapsible-body>
                     @foreach($event->agendaItems as $index => $item)
                         @include('admin.events.partials.agenda-row', ['index' => $index, 'item' => $item])
                     @endforeach
                 </div>
             </div>
 
-            <div class="event-admin-card">
+            <div class="event-admin-card" id="event-faqs" data-editor-section>
                 <div class="event-admin-row-head">
                     <h3>FAQs</h3>
-                    <button type="button" class="event-admin-btn primary" data-add-faq>Add FAQ</button>
+                    <div class="event-editor-tools__actions">
+                        <button type="button" class="event-section-toggle" data-section-toggle aria-label="Expand FAQs" aria-expanded="false"></button>
+                        <button type="button" class="event-admin-btn primary" data-add-faq>Add FAQ</button>
+                    </div>
                 </div>
-                <div data-faq-list>
+                <div data-faq-list data-collapsible-body>
                     @foreach($event->faqs as $index => $faq)
                         @include('admin.events.partials.faq-row', ['index' => $index, 'faq' => $faq])
                     @endforeach
@@ -147,13 +229,17 @@
 
             <div class="event-admin-divider"><span>Commercial Setup</span></div>
 
-            <section class="event-page-block" id="event-sponsor-page">
+            <section class="event-page-block" id="event-sponsor-page" data-editor-section>
                 <div class="event-page-block__head green">
                     <div>
+                        <span class="event-section-kicker">Commercial page</span>
                         <h3>Sponsorship Page Content</h3>
                         <p>This is the dedicated editor for /events/sponsorship. Hero text, sponsor copy, exhibitor copy, and contact details live here.</p>
                     </div>
-                    <a class="event-page-link" href="{{ route('events.sponsorship') }}" target="_blank">View page</a>
+                    <div class="event-page-block__tools">
+                        <button type="button" class="event-section-toggle" data-section-toggle aria-label="Expand Sponsorship Page Content" aria-expanded="false"></button>
+                        <a class="event-page-link" href="{{ route('events.sponsorship') }}" target="_blank">View page</a>
+                    </div>
                 </div>
                 <div class="event-page-block__body">
                     <div class="event-admin-grid-3">
@@ -170,14 +256,22 @@
                         <label>Exhibitor Package Notes, one per line <textarea name="exhibitor_package_notes_text">{{ old('exhibitor_package_notes_text', implode("\n", $event->exhibitor_package_notes ?: [])) }}</textarea></label>
                         <label>Contact Email <input name="event[contact_email]" value="{{ old('event.contact_email', $event->contact_email) }}"></label>
                         <label>Contact Note <textarea name="event[contact_note]">{{ old('event.contact_note', $event->contact_note) }}</textarea></label>
+                        <label>Register Interest Types
+                            <input value="Managed in Registration Page Content" readonly>
+                            <span class="field-help">These choices are shared with sponsor/exhibitor enquiries. Use the Registration Page Content section above to edit them.</span>
+                        </label>
                         <label>Closing Note <textarea name="event[closing_note]">{{ old('event.closing_note', $event->closing_note) }}</textarea></label>
                         <label>Exhibitor Profile <textarea name="event[exhibitor_profile]">{{ old('event.exhibitor_profile', $event->exhibitor_profile) }}</textarea></label>
                     </div>
                 </div>
             </section>
 
-            <div class="event-admin-card">
-                <h3>Payment Settings & SEO</h3>
+            <div class="event-admin-card" id="event-settings" data-editor-section>
+                <div class="event-admin-row-head">
+                    <h3>Payment Settings & SEO</h3>
+                    <button type="button" class="event-section-toggle" data-section-toggle aria-label="Expand Payment Settings and SEO" aria-expanded="false"></button>
+                </div>
+                <div data-collapsible-body>
                 <div class="event-admin-grid-3">
                     <label>Active Sponsor Currency
                         <div class="currency-choice">
@@ -200,9 +294,13 @@
                     <label>Canonical URL <input name="event[canonical_url]" value="{{ old('event.canonical_url', $event->canonical_url) }}"></label>
                     <label>Meta Description <textarea name="event[meta_description]">{{ old('event.meta_description', $event->meta_description) }}</textarea></label>
                 </div>
+                </div>
             </div>
 
-            <div class="save-bar"><button type="submit">Update Event</button></div>
+            <div class="save-bar">
+                <span data-save-status aria-live="polite"></span>
+                <button type="submit" data-save-button>Update Event</button>
+            </div>
         </form>
     </div>
 </section>
@@ -210,9 +308,69 @@
 <template id="agenda-template">@include('admin.events.partials.agenda-row', ['index' => '__INDEX__', 'item' => null])</template>
 <template id="faq-template">@include('admin.events.partials.faq-row', ['index' => '__INDEX__', 'faq' => null])</template>
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    var sections = Array.prototype.slice.call(document.querySelectorAll('[data-editor-section]'));
+    var hasErrors = !!document.querySelector('.alert-danger');
+
+    sections.forEach(function (section) {
+        if (!hasErrors && section.dataset.defaultOpen !== 'true') {
+            setSection(section, false, false);
+        } else {
+            setSection(section, true, false);
+        }
+    });
+
+    var form = document.querySelector('[data-event-editor-form]');
+    if (form) {
+        form.addEventListener('submit', function () {
+            var button = form.querySelector('[data-save-button]');
+            var status = form.querySelector('[data-save-status]');
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'Saving...';
+            }
+            if (status) {
+                status.textContent = 'Saving event changes';
+            }
+        });
+    }
+});
+
 document.addEventListener('click', function (event) {
-    if (event.target.matches('[data-add-agenda]')) addRow('agenda-template', '[data-agenda-list]');
-    if (event.target.matches('[data-add-faq]')) addRow('faq-template', '[data-faq-list]');
+    var toggle = event.target.closest('[data-section-toggle]');
+    if (toggle) {
+        var section = toggle.closest('[data-editor-section]');
+        if (section) setSection(section, section.classList.contains('is-collapsed'), true);
+    }
+
+    if (event.target.matches('[data-expand-all]')) {
+        document.querySelectorAll('[data-editor-section]').forEach(function (section) {
+            setSection(section, true, true);
+        });
+    }
+
+    if (event.target.matches('[data-collapse-all]')) {
+        document.querySelectorAll('[data-editor-section]').forEach(function (section) {
+            setSection(section, false, true);
+        });
+    }
+
+    var navLink = event.target.closest('.event-page-nav a[href^="#"]');
+    if (navLink) {
+        var target = document.querySelector(navLink.getAttribute('href'));
+        if (target && target.matches('[data-editor-section]')) {
+            setSection(target, true, true);
+        }
+    }
+
+    if (event.target.matches('[data-add-agenda]')) {
+        setSection(event.target.closest('[data-editor-section]'), true, true);
+        addRow('agenda-template', '[data-agenda-list]');
+    }
+    if (event.target.matches('[data-add-faq]')) {
+        setSection(event.target.closest('[data-editor-section]'), true, true);
+        addRow('faq-template', '[data-faq-list]');
+    }
     if (event.target.matches('[data-remove-row]')) {
         const row = event.target.closest('.event-admin-row');
         const del = row.querySelector('[data-delete-input]');
@@ -222,6 +380,65 @@ document.addEventListener('click', function (event) {
 function addRow(templateId, targetSelector) {
     const template = document.getElementById(templateId).innerHTML.replaceAll('__INDEX__', Date.now());
     document.querySelector(targetSelector).insertAdjacentHTML('beforeend', template);
+}
+
+function sectionBody(section) {
+    var children = Array.prototype.slice.call(section.children);
+    return children.find(function (child) {
+        return child.classList.contains('event-page-block__body') || child.hasAttribute('data-collapsible-body');
+    });
+}
+
+function setSection(section, open, animate) {
+    if (!section) return;
+
+    var body = sectionBody(section);
+    var toggle = section.querySelector('[data-section-toggle]');
+    if (!body) return;
+
+    section.classList.toggle('is-collapsed', !open);
+    if (toggle) {
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        toggle.setAttribute('aria-label', (open ? 'Collapse ' : 'Expand ') + sectionTitle(section));
+    }
+
+    if (!animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        body.style.display = open ? '' : 'none';
+        body.style.height = '';
+        body.style.overflow = '';
+        body.style.transition = '';
+        return;
+    }
+
+    body.style.overflow = 'hidden';
+    body.style.transition = 'height 220ms ease';
+
+    if (open) {
+        body.style.display = '';
+        body.style.height = '0px';
+        requestAnimationFrame(function () {
+            body.style.height = body.scrollHeight + 'px';
+        });
+    } else {
+        body.style.height = body.scrollHeight + 'px';
+        requestAnimationFrame(function () {
+            body.style.height = '0px';
+        });
+    }
+
+    body.addEventListener('transitionend', function finish(event) {
+        if (event.propertyName !== 'height') return;
+        body.removeEventListener('transitionend', finish);
+        body.style.transition = '';
+        body.style.overflow = '';
+        body.style.height = '';
+        if (!open) body.style.display = 'none';
+    });
+}
+
+function sectionTitle(section) {
+    var heading = section.querySelector('h3');
+    return heading ? heading.textContent.trim() : 'section';
 }
 </script>
 @include('admin.adminFooter')

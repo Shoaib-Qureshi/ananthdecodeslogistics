@@ -73,12 +73,7 @@ class PageContentController extends Controller
     public function editPageBanners()
     {
         $banners = PageBanner::orderBy('key')->get()->keyBy('key');
-        $bannerKeys = [
-            'blog' => 'Blog banner',
-            'expert_desk' => 'The Expert Desk banner',
-            'board_insights' => 'Board Insights banner',
-            'book_reviews' => 'Book Reviews banner',
-        ];
+        $bannerKeys = PageBanner::manageableKeys();
 
         return view('admin.editPageBanners', compact('banners', 'bannerKeys'));
     }
@@ -87,7 +82,7 @@ class PageContentController extends Controller
     {
         $validated = $request->validate([
             'banners' => 'required|array',
-            'banners.*.key' => 'required|string|in:blog,expert_desk,board_insights,book_reviews',
+            'banners.*.key' => 'required|string|in:' . implode(',', array_keys(PageBanner::manageableKeys())),
             'banners.*.eyebrow' => 'nullable|string|max:255',
             'banners.*.heading' => 'nullable|string|max:255',
             'banners.*.subheading' => 'nullable|string|max:2000',

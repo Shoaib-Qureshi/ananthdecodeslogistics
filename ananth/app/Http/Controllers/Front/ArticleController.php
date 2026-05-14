@@ -159,8 +159,19 @@ class ArticleController extends Controller
         if(is_null($bookDetail)){
             return response()->view('errors.404', [], 404);
         }
+        $plainText = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($bookDetail->short_description ?: $bookDetail->detail_review), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+
         return view('reviews.reviewPage', [
-            'bookDetail' => $bookDetail
+            'bookDetail' => $bookDetail,
+            'seo' => [
+                'title' => $bookDetail->meta_title ?: $bookDetail->name,
+                'description' => $bookDetail->meta_description ?: Str::limit($plainText, 155),
+                'keywords' => $bookDetail->meta_keywords,
+                'canonical' => $bookDetail->canonical_url ?: url('book-review/' . $bookDetail->slug),
+                'image' => $this->publicAssetUrl($bookDetail->og_image ?: ($bookDetail->cover ? 'img/thumbnail/' . $bookDetail->cover : null), asset('img/site-banner.jpg')),
+                'robots' => $this->robotsContent((bool) ($bookDetail->robots_index ?? true), (bool) ($bookDetail->robots_follow ?? true)),
+                'schema' => $bookDetail->schema_json_ld,
+            ],
         ]);
     }
 

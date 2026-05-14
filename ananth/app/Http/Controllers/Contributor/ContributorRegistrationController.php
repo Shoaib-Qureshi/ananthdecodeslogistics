@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Contributor;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AdminCreatedContributor;
 use App\Mail\ContributorApproved;
 use App\Mail\ContributorRejected;
 use App\Mail\NewRegistrationAdminNotification;
 use App\Models\ContributorPayment;
+use App\Models\PageBanner;
 use App\Models\User;
 use App\Support\ContributorPlans;
 use Illuminate\Http\Request;
@@ -23,6 +25,7 @@ class ContributorRegistrationController extends Controller
     {
         return view('front.writeForUs', [
             'plans' => ContributorPlans::publicPlans(),
+            'banner' => PageBanner::forKey('write_for_us'),
         ]);
     }
 
@@ -38,11 +41,30 @@ class ContributorRegistrationController extends Controller
         return view('contributor.register', [
             'plans' => ContributorPlans::publicPlans(),
             'defaultPlan' => $defaultPlan,
+            'submitRoute' => route('contributor.register.submit'),
+            'isFreeSignup' => false,
+            'banner' => PageBanner::forKey('contributor_apply'),
+        ]);
+    }
+
+    public function showFreeForm()
+    {
+        return view('contributor.register', [
+            'plans' => ContributorPlans::hiddenFreeSignupPlans(),
+            'defaultPlan' => ContributorPlans::FREE_ACCOUNT,
+            'submitRoute' => route('contributor.free-signup.submit'),
+            'isFreeSignup' => true,
+            'banner' => PageBanner::forKey('free_signup'),
         ]);
     }
 
     public function submit(Request $request)
     {
+        $isHiddenFreeSignup = $request->routeIs('contributor.free-signup.submit');
+        $allowedPlanCodes = $isHiddenFreeSignup
+            ? ContributorPlans::hiddenFreeSignupPlanCodes()
+            : ContributorPlans::publicPlanCodes();
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
@@ -60,11 +82,12 @@ class ContributorRegistrationController extends Controller
             'designation' => 'required|string|max:255',
             'intro' => 'required|string|max:1000',
             'reason_for_joining' => 'required|string|max:2000',
-            'plan' => ['required', Rule::in(ContributorPlans::publicPlanCodes())],
+            'plan' => ['required', Rule::in($allowedPlanCodes)],
         ]);
 
-        $planCode = ContributorPlans::normalize($request->plan, ContributorPlans::STARTER);
-        $plan = ContributorPlans::get($planCode, ContributorPlans::STARTER);
+        $planFallback = $isHiddenFreeSignup ? ContributorPlans::FREE_ACCOUNT : ContributorPlans::STARTER;
+        $planCode = ContributorPlans::normalize($request->plan, $planFallback);
+        $plan = ContributorPlans::get($planCode, $planFallback);
 
         if ((int) $plan['price'] > 0 && !$this->razorpayConfigured()) {
             return back()->withErrors([
@@ -82,9 +105,15 @@ class ContributorRegistrationController extends Controller
             'plan' => $planCode,
             'amount' => $plan['price'],
             'currency' => $plan['currency'],
-            'status' => (int) $plan['price'] > 0 ? 'pending' : 'paid',
-            'activated_at' => (int) $plan['price'] > 0 ? null : now(),
+            'status' => ((int) $plan['price'] > 0 || $isHiddenFreeSignup) ? 'pending' : 'paid',
+            'activated_at' => ((int) $plan['price'] > 0 || $isHiddenFreeSignup) ? null : now(),
         ]);
+
+        if ($isHiddenFreeSignup) {
+            $payment = $this->createPendingFreeContributor($payment);
+
+            return redirect()->route('contributor.free-signup.pending', ['payment' => $payment->id]);
+        }
 
         if ((int) $plan['price'] <= 0) {
             $payment = $this->finalizePaidContributor($payment, []);
@@ -230,6 +259,17 @@ class ContributorRegistrationController extends Controller
         ]);
     }
 
+    public function freeSignupPending(Request $request)
+    {
+        $payment = ContributorPayment::find($request->get('payment'));
+        abort_if(!$payment || $payment->plan !== ContributorPlans::FREE_ACCOUNT, 404);
+
+        return view('contributor.free-signup-pending', [
+            'payment' => $payment,
+            'plan' => ContributorPlans::get($payment->plan, ContributorPlans::FREE_ACCOUNT),
+        ]);
+    }
+
     public function razorpayWebhook(Request $request)
     {
         $payload = $request->getContent();
@@ -283,9 +323,10 @@ class ContributorRegistrationController extends Controller
             'status' => 'approved',
             'contributor_plan' => $planCode,
             'payment_status' => $user->payment_status ?: (ContributorPlans::isComplimentary($planCode) ? 'complimentary' : 'paid'),
+            'activated_at' => $user->activated_at ?: now(),
         ]);
 
-        Password::sendResetLink(['email' => $user->email]);
+        $this->sendPasswordSetupEmail($user);
 
         try {
             Mail::to($user->email)->send(new ContributorApproved($user));
@@ -293,7 +334,7 @@ class ContributorRegistrationController extends Controller
             //
         }
 
-        return redirect()->back()->with('success', "Contributor {$user->name} approved. Password reset email sent.");
+        return redirect()->back()->with('success', "Contributor {$user->name} approved. Password setup email sent.");
     }
 
     public function reject(Request $request, $id)
@@ -531,11 +572,69 @@ class ContributorRegistrationController extends Controller
         return $payment->fresh();
     }
 
+    private function createPendingFreeContributor(ContributorPayment $payment): ContributorPayment
+    {
+        $planCode = ContributorPlans::FREE_ACCOUNT;
+        $user = $payment->user_id ? User::find($payment->user_id) : User::where('email', $payment->email)->first();
+
+        if (!$user) {
+            $user = User::create([
+                'name' => $payment->name,
+                'email' => $payment->email,
+                'username' => $this->generateUniqueUsername(Str::slug($payment->name)),
+                'password' => bcrypt(Str::random(32)),
+                'user_role' => 'guest',
+                'status' => 'pending',
+                'contributor_plan' => $planCode,
+                'payment_status' => 'complimentary',
+                'activated_at' => null,
+                'designation' => $payment->designation,
+                'intro' => $payment->intro,
+                'reason_for_joining' => $payment->reason_for_joining,
+            ]);
+        } else {
+            $user->update([
+                'status' => 'pending',
+                'contributor_plan' => $planCode,
+                'payment_status' => 'complimentary',
+                'activated_at' => null,
+                'designation' => $payment->designation ?: $user->designation,
+                'intro' => $payment->intro ?: $user->intro,
+                'reason_for_joining' => $payment->reason_for_joining ?: $user->reason_for_joining,
+            ]);
+        }
+
+        $payment->update([
+            'user_id' => $user->id,
+            'plan' => $planCode,
+            'amount' => 0,
+            'status' => 'pending',
+            'activated_at' => null,
+        ]);
+
+        $this->sendPendingContributorAdminNotification($user);
+
+        return $payment->fresh();
+    }
+
+    private function sendPendingContributorAdminNotification(User $user): void
+    {
+        try {
+            $adminEmail = config('mail.admin_email', 'admin@ananthdecodeslogistics.com');
+            Mail::to($adminEmail)->send(new NewRegistrationAdminNotification($user));
+        } catch (\Throwable $exception) {
+            Log::warning('Failed sending pending free contributor admin notification.', [
+                'user_id' => $user->id,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+    }
+
     private function sendContributorAccessEmails(User $user, bool $sendPasswordLink = false): void
     {
         try {
             if ($sendPasswordLink) {
-                Password::sendResetLink(['email' => $user->email]);
+                $this->sendPasswordSetupEmail($user);
             }
             Mail::to($user->email)->send(new ContributorApproved($user));
         } catch (\Throwable $exception) {
@@ -554,6 +653,14 @@ class ContributorRegistrationController extends Controller
                 'error' => $exception->getMessage(),
             ]);
         }
+    }
+
+    private function sendPasswordSetupEmail(User $user): void
+    {
+        $token = Password::broker()->createToken($user);
+        $resetUrl = url(route('password.reset', ['token' => $token, 'email' => $user->email], false));
+
+        Mail::to($user->email)->send(new AdminCreatedContributor($user, $resetUrl));
     }
 
     private function paymentStatusForAmount(int $amount): string

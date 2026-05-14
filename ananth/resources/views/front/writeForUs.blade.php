@@ -10,6 +10,8 @@
 /* ── Base ── */
 header{position:sticky;top:0;background:var(--white)!important;z-index:100}
 .wfu-shell{background:#f8fbff}
+.wfu-shell .container{width:100%;max-width:1200px;margin-left:auto;margin-right:auto;padding-left:1rem;padding-right:1rem}
+@media(min-width:640px){.wfu-shell .container{padding-left:1.5rem;padding-right:1.5rem}}
 
 /* ── Hero ── */
 .wfu-hero{padding:5rem 0 4rem;text-align:center}
@@ -87,12 +89,16 @@ header{position:sticky;top:0;background:var(--white)!important;z-index:100}
 
 /* ── FAQ ── */
 .faq-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:2.5rem}
-.faq-card .accordion-item{border:1px solid #e2e8f0;border-radius:12px!important;overflow:hidden;margin-bottom:.75rem}
-.faq-card .accordion-item:last-child{margin-bottom:0}
-.faq-card .accordion-button{font-size:.93rem;font-weight:600;color:#0f172a;background:#fff;box-shadow:none;padding:1rem 1.1rem}
-.faq-card .accordion-button:not(.collapsed){color:#1d4ed8;background:#f0f6ff}
-.faq-card .accordion-button::after{filter:none}
-.faq-card .accordion-body{font-size:.88rem;color:#64748b;line-height:1.75;padding:.75rem 1.1rem 1.1rem}
+.faq-list{display:grid;gap:.75rem;margin-top:1.5rem}
+.faq-item{border:1px solid #e2e8f0;border-radius:12px;background:#fff;overflow:hidden}
+.faq-item[open]{background:#fff}
+.faq-question{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.1rem;font-size:.93rem;font-weight:700;color:#0f172a;background:#fff;cursor:pointer;list-style:none}
+.faq-question::-webkit-details-marker{display:none}
+.faq-question::after{content:'';width:.65rem;height:.65rem;border-right:2px solid #0f3b78;border-bottom:2px solid #0f3b78;transform:rotate(45deg);transition:transform .2s ease;flex-shrink:0}
+.faq-item[open] .faq-question{color:#1d4ed8;background:#f0f6ff}
+.faq-item[open] .faq-question::after{transform:rotate(225deg)}
+.faq-answer{padding:1rem 1.1rem 1.15rem;font-size:.9rem;color:#475569;line-height:1.75;background:#fff;border-top:1px solid #eaf1fb}
+.faq-answer p{margin:0;color:#475569}
 
 /* ── Final CTA ── */
 .final-cta{background:#0f172a;border-radius:18px;padding:2.5rem;text-align:center;margin-top:2.5rem}
@@ -146,23 +152,24 @@ $faqItems = [
     ['q' => 'Is homepage placement guaranteed on Authority?','a' => 'No. Authority makes eligible approved posts available for homepage placement, but editorial selection still applies.'],
     ['q' => 'What is handled automatically vs manually?','a' => 'Duration limits, article caps, and Authority feature eligibility are automated. Promotion, newsletter mentions, and spotlight coordination are handled by the editorial team.'],
 ];
+$banner = $banner ?? null;
 @endphp
 
 <div class="wfu-shell">
 
 {{-- ── Hero ── --}}
-<section class="wfu-hero">
+<section class="wfu-hero" @if($banner?->image) style="background:linear-gradient(rgba(248,251,255,.90),rgba(248,251,255,.94)),url('{{ Storage::url($banner->image) }}') center/cover no-repeat" @endif>
     <div class="container">
         <span class="wfu-eyebrow">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7"/></svg>
-            The Expert Desk
+            {{ $banner?->eyebrow ?? 'The Expert Desk' }}
         </span>
-        <h1 class="wfu-h1">Write for a logistics audience that <span>reads with intent</span></h1>
-        <p class="wfu-lead">The Expert Desk is a credibility-first contributor platform for logistics and supply chain professionals. Pick a publishing plan that fits your pace — and build a real author presence.</p>
+        <h1 class="wfu-h1">{{ $banner?->heading ?? 'Write for a logistics audience that reads with intent' }}</h1>
+        <p class="wfu-lead">{{ $banner?->subheading ?? 'The Expert Desk is a credibility-first contributor platform for logistics and supply chain professionals. Pick a publishing plan that fits your pace and build a real author presence.' }}</p>
         <div class="wfu-actions">
-            <a href="#pricing" class="btn-primary-x">
+            <a href="{{ $banner?->cta_link ?: '#pricing' }}" class="btn-primary-x">
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/></svg>
-                View Plans
+                {{ $banner?->cta_label ?: 'View Plans' }}
             </a>
             <a href="{{ route('contributors.index') }}" class="btn-ghost-x">Browse The Expert Desk</a>
         </div>
@@ -287,18 +294,12 @@ $faqItems = [
     <div class="faq-card wfu-section">
         <span class="section-eyebrow">Common questions</span>
         <h2 class="section-title">Before you apply</h2>
-        <div class="accordion mt-4" id="wfuFaq">
+        <div class="faq-list" id="wfuFaq">
             @foreach($faqItems as $faq)
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button {{ $loop->first ? '' : 'collapsed' }}" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#faq{{ $loop->index }}"
-                            aria-expanded="{{ $loop->first ? 'true' : 'false' }}">{{ $faq['q'] }}</button>
-                </h2>
-                <div id="faq{{ $loop->index }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" data-bs-parent="#wfuFaq">
-                    <div class="accordion-body">{{ $faq['a'] }}</div>
-                </div>
-            </div>
+            <details class="faq-item" {{ $loop->first ? 'open' : '' }}>
+                <summary class="faq-question">{{ $faq['q'] }}</summary>
+                <div class="faq-answer"><p>{{ $faq['a'] }}</p></div>
+            </details>
             @endforeach
         </div>
     </div>

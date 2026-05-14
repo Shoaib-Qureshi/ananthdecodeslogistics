@@ -157,6 +157,9 @@ Route::post('password/reset', function(\Illuminate\Http\Request $request) {
 // ─── Contributor Registration (public) ───────────────────────────────────
 Route::get('expert-desk/apply', [ContributorRegistrationController::class, 'showForm'])->name('contributor.register');
 Route::post('expert-desk/apply', [ContributorRegistrationController::class, 'submit'])->name('contributor.register.submit');
+Route::get('expert-desk/free-signup', [ContributorRegistrationController::class, 'showFreeForm'])->name('contributor.free-signup');
+Route::post('expert-desk/free-signup', [ContributorRegistrationController::class, 'submit'])->name('contributor.free-signup.submit');
+Route::get('expert-desk/free-signup/pending', [ContributorRegistrationController::class, 'freeSignupPending'])->name('contributor.free-signup.pending');
 Route::get('write-for-us', [ContributorRegistrationController::class, 'showWriteForUs'])->name('write-for-us');
 Route::post('expert-desk/payment/verify', [ContributorRegistrationController::class, 'paymentVerify'])->name('contributor.payment.verify');
 Route::get('expert-desk/payment/success', [ContributorRegistrationController::class, 'paymentSuccess'])->name('contributor.payment.success');

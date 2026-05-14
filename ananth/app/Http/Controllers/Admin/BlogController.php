@@ -269,6 +269,14 @@ class BlogController extends Controller
             'detail_review'     => 'nullable|string',
             'buy_link'          => 'nullable|url|max:2000',
             'cover'             => 'nullable|image|max:4096',
+            'meta_title'        => 'nullable|string|max:255',
+            'meta_description'  => 'nullable|string|max:500',
+            'meta_keywords'     => 'nullable|string|max:1000',
+            'canonical_url'     => 'nullable|string|max:255',
+            'og_image'          => 'nullable|string|max:255',
+            'robots_index'      => 'nullable|in:0,1',
+            'robots_follow'     => 'nullable|in:0,1',
+            'schema_json_ld'    => 'nullable|string',
         ]);
 
         $addBook = new BookReview();
@@ -280,6 +288,14 @@ class BlogController extends Controller
         $addBook->short_description = $request->short_description;        
         $addBook->detail_review = $request->detail_review;
         $addBook->buy_link = $request->buy_link;
+        $addBook->meta_title = $request->meta_title;
+        $addBook->meta_description = $request->meta_description;
+        $addBook->meta_keywords = $request->meta_keywords;
+        $addBook->canonical_url = $request->canonical_url;
+        $addBook->og_image = $request->og_image;
+        $addBook->robots_index = $request->input('robots_index', 1);
+        $addBook->robots_follow = $request->input('robots_follow', 1);
+        $addBook->schema_json_ld = $request->schema_json_ld;
 
         if( $request->hasFile('cover') ) {
             $image = $request->file('cover');
@@ -324,6 +340,14 @@ class BlogController extends Controller
             'buy_link'          => 'nullable|url|max:2000',
             'cover'             => 'nullable|image|max:4096',
             'status'            => 'nullable|in:0,1',
+            'meta_title'        => 'nullable|string|max:255',
+            'meta_description'  => 'nullable|string|max:500',
+            'meta_keywords'     => 'nullable|string|max:1000',
+            'canonical_url'     => 'nullable|string|max:255',
+            'og_image'          => 'nullable|string|max:255',
+            'robots_index'      => 'nullable|in:0,1',
+            'robots_follow'     => 'nullable|in:0,1',
+            'schema_json_ld'    => 'nullable|string',
         ]);
 
         $updateBook = BookReview::findOrFail($id);
@@ -336,6 +360,14 @@ class BlogController extends Controller
         $updateBook->detail_review = $request->detail_review;
         $updateBook->buy_link = $request->buy_link;
         $updateBook->status = $request->status;
+        $updateBook->meta_title = $request->meta_title;
+        $updateBook->meta_description = $request->meta_description;
+        $updateBook->meta_keywords = $request->meta_keywords;
+        $updateBook->canonical_url = $request->canonical_url;
+        $updateBook->og_image = $request->og_image;
+        $updateBook->robots_index = $request->input('robots_index', 1);
+        $updateBook->robots_follow = $request->input('robots_follow', 1);
+        $updateBook->schema_json_ld = $request->schema_json_ld;
 
         if( $request->hasFile('cover') ) {
             $image = $request->file('cover');

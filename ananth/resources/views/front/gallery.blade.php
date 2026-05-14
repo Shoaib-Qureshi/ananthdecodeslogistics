@@ -110,32 +110,11 @@
 @endphp
 <main class="gallery-page">
 
-    {{-- Hero --}}
-    <section class="gallery-hero">
-        <div class="gallery-container gallery-hero__inner">
-            <div>
-                <div class="gallery-eyebrow">ADL Gallery</div>
-                <h1>A visual record of logistics thinking.</h1>
-                <p>Boardroom conversations, field perspectives, events, and the systems that keep ideas moving.</p>
-                <div class="gallery-hero__stats">
-                    <div class="gallery-hero__stat">
-                        <span>Images</span>
-                        <strong>{{ $totalCount }}</strong>
-                    </div>
-                    @if($categories->count() > 1)
-                    <div class="gallery-hero__stat">
-                        <span>Categories</span>
-                        <strong>{{ $categories->count() }}</strong>
-                    </div>
-                    @endif
-                </div>
-            </div>
-            <aside class="gallery-note">
-                <strong>Curated for context</strong>
-                <span>Images are grouped around strategy, operations, infrastructure, innovation, and people. Click any image to view it larger.</span>
-            </aside>
-        </div>
-    </section>
+    @include('partials.page-banner', [
+        'banner' => $banner ?? null,
+        'fallbackHeading' => 'A visual record of logistics thinking',
+        'fallbackSubheading' => 'Boardroom conversations, field perspectives, events, and the systems that keep ideas moving.',
+    ])
 
     {{-- Gallery --}}
     <section class="gallery-section">

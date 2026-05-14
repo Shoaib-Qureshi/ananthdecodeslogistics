@@ -6,23 +6,27 @@
 
 @section('content')
 @php
-    $interestOptions = ['delegate' => 'Delegate', 'speaker' => 'Speaker', 'sponsor' => 'Sponsor', 'exhibitor' => 'Exhibitor'];
-    $selectedInterest = old('inquiry_type', request('type', 'delegate'));
+    $interestOptions = $event->interestOptionMap();
+    $fallbackInterest = array_key_first($interestOptions) ?: 'delegate';
+    $selectedInterest = old('inquiry_type', request('type', $fallbackInterest));
+    if (! array_key_exists($selectedInterest, $interestOptions)) {
+        $selectedInterest = $fallbackInterest;
+    }
     $selectedInterestLabel = $interestOptions[$selectedInterest] ?? 'Delegate';
 @endphp
 <main class="event-page">
     @include('events.partials.hero', [
-        'eyebrow'  => 'Register',
-        'title'    => 'Register for LogiSphere',
-        'subtitle' => 'Share your interest as a delegate, speaker, sponsor, or exhibitor.',
+        'eyebrow'  => $event->registration_eyebrow ?: 'Register',
+        'title'    => $event->registration_heading ?: 'Register for LogiSphere',
+        'subtitle' => $event->registration_subheading ?: 'Share your interest as a delegate, speaker, sponsor, or exhibitor.',
     ])
     @include('events.partials.nav')
 
     <section class="event-section event-register-section">
         <div class="event-container event-register-layout">
             <aside class="event-register-panel">
-                <div class="event-eyebrow">Contact Information</div>
-                <h2 class="event-title">The event team will follow up.</h2>
+                <div class="event-eyebrow">{{ $event->registration_panel_eyebrow ?: 'Contact Information' }}</div>
+                <h2 class="event-title">{{ $event->registration_panel_heading ?: 'The event team will follow up.' }}</h2>
                 <p class="event-lead">{!! nl2br(e($event->contact_note)) !!}</p>
 
                 @if($event->contact_email)
@@ -33,35 +37,25 @@
                 @endif
 
                 <ul class="event-register-steps">
-                    <li>
-                        <span class="event-register-step-num">1</span>
-                        <div>
-                            <strong>Submit your interest</strong>
-                            <span>Choose delegate, speaker, sponsor, or exhibitor and share basic details.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="event-register-step-num">2</span>
-                        <div>
-                            <strong>Team review</strong>
-                            <span>The LogiSphere team checks fit and follows up with the right next step.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="event-register-step-num">3</span>
-                        <div>
-                            <strong>Confirmation</strong>
-                            <span>Approved delegates and partners receive event coordination details.</span>
-                        </div>
-                    </li>
+                    @foreach($event->registrationSteps() as $index => $step)
+                        <li>
+                            <span class="event-register-step-num">{{ $index + 1 }}</span>
+                            <div>
+                                <strong>{{ $step['title'] }}</strong>
+                                @if($step['text'])
+                                    <span>{{ $step['text'] }}</span>
+                                @endif
+                            </div>
+                        </li>
+                    @endforeach
                 </ul>
             </aside>
 
             <div class="event-card event-register-form-card">
                 <div class="event-register-form-head">
                     <div>
-                        <h2>Register Interest</h2>
-                        <p>Tell us how you want to participate in LogiSphere.</p>
+                        <h2>{{ $event->registration_form_heading ?: 'Register Interest' }}</h2>
+                        <p>{{ $event->registration_form_subheading ?: 'Tell us how you want to participate in LogiSphere.' }}</p>
                     </div>
                     <span class="event-register-badge">{{ $event->formattedDate() }}</span>
                 </div>

@@ -268,7 +268,8 @@
 
             <div class="plans-grid">
                 @foreach($visiblePlans as $index => $plan)
-                    @php($publicValue = old("plans.$index.public", $plan['public']))
+                    @php($isHiddenFreeAccountPlan = ($plan['code'] ?? null) === \App\Support\ContributorPlans::FREE_ACCOUNT)
+                    @php($publicValue = $isHiddenFreeAccountPlan ? false : old("plans.$index.public", $plan['public']))
                     @php($featuredValue = old("plans.$index.homepage_feature", $plan['homepage_feature']))
                     <details class="plan-card plan-accordion" {{ !$errors->any() && $loop->first ? 'open' : '' }}>
                         <summary class="plan-card-header">
@@ -376,10 +377,10 @@
                                     <div class="checkbox-card">
                                         <input type="hidden" name="plans[{{ $index }}][public]" value="0">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="plans[{{ $index }}][public]" value="1" id="publicPlan{{ $index }}" {{ $publicValue ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="publicPlan{{ $index }}">Show on public signup pages</label>
+                                            <input class="form-check-input" type="checkbox" name="plans[{{ $index }}][public]" value="1" id="publicPlan{{ $index }}" {{ $publicValue && !$isHiddenFreeAccountPlan ? 'checked' : '' }} {{ $isHiddenFreeAccountPlan ? 'disabled' : '' }}>
+                                            <label class="form-check-label" for="publicPlan{{ $index }}">{{ $isHiddenFreeAccountPlan ? 'Hidden direct-link signup only' : 'Show on public signup pages' }}</label>
                                         </div>
-                                        <div class="muted-note mt-2">If enabled, this plan appears on `/write-for-us` and `/expert-desk/apply`.</div>
+                                        <div class="muted-note mt-2">{{ $isHiddenFreeAccountPlan ? 'This plan is available only at the direct free signup URL and is never shown in public plan cards.' : 'If enabled, this plan appears on `/write-for-us` and `/expert-desk/apply`.' }}</div>
                                     </div>
                                 </div>
 

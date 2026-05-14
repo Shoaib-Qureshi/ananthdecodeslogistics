@@ -14,7 +14,7 @@
     <div class="container-fluid">
         @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
         <div class="event-admin-hero">
-            <div><h2>Event Registrations</h2><p>Delegate, speaker, sponsor, and exhibitor interest submissions.</p></div>
+            <div><h2>Event Registrations</h2><p>Event interest submissions.</p></div>
             <a class="event-admin-btn" href="{{ route('events.register') }}" target="_blank">View Form</a>
         </div>
         <div class="event-admin-card">
@@ -24,7 +24,7 @@
                 @forelse($registrations as $registration)
                     <tr>
                         <td><strong>{{ $registration->name }}</strong><br>{{ $registration->created_at->format('d M Y') }}</td>
-                        <td>{{ ucfirst($registration->inquiry_type) }}</td>
+                        <td>{{ $registration->event ? ($registration->event->interestOptionMap()[$registration->inquiry_type] ?? \Illuminate\Support\Str::headline($registration->inquiry_type)) : \Illuminate\Support\Str::headline($registration->inquiry_type) }}</td>
                         <td>{{ $registration->company }}<br>{{ $registration->designation }}</td>
                         <td>{{ $registration->email }}<br>{{ $registration->phone }}</td>
                         <td>{{ \Illuminate\Support\Str::limit($registration->message, 140) }}</td>

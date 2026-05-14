@@ -73,6 +73,7 @@
                                 <h4>Detailed Review</h4>
                                 <textarea name="detail_review" id="ckeditor"></textarea>
                             </div>
+                            @include('admin.partials.seo-fields')
                         </div>
                         <button type="submit">Post Book Review</button>
                     </form>

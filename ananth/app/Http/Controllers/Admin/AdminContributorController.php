@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Concerns\HandlesFaqs;
 use App\Http\Controllers\Controller;
+use App\Mail\AdminCreatedContributor;
 use App\Mail\ContributorApproved;
 use App\Mail\ContributorRejected;
 use App\Mail\PostApproved;
@@ -45,9 +46,10 @@ class AdminContributorController extends Controller
             'status' => 'approved',
             'contributor_plan' => $planCode,
             'payment_status' => $user->payment_status ?: (ContributorPlans::isComplimentary($planCode) ? 'complimentary' : 'paid'),
+            'activated_at' => $user->activated_at ?: now(),
         ]);
 
-        Password::sendResetLink(['email' => $user->email]);
+        $this->sendPasswordSetupEmail($user);
 
         try {
             Mail::to($user->email)->send(new ContributorApproved($user));
@@ -75,6 +77,14 @@ class AdminContributorController extends Controller
         }
 
         return redirect()->back()->with('success', "{$user->name} has been rejected.");
+    }
+
+    private function sendPasswordSetupEmail(User $user): void
+    {
+        $token = Password::broker()->createToken($user);
+        $resetUrl = url(route('password.reset', ['token' => $token, 'email' => $user->email], false));
+
+        Mail::to($user->email)->send(new AdminCreatedContributor($user, $resetUrl));
     }
 
     public function plans()
@@ -116,10 +126,12 @@ class AdminContributorController extends Controller
         ]);
 
         foreach ($validated['plans'] as $planData) {
+            $isHiddenFreeAccount = $planData['code'] === ContributorPlans::FREE_ACCOUNT;
+
             ContributorPlan::updateOrCreate(
                 ['code' => $planData['code']],
                 [
-                    'is_public' => (bool) ($planData['public'] ?? false),
+                    'is_public' => $isHiddenFreeAccount ? false : (bool) ($planData['public'] ?? false),
                     'name' => trim($planData['name']),
                     'admin_name' => trim($planData['admin_name']),
                     'price' => (int) $planData['price'],
