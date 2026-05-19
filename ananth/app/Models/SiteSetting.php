@@ -17,10 +17,20 @@ class SiteSetting extends Model
         'social_twitter',
         'social_instagram',
         'footer_logo',
+        'gallery_page_visible',
+    ];
+
+    protected $casts = [
+        'gallery_page_visible' => 'boolean',
     ];
 
     public static function instance(): self
     {
         return static::firstOrNew(['id' => 1]);
+    }
+
+    public static function galleryPageVisible(): bool
+    {
+        return (bool) (static::first()?->gallery_page_visible ?? true);
     }
 }

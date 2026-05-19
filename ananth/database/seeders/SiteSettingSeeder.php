@@ -18,6 +18,7 @@ class SiteSettingSeeder extends Seeder
             'social_twitter'      => null,
             'social_instagram'    => null,
             'footer_logo'         => null,
+            'gallery_page_visible'=> true,
         ]);
     }
 }

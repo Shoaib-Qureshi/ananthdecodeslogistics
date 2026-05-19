@@ -1,6 +1,16 @@
 @php
     $footer = \App\Models\SiteSetting::first();
     $footerLogo = $footer?->footer_logo ? Storage::url($footer->footer_logo) : '/img/site/ananth-inverted0logo.svg';
+    $exploreLinks = [
+        'Home' => '/',
+        'About Us' => '/about-us',
+        'Blog' => '/blog',
+        'The Expert Desk' => route('contributors.index'),
+        'Events' => '/events/conference',
+    ];
+    if (\App\Models\SiteSetting::galleryPageVisible()) {
+        $exploreLinks['Gallery'] = '/gallery';
+    }
 @endphp
 
 <footer id="adl-footer" class="bg-white pt-8 lg:pt-10" aria-label="Site footer">
@@ -51,14 +61,7 @@
                     <nav aria-label="Footer explore links">
                         <p class="text-white/42 text-sm font-semibold mb-4">Explore</p>
                         <ul class="grid gap-3">
-                            @foreach ([
-                                'Home' => '/',
-                                'About Us' => '/about-us',
-                                'Blog' => '/blog',
-                                'The Expert Desk' => route('contributors.index'),
-                                'Events' => '/events/conference',
-                                'Gallery' => '/gallery',
-                            ] as $label => $url)
+                            @foreach ($exploreLinks as $label => $url)
                             <li><a href="{{ $url }}" class="text-white/70 hover:text-white transition-colors duration-200">{{ $label }}</a></li>
                             @endforeach
                         </ul>

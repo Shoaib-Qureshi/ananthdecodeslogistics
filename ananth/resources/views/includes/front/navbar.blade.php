@@ -1,3 +1,4 @@
+@php($showGalleryNav = \App\Models\SiteSetting::galleryPageVisible())
 <header id="nav-menu" aria-label="navigation bar">
     <div class="container menu_container">
         <div class="nav-start">
@@ -15,6 +16,9 @@
                     <li class="contributor-mobile-link"><a class="mainColor nav-link" href="{{ route('contributor.login') }}">The Expert Desk Login</a></li>
                     <li><a class="mainColor nav-link" href="/board-insights/">Board Insights</a></li>
                     <li><a class="mainColor nav-link" href="/book-review/">Book Reviews</a></li>
+                    @if($showGalleryNav)
+                        <li><a class="mainColor nav-link" href="/gallery/">Gallery</a></li>
+                    @endif
                 </ul>
             </nav>
         </div>

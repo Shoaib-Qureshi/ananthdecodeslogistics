@@ -29,12 +29,10 @@
                     <span class="event-stat__label">Format</span>
                     <strong class="event-stat__value">{{ $event->format ?: 'Executive Conclave' }}</strong>
                 </div>
-                @if($event->seat_count ?? null)
                 <div class="event-stat">
-                    <span class="event-stat__label">Seats</span>
-                    <strong class="event-stat__value">{{ $event->seat_count }} only</strong>
+                    <span class="event-stat__label">Audience</span>
+                    <strong class="event-stat__value">250-300 senior professionals</strong>
                 </div>
-                @endif
             </div>
         </div>
     </div>
@@ -57,6 +55,30 @@
         </div>
     </section>
 
+    {{-- Formats & Outcomes --}}
+    <section class="event-section">
+        <div class="event-container">
+            <div class="event-eyebrow">Why It Matters</div>
+            <h2 class="event-title">Practical conversations. Real business outcomes.</h2>
+            <p class="event-lead">Every format, session, and networking moment is structured to maximise engagement between attendees, test ideas, form partnerships, and influence business decisions.</p>
+            <div class="event-grid event-grid--3" style="margin-top:34px">
+                @foreach([
+                    ['Insightful Seminars', 'Deep-dive sessions led by practitioners on topics that matter most to supply chain leaders.'],
+                    ['Expert-Led Panels', 'Cross-functional conversations with CXOs, innovators, and policy leaders sharing direct perspectives.'],
+                    ['Exhibition Showcase', 'Curated product and solution demonstrations for a targeted audience of senior decision-makers.'],
+                    ['Premium Networking', 'Business breakfast, curated lunch, and cocktail dinner built for relationship development.'],
+                    ['Actionable Insights', 'Implementation-ready takeaways from proven operators and industry practitioners.'],
+                    ['Partnership Opportunities', 'A focused setting that accelerates conversations and shortens the path to strategic partnerships.'],
+                ] as [$title, $copy])
+                    <article class="event-card">
+                        <h3>{{ $title }}</h3>
+                        <p>{{ $copy }}</p>
+                    </article>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
     {{-- Theme --}}
     <section class="event-section event-section--soft">
         <div class="event-container">
@@ -73,6 +95,28 @@
                         @endforeach
                     </ul>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Event Snapshot --}}
+    <section class="event-section">
+        <div class="event-container">
+            <div class="event-eyebrow">Event Snapshot</div>
+            <h2 class="event-title">A single intensive day of curated engagement.</h2>
+            <div class="event-grid event-grid--3" style="margin-top:34px">
+                <article class="event-card">
+                    <h3>300</h3>
+                    <p><strong>Senior Professionals</strong><br>250-300 carefully curated delegates from India's leading supply chain organisations.</p>
+                </article>
+                <article class="event-card">
+                    <h3>100+</h3>
+                    <p><strong>Companies Represented</strong><br>Manufacturing, FMCG, retail, e-commerce, pharma, automotive, and logistics tech.</p>
+                </article>
+                <article class="event-card">
+                    <h3>40</h3>
+                    <p><strong>Exhibitors</strong><br>Technology providers, solution innovators, and service companies showcasing new capabilities.</p>
+                </article>
             </div>
         </div>
     </section>
@@ -242,5 +286,17 @@
         </div>
     </section>
     @endif
+
+    <section class="event-section event-section--dark" style="padding:64px 0">
+        <div class="event-container">
+            <div class="event-eyebrow">One Day. One Room.</div>
+            <h2 class="event-title" style="color:#fff">Infinite possibilities.</h2>
+            <p style="color:rgba(255,255,255,.72);font-size:1.08rem;max-width:760px">{!! nl2br(e($event->closing_note)) !!}</p>
+            <div class="event-actions" style="margin-top:28px">
+                <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Interest</a>
+                <a class="event-btn" href="{{ route('events.sponsorship') }}">Partner With Us</a>
+            </div>
+        </div>
+    </section>
 </main>
 @endsection

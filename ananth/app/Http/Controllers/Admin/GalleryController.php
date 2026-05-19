@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\GalleryImage;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,8 +13,22 @@ class GalleryController extends Controller
     public function index()
     {
         $images = GalleryImage::orderBy('sort_order')->orderByDesc('id')->get();
+        $site = SiteSetting::instance();
 
-        return view('admin.gallery.index', compact('images'));
+        return view('admin.gallery.index', compact('images', 'site'));
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'hide_gallery_page' => 'nullable|boolean',
+        ]);
+
+        $site = SiteSetting::instance();
+        $site->gallery_page_visible = empty($validated['hide_gallery_page']);
+        $site->save();
+
+        return back()->with('success', 'Gallery page visibility updated.');
     }
 
     public function store(Request $request)

@@ -148,6 +148,8 @@
     }
 </style>
 
+@php($showGalleryNav = \App\Models\SiteSetting::galleryPageVisible())
+
 <nav id="adl-nav" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm border-b border-border shadow-sm" aria-label="Main navigation">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
         <div class="flex items-center justify-between h-16 lg:h-20">
@@ -214,11 +216,13 @@
                     </ul>
                 </li>
 
-                <li role="none">
-                    <a href="/gallery" class="px-3 py-2 text-sm font-medium text-body hover:text-navy transition-colors duration-200 rounded cursor-pointer" role="menuitem">
-                        Gallery
-                    </a>
-                </li>
+                @if($showGalleryNav)
+                    <li role="none">
+                        <a href="/gallery" class="px-3 py-2 text-sm font-medium text-body hover:text-navy transition-colors duration-200 rounded cursor-pointer" role="menuitem">
+                            Gallery
+                        </a>
+                    </li>
+                @endif
 
             </ul>
 
@@ -297,7 +301,9 @@
                     </ul>
                 </li>
 
-                <li><a href="/gallery" class="block px-3 py-2.5 text-sm font-medium text-body hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">Gallery</a></li>
+                @if($showGalleryNav)
+                    <li><a href="/gallery" class="block px-3 py-2.5 text-sm font-medium text-body hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">Gallery</a></li>
+                @endif
                 <li><a href="{{ route('contributor.login') }}" class="block px-3 py-2.5 text-sm font-medium text-body hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">Expert Desk Login</a></li>
                 <li class="pt-2">
                     <a href="/contact-us"

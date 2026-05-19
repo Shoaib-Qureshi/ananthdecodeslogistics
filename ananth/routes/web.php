@@ -74,6 +74,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('admin/page-banners',[PageContentController::class,'editPageBanners'])->name('admin.page-banners.edit');
     Route::post('admin/page-banners',[PageContentController::class,'updatePageBanners'])->name('admin.page-banners.update');
     Route::get('admin/gallery',[AdminGalleryController::class,'index'])->name('admin.gallery.index');
+    Route::post('admin/gallery/settings',[AdminGalleryController::class,'updateSettings'])->name('admin.gallery.settings');
     Route::post('admin/gallery',[AdminGalleryController::class,'store'])->name('admin.gallery.store');
     Route::post('admin/gallery/{galleryImage}',[AdminGalleryController::class,'update'])->name('admin.gallery.update');
     Route::post('admin/gallery/{galleryImage}/delete',[AdminGalleryController::class,'destroy'])->name('admin.gallery.destroy');

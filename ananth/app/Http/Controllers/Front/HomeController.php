@@ -25,6 +25,7 @@ use App\Models\ServiceCard;
 use App\Models\ExpertDeskPillar;
 use App\Models\GalleryImage;
 use App\Models\PageBanner;
+use App\Models\SiteSetting;
 use App\Mail\ContactSubmissionAdminNotification;
 
 class HomeController extends Controller
@@ -84,6 +85,12 @@ class HomeController extends Controller
 
     public function gallery()
     {
+        $banner = PageBanner::forKey('gallery');
+
+        if (!SiteSetting::galleryPageVisible()) {
+            return view('front.gallery-coming-soon', compact('banner'));
+        }
+
         $galleryItems = GalleryImage::where('visible', true)
             ->orderBy('sort_order')
             ->orderByDesc('id')
@@ -96,49 +103,12 @@ class HomeController extends Controller
             ]);
 
         if ($galleryItems->isEmpty()) {
-            $galleryItems = collect([
-            [
-                'title' => 'Supply Chain Strategy',
-                'category' => 'Boardroom',
-                'image' => asset('img/site/anantha-home-banner.jpg'),
-                'caption' => 'Strategy-led logistics conversations shaped for decision makers.',
-            ],
-            [
-                'title' => 'Operational Intelligence',
-                'category' => 'Logistics',
-                'image' => asset('img/site/generative-ai-is-used-transport-goods.jpg'),
-                'caption' => 'Modern mobility, freight, and data-led operational thinking.',
-            ],
-            [
-                'title' => 'Field Perspectives',
-                'category' => 'Expert Desk',
-                'image' => asset('img/site/truck-bg-img-1.webp'),
-                'caption' => 'Ideas from practitioners who understand execution at ground level.',
-            ],
-            [
-                'title' => 'Leadership Notes',
-                'category' => 'People',
-                'image' => asset('img/site/founder.jpeg'),
-                'caption' => 'Ananth Decodes Logistics through conversations, sessions, and industry notes.',
-            ],
-            [
-                'title' => 'Logistics Networks',
-                'category' => 'Infrastructure',
-                'image' => asset('img/site/Universal-Logistics-Customs-Brokerage-Services-2.jpeg'),
-                'caption' => 'Ports, customs, freight movement, and the networks behind growth.',
-            ],
-            [
-                'title' => 'Future Systems',
-                'category' => 'Innovation',
-                'image' => asset('img/site/anantha-logistics.webp'),
-                'caption' => 'Technology, resilience, and the next decade of supply chains.',
-            ],
-            ]);
+            return view('front.gallery-coming-soon', compact('banner'));
         }
 
         return view('front.gallery', [
             'galleryItems' => $galleryItems,
-            'banner' => PageBanner::forKey('gallery'),
+            'banner' => $banner,
         ]);
     }
     

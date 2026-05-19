@@ -1,4 +1,5 @@
 @php($footer = \App\Models\SiteSetting::first())
+@php($showGalleryNav = \App\Models\SiteSetting::galleryPageVisible())
 <footer class="footer">
     <div class="container">
         <div class="row">
@@ -34,6 +35,7 @@
                                 <li><a href="{{ route('contributors.index') }}">The Expert Desk</a></li>
                                 <li><a href="/board-insights/">Board Insights</a></li>
                                 <li><a href="/book-review/">Book Reviews</a></li>
+                                @if($showGalleryNav)<li><a href="/gallery/">Gallery</a></li>@endif
                                 <li><a href="/contact-us/">Contact Us</a></li>
                             </ul>
                         </div>

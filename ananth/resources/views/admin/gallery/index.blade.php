@@ -19,6 +19,8 @@
         .gallery-admin-card label{display:block;margin-bottom:12px;color:#0f172a;font-weight:700}
         .gallery-admin-card input,.gallery-admin-card textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3f0;border-radius:14px;padding:11px 13px;margin-top:6px}
         .gallery-admin-card textarea{min-height:95px;resize:vertical}
+        .gallery-settings{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+        .gallery-settings p{margin:6px 0 0;color:#64748b;line-height:1.6}
         .gallery-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
         .gallery-item{overflow:hidden;border:1px solid #d8e3f0;border-radius:18px;background:#fff;box-shadow:0 14px 40px rgba(15,23,42,.05)}
         .gallery-item__media{aspect-ratio:16/9;background:#eaf3fb}
@@ -27,7 +29,7 @@
         .visible-toggle{display:inline-flex!important;align-items:center;gap:8px;margin:0 0 12px!important;white-space:nowrap}
         .visible-toggle input{width:auto;margin:0}
         .gallery-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-        @media(max-width:1000px){.gallery-admin-grid,.gallery-list{grid-template-columns:1fr}.gallery-admin-hero{display:block}.gallery-admin-hero .gallery-admin-btn{margin-top:14px}}
+        @media(max-width:1000px){.gallery-admin-grid,.gallery-list{grid-template-columns:1fr}.gallery-admin-hero,.gallery-settings{display:block}.gallery-admin-hero .gallery-admin-btn,.gallery-settings .gallery-admin-btn{margin-top:14px}}
     </style>
 </head>
 <body>
@@ -43,6 +45,21 @@
                 <p>Add, edit, hide, reorder, or remove images shown on the public gallery page.</p>
             </div>
             <a class="gallery-admin-btn" href="{{ route('gallery') }}" target="_blank">View Gallery</a>
+        </div>
+
+        <div class="gallery-admin-card">
+            <form class="gallery-settings" method="POST" action="{{ route('admin.gallery.settings') }}">
+                @csrf
+                <div>
+                    <h3>Frontend Visibility</h3>
+                    <label class="visible-toggle">
+                        <input type="checkbox" name="hide_gallery_page" value="1" {{ !($site->gallery_page_visible ?? true) ? 'checked' : '' }}>
+                        Hide gallery page and show Coming Soon
+                    </label>
+                    <p>When checked, Gallery is removed from the frontend menu and footer. Visiting the URL directly shows a Coming Soon page.</p>
+                </div>
+                <button class="gallery-admin-btn primary" type="submit">Save Visibility</button>
+            </form>
         </div>
 
         <div class="gallery-admin-card">
@@ -91,7 +108,7 @@
             @empty
                 <div class="gallery-admin-card">
                     <h3>No gallery images yet.</h3>
-                    <p>Add the first image above. Until then, the public gallery shows curated default visuals.</p>
+                    <p>Add the first image above. Until then, the public gallery shows a Coming Soon message.</p>
                 </div>
             @endforelse
         </div>
