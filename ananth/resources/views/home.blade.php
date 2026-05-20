@@ -109,7 +109,7 @@
         <div class="relative reveal">
             <div class="aspect-[4/5] rounded-xl overflow-hidden shadow-[0_22px_60px_rgba(15,23,42,0.16)] border border-border bg-white">
                 @if($settings?->founder_photo)
-                    <img src="{{ Storage::url($settings->founder_photo) }}" alt="{{ $settings->founder_heading }}" class="w-full h-full object-cover" loading="lazy">
+                    <img style="object-position: 25% center;" src="{{ Storage::url($settings->founder_photo) }}" alt="{{ $settings->founder_heading }}" class="w-full h-full object-cover" loading="lazy">
                 @else
                     <div class="w-full h-full bg-softbg flex items-center justify-center text-steel text-6xl"><i class="bx bx-user"></i></div>
                 @endif

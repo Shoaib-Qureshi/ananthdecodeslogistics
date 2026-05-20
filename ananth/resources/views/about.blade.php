@@ -98,7 +98,7 @@
                     <div class="{{ $index % 2 ? 'lg:[direction:ltr]' : '' }}">
                         <div class="aspect-[4/5] max-w-md mx-auto rounded-xl overflow-hidden bg-softbg border border-border">
                             @if($founder->photo)
-                                <img src="{{ Storage::url($founder->photo) }}" alt="{{ $founder->name }}" class="w-full h-full object-cover" loading="lazy">
+                                <img style="object-position: 25% center;" src="{{ Storage::url($founder->photo) }}" alt="{{ $founder->name }}" class="w-full h-full object-cover" loading="lazy">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-cta text-7xl"><i class="bx bx-user"></i></div>
                             @endif

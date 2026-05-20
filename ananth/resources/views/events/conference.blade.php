@@ -170,7 +170,7 @@
             <div class="event-eyebrow">Agenda Preview</div>
             <h2 class="event-title">A compact day built for depth.</h2>
             <ol class="agenda" style="margin-top:36px">
-                @foreach($event->agendaItems->where('visible', true)->take(8) as $item)
+                @foreach($event->agendaItems->where('visible', true) as $item)
                     <li class="agenda-row">
                         <div class="agenda-time">
                             <span class="agenda-time-chip">{{ $item->start_time }}{{ $item->end_time ? '–' . $item->end_time : '' }}</span>

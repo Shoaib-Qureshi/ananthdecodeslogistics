@@ -10,7 +10,7 @@
     .event-hero:after{content:var(--hero-watermark,"LOGISPHERE");position:absolute;right:-5vw;bottom:22px;color:rgba(255,255,255,.035);font-size:clamp(5rem,14vw,15rem);font-weight:900;letter-spacing:.02em;line-height:1;pointer-events:none;white-space:nowrap}
     /* Hero image in right grid column */
     .event-hero__image-wrap{display:flex;flex-direction:column;gap:14px;align-self:center}
-    .event-hero__image{width:100%;border-radius:20px;object-fit:cover;aspect-ratio:4/3;box-shadow:0 32px 80px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.12)}
+    .event-hero__image{width:100%;border-radius:20px;object-fit:cover;box-shadow:0 32px 80px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.12)}
     .event-hero__image-facts{display:flex;gap:0;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(255,255,255,.07);backdrop-filter:blur(14px);overflow:hidden}
     .event-hero__image-facts div{flex:1;padding:14px 16px;border-right:1px solid rgba(255,255,255,.1)}
     .event-hero__image-facts div:last-child{border-right:0}
