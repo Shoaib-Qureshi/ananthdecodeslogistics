@@ -33,7 +33,7 @@ class PageContentController extends Controller
     {
         $validated = $request->validate($this->homeRules());
         $settings = HomePageSetting::instance();
-        $settings->fill($validated['settings'] ?? []);
+        $settings->fill($this->normalizeHomeSettings($settings, $validated['settings'] ?? []));
         $this->storeImage($request, $settings, 'hero_image', 'settings.hero_image', 'page-content');
         $this->storeImage($request, $settings, 'founder_photo', 'settings.founder_photo', 'page-content');
         $settings->save();
@@ -211,6 +211,30 @@ class PageContentController extends Controller
             'site.*' => 'nullable',
             'site.footer_logo' => 'nullable|image|max:2048',
         ];
+    }
+
+    private function normalizeHomeSettings(HomePageSetting $settings, array $data): array
+    {
+        $defaults = [
+            'stat1_number' => '25+',
+            'stat1_label' => 'Years Industry Experience',
+            'stat2_number' => '97%',
+            'stat2_label' => 'Customer Retention Rate',
+            'stat3_number' => '500+',
+            'stat3_label' => 'Articles & Insights Published',
+            'stat4_number' => '50+',
+            'stat4_label' => 'Companies Served Globally',
+        ];
+
+        foreach ($defaults as $field => $fallback) {
+            if (! array_key_exists($field, $data) || trim((string) $data[$field]) === '') {
+                $data[$field] = $settings->exists && trim((string) $settings->{$field}) !== ''
+                    ? $settings->{$field}
+                    : $fallback;
+            }
+        }
+
+        return $data;
     }
 
     private function aboutRules(): array
