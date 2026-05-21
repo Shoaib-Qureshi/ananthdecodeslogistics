@@ -359,7 +359,7 @@ class BlogController extends Controller
         $updateBook->short_description = $request->short_description;        
         $updateBook->detail_review = $request->detail_review;
         $updateBook->buy_link = $request->buy_link;
-        $updateBook->status = $request->status;
+        $updateBook->status = $request->input('status', $updateBook->status ?? 1);
         $updateBook->meta_title = $request->meta_title;
         $updateBook->meta_description = $request->meta_description;
         $updateBook->meta_keywords = $request->meta_keywords;

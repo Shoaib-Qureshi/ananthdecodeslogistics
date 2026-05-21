@@ -50,6 +50,7 @@ class EventController extends Controller
         ]);
 
         $payload = $validated['event'];
+        $this->normalizeEventRequiredFields($payload);
         $payload['slug'] = \Illuminate\Support\Str::slug($payload['name'] . '-' . ($payload['event_date'] ?? now()->year));
         if (Event::where('slug', $payload['slug'])->exists()) {
             $payload['slug'] .= '-' . uniqid();
@@ -73,6 +74,7 @@ class EventController extends Controller
         $validated = $request->validate($this->eventValidationRules());
 
         $payload = $validated['event'];
+        $this->normalizeEventRequiredFields($payload, $event);
         $payload['hero_image'] = $this->resolveHeroImage($request, $event->hero_image);
         $payload['theme_points']           = $this->lines($request->input('theme_points_text'));
         $payload['comparison_rows']        = $this->comparisonRows($request->input('comparison_rows_text'));
@@ -123,6 +125,7 @@ class EventController extends Controller
         $validated = $request->validate($this->eventValidationRules());
 
         $payload = $validated['event'];
+        $this->normalizeEventRequiredFields($payload, $event);
         $payload['hero_image'] = $this->resolveHeroImage($request, $event->hero_image);
         $payload['theme_points']            = $this->lines($request->input('theme_points_text'));
         $payload['comparison_rows']         = $this->comparisonRows($request->input('comparison_rows_text'));
@@ -318,6 +321,20 @@ class EventController extends Controller
                 'visible' => !empty($row['visible']),
             ])->save();
         }
+    }
+
+    private function normalizeEventRequiredFields(array &$payload, ?Event $event = null): void
+    {
+        $payload['tax_label'] = trim((string) ($payload['tax_label'] ?? '')) !== ''
+            ? $payload['tax_label']
+            : ($event && trim((string) $event->tax_label) !== '' ? $event->tax_label : 'GST');
+
+        $payload['tax_percentage'] = $payload['tax_percentage'] ?? ($event?->tax_percentage ?? 18);
+        if ($payload['tax_percentage'] === '') {
+            $payload['tax_percentage'] = $event?->tax_percentage ?? 18;
+        }
+
+        $payload['active_sponsor_currency'] = strtoupper($payload['active_sponsor_currency'] ?? '') === 'USD' ? 'USD' : 'INR';
     }
 
     private function eventValidationRules(): array

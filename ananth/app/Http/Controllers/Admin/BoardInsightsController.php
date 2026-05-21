@@ -94,7 +94,7 @@ class BoardInsightsController extends Controller
         $updateInsight->title = $request->title;
         $updateInsight->slug = $request->slug;
         $updateInsight->content = $request->content;
-        $updateInsight->status = $request->status;
+        $updateInsight->status = $request->input('status', $updateInsight->status ?? 0);
         $updateInsight->meta_title = $request->meta_title;
         $updateInsight->meta_description = $request->meta_description;
         $updateInsight->meta_keywords = $request->meta_keywords;

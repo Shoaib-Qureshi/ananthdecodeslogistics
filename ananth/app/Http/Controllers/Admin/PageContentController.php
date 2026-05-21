@@ -60,7 +60,7 @@ class PageContentController extends Controller
     {
         $validated = $request->validate($this->aboutRules());
         $settings = AboutPageSetting::instance();
-        $settings->fill($validated['settings'] ?? []);
+        $settings->fill($this->normalizeAboutSettings($settings, $validated['settings'] ?? []));
         $this->storeImage($request, $settings, 'hero_image', 'settings.hero_image', 'page-content');
         $settings->save();
 
@@ -237,6 +237,25 @@ class PageContentController extends Controller
         return $data;
     }
 
+    private function normalizeAboutSettings(AboutPageSetting $settings, array $data): array
+    {
+        $defaults = [
+            'vision_title' => 'Our Vision',
+            'mission_title' => 'Our Mission',
+            'values_title' => 'Our Values',
+        ];
+
+        foreach ($defaults as $field => $fallback) {
+            if (! array_key_exists($field, $data) || trim((string) $data[$field]) === '') {
+                $data[$field] = $settings->exists && trim((string) $settings->{$field}) !== ''
+                    ? $settings->{$field}
+                    : $fallback;
+            }
+        }
+
+        return $data;
+    }
+
     private function aboutRules(): array
     {
         return [
@@ -326,10 +345,10 @@ class PageContentController extends Controller
                 continue;
             }
             $founder->fill([
-                'eyebrow' => $item['eyebrow'] ?? null,
+                'eyebrow' => $this->requiredText($item['eyebrow'] ?? null, $founder, 'eyebrow', 'Founder'),
                 'name' => $item['name'] ?? '',
-                'title' => $item['title'] ?? null,
-                'bio' => $item['bio'] ?? null,
+                'title' => $this->requiredText($item['title'] ?? null, $founder, 'title', 'Leadership'),
+                'bio' => $this->requiredText($item['bio'] ?? null, $founder, 'bio', 'Bio will be updated soon.'),
                 'sort_order' => $item['sort_order'] ?? 0,
                 'visible' => (bool) ($item['visible'] ?? false),
             ]);
@@ -355,7 +374,15 @@ class PageContentController extends Controller
 
             $payload = [];
             foreach ($columns as $column) {
-                $payload[$column] = $item[$column] ?? ($column === 'sort_order' ? 0 : null);
+                if ($column === 'sort_order') {
+                    $payload[$column] = $item[$column] ?? 0;
+                } elseif ($column === 'body') {
+                    $payload[$column] = trim((string) ($item[$column] ?? '')) !== ''
+                        ? $item[$column]
+                        : 'Details will be updated soon.';
+                } else {
+                    $payload[$column] = $item[$column] ?? null;
+                }
             }
 
             $model = !empty($item['id']) ? $modelClass::find($item['id']) : new $modelClass();
@@ -371,6 +398,20 @@ class PageContentController extends Controller
         $site->fill($data);
         $this->storeImage($request, $site, 'footer_logo', 'site.footer_logo', 'site');
         $site->save();
+    }
+
+    private function requiredText($value, $model, string $field, string $fallback): string
+    {
+        $value = trim((string) $value);
+        if ($value !== '') {
+            return $value;
+        }
+
+        if ($model && $model->exists && trim((string) $model->{$field}) !== '') {
+            return $model->{$field};
+        }
+
+        return $fallback;
     }
 
     private function storeImage(Request $request, $model, string $column, string $input, string $directory): void
