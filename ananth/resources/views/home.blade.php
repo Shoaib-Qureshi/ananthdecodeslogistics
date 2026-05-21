@@ -121,7 +121,6 @@
                 <p class="section-kicker text-steel text-xs font-semibold uppercase mb-4">{{ $settings->founder_eyebrow }}</p>
             @endif
             <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl text-navy mb-3 leading-tight">{{ $settings?->founder_heading }}</h2>
-            <p class="text-steel text-sm font-semibold mb-6">{{ $settings?->founder_title_badge }}</p>
             <div class="text-body leading-relaxed mb-8 text-base lg:text-lg prose max-w-none">{!! $settings?->founder_bio !!}</div>
             @if($credentials->count())
                 <ul class="space-y-2.5 mb-9">

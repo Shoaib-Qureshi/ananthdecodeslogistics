@@ -108,7 +108,6 @@
                     <div class="{{ $index % 2 ? 'lg:[direction:ltr]' : '' }}">
                         @if($founder->eyebrow)<p class="text-cta text-xs font-semibold uppercase mb-4">{{ $founder->eyebrow }}</p>@endif
                         <h3 class="font-heading text-3xl sm:text-4xl lg:text-5xl text-navy mb-3 leading-tight">{{ $founder->name }}</h3>
-                        <p class="text-cta text-sm font-semibold mb-6">{{ $founder->title }}</p>
                         <div class="text-body text-base lg:text-lg leading-8 prose max-w-none">{!! $founder->bio !!}</div>
                         @if($founder->signature_image)
                             <img src="{{ Storage::url($founder->signature_image) }}" alt="{{ $founder->name }} signature" class="h-12 opacity-70 mt-8" loading="lazy">
