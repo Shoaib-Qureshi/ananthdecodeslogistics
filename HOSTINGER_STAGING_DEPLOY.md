@@ -95,6 +95,38 @@ cd ~
 rm -rf ananthdecodeslogistics-temp
 ```
 
+
+
+
+<!-- // for production to push -->
+rm -rf ananthdecodeslogistics-temp
+git clone https://github.com/Shoaib-Qureshi/ananthdecodeslogistics.git ananthdecodeslogistics-temp
+cp -a ananthdecodeslogistics-temp/ananth/. /home/u644731106/domains/ananthdecodeslogistics.com/ananth/
+cp -a ananthdecodeslogistics-temp/public_html/. /home/u644731106/domains/ananthdecodeslogistics.com/public_html/
+cd /home/u644731106/domains/ananthdecodeslogistics.com/ananth
+php artisan migrate --force
+php artisan optimize:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+cd ~
+rm -rf ananthdecodeslogistics-temp
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Important Notes
 
 - Run this in the staging domain folder, not the live production domain folder.
