@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Models\Blogs;
 use App\Models\BlogCategories;
 use App\Models\BookReview;
+use App\Support\ArticleCategories;
 
 class BlogController extends Controller
 {
@@ -25,7 +26,7 @@ class BlogController extends Controller
     public function createBlog()
     {
         $users = User::all();
-        $category = $this->getDefaultCategories();
+        $category = ArticleCategories::selectable();
         return view('admin.createBlog', [
             'category' => $category,
             'users' => $users
@@ -36,7 +37,6 @@ class BlogController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'category_id' => 'required|exists:blog_category,id',
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'status' => 'required|in:0,1',
@@ -53,13 +53,14 @@ class BlogController extends Controller
             'faq_items' => 'nullable|array|max:20',
             'faq_items.*.question' => 'nullable|string|max:255',
             'faq_items.*.answer' => 'nullable|string|max:5000',
-        ]);
+        ] + ArticleCategories::validationRules());
 
+        $category = ArticleCategories::resolveFromRequest($request);
         $faqPayload = $this->resolveFaqPayload($request);
 
         $post = new Blogs();
         $post->user_id = $request->user_id ?? Auth::id();
-        $post->category_id = $request->category_id;
+        $post->category_id = $category->id;
         $post->title = $request->title;
         $post->slug = Str::slug($request->input('title'));
         $post->content = $request->content;
@@ -154,8 +155,8 @@ class BlogController extends Controller
 
     public function editBlog($id)
     {
-        $editBlog = Blogs::findOrFail($id);
-        $category = $this->getDefaultCategories();
+        $editBlog = Blogs::with('category')->findOrFail($id);
+        $category = ArticleCategories::selectable();
         $users = User::all();
         return view('admin/editBlog', [
             'editBlog' => $editBlog,
@@ -169,7 +170,6 @@ class BlogController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'category_id' => 'required|exists:blog_category,id',
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
             'content' => 'required|string',
@@ -185,8 +185,9 @@ class BlogController extends Controller
             'faq_items' => 'nullable|array|max:20',
             'faq_items.*.question' => 'nullable|string|max:255',
             'faq_items.*.answer' => 'nullable|string|max:5000',
-        ]);
+        ] + ArticleCategories::validationRules());
 
+        $category = ArticleCategories::resolveFromRequest($request);
         $faqPayload = $this->resolveFaqPayload($request);
 
         $update_blog = Blogs::findOrFail($id);
@@ -208,7 +209,7 @@ class BlogController extends Controller
         if ($request->has('visibility')) {
             $update_blog->visibility = ($request->visibility === 'public' || $request->visibility == 1) ? 1 : 0;
         }
-        $update_blog->category_id = $request->category_id;
+        $update_blog->category_id = $category->id;
         $update_blog->slug = $request->slug;
 
         if( $request->hasFile('thumbnail') ) {
@@ -389,47 +390,5 @@ class BlogController extends Controller
 	    $updateBook->save();
         return redirect('admin/book-reviews')->with('message', 'Book Review Successfully Updated!');
     }    
-
-    /**
-     * Ensure only the default editorial categories are offered.
-     */
-    private function getDefaultCategories()
-    {
-        $slugColumn = Schema::hasColumn('blog_category', 'category_slug')
-            ? 'category_slug'
-            : (Schema::hasColumn('blog_category', 'slug') ? 'slug' : null);
-        $nameColumn = Schema::hasColumn('blog_category', 'category_name')
-            ? 'category_name'
-            : (Schema::hasColumn('blog_category', 'name') ? 'name' : null);
-
-        // If table is missing required columns, avoid querying invalid fields
-        if (is_null($slugColumn) || is_null($nameColumn)) {
-            return collect([]);
-        }
-
-        $defaults = [
-            [
-                'category_name' => 'Transport & Logistics',
-                'category_slug' => 'transport-logistics',
-                'name' => 'Transport & Logistics',
-                'slug' => 'transport-logistics',
-            ],
-        ];
-
-        foreach ($defaults as $category) {
-            BlogCategories::updateOrCreate(
-                [$slugColumn => $category['category_slug']],
-                [
-                    $nameColumn => $category['category_name'],
-                    $slugColumn => $category['category_slug'],
-                ]
-            );
-        }
-
-        $slugs = array_column($defaults, 'category_slug'); // same values for slug fallback
-
-        return BlogCategories::whereIn($slugColumn, $slugs)
-            ->get();
-    }
 
 }

@@ -32,6 +32,10 @@
                     <h3>Edit Contributor Post</h3>
                 </div>
                 <div class="wrapper_body">
+                    @php
+                        $currentCategoryChoice = old('category_choice', \App\Support\ArticleCategories::choiceFor($post->category));
+                        $currentOtherCategory = old('other_category', $currentCategoryChoice === 'other' ? \App\Support\ArticleCategories::nameFor($post->category) : '');
+                    @endphp
                     <form class="form_input" action="{{ route('admin.contributor.posts.update', $post->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
@@ -41,7 +45,13 @@
                             </div>
                             <div class="col-md-6">
                                 <h4>Category</h4>
-                                <input type="text" value="{{ $category->category_name ?? $category->name }}" readonly>
+                                <select name="category_choice" class="js-category-choice" required>
+                                    @foreach ($category as $item)
+                                        <option value="{{ $item->category_slug ?? $item->slug }}" {{ $currentCategoryChoice === ($item->category_slug ?? $item->slug) ? 'selected' : '' }}>{{ $item->category_name ?? $item->name }}</option>
+                                    @endforeach
+                                    <option value="other" {{ $currentCategoryChoice === 'other' ? 'selected' : '' }}>Other</option>
+                                </select>
+                                <input name="other_category" class="js-other-category mt-2" value="{{ $currentOtherCategory }}" type="text" placeholder="Type category name" autocomplete="off">
                             </div>
                             <div class="col-md-12">
                                 <h4>Title</h4>
@@ -134,6 +144,31 @@
     @include('admin.adminFooter')
     <script src="/js/ckeditor.js"></script>
     <script>
+        (function () {
+            document.querySelectorAll('.js-category-choice').forEach(function (categoryChoice) {
+                var otherCategory = categoryChoice.parentElement.querySelector('.js-other-category');
+                if (!otherCategory) {
+                    return;
+                }
+
+                function toggleOtherCategory(shouldFocus) {
+                    var isOther = categoryChoice.value === 'other';
+                    otherCategory.style.display = isOther ? 'block' : 'none';
+                    otherCategory.required = isOther;
+                    otherCategory.disabled = !isOther;
+
+                    if (isOther && shouldFocus) {
+                        otherCategory.focus();
+                    }
+                }
+
+                categoryChoice.addEventListener('change', function () {
+                    toggleOtherCategory(true);
+                });
+                toggleOtherCategory(false);
+            });
+        })();
+
         ClassicEditor
             .create(document.querySelector('#ckeditor'), {
                 ckfinder: {

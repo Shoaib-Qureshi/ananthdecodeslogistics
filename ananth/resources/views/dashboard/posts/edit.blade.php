@@ -86,6 +86,11 @@
         </div>
         @endif
 
+        @php
+            $currentCategoryChoice = old('category_choice', \App\Support\ArticleCategories::choiceFor($post->category));
+            $currentOtherCategory = old('other_category', $currentCategoryChoice === 'other' ? \App\Support\ArticleCategories::nameFor($post->category) : '');
+        @endphp
+
         <form method="POST" action="{{ route('dashboard.posts.update', $post->id) }}" enctype="multipart/form-data" id="editForm">
             @csrf
 
@@ -102,9 +107,15 @@
                 <div class="row g-3">
                     <div class="col-sm-6">
                         <label class="form-label">Category</label>
-                        <input type="hidden" name="category_id" value="{{ $category->id }}">
-                        <input type="text" class="form-control" value="{{ $category->category_name ?? $category->name }}" readonly>
-                        <div class="form-text" style="font-size:.77rem;">Contributor posts always stay in Transport &amp; Logistics.</div>
+                        <select name="category_choice" class="form-select js-category-choice @error('category_choice') is-invalid @enderror" required>
+                            @foreach ($category as $item)
+                                <option value="{{ $item->category_slug ?? $item->slug }}" {{ $currentCategoryChoice === ($item->category_slug ?? $item->slug) ? 'selected' : '' }}>{{ $item->category_name ?? $item->name }}</option>
+                            @endforeach
+                            <option value="other" {{ $currentCategoryChoice === 'other' ? 'selected' : '' }}>Other</option>
+                        </select>
+                        @error('category_choice')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <input type="text" name="other_category" class="form-control js-other-category mt-2 @error('other_category') is-invalid @enderror" value="{{ $currentOtherCategory }}" placeholder="Type category name" autocomplete="off">
+                        @error('other_category')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-sm-6">
                         <label class="form-label">Featured Image</label>
@@ -207,5 +218,30 @@
     document.getElementById('editForm').addEventListener('submit', function () {
         document.getElementById('bodyInput').value = quill.root.innerHTML;
     });
+
+    (function () {
+        document.querySelectorAll('.js-category-choice').forEach(function (categoryChoice) {
+            var otherCategory = categoryChoice.parentElement.querySelector('.js-other-category');
+            if (!otherCategory) {
+                return;
+            }
+
+            function toggleOtherCategory(shouldFocus) {
+                var isOther = categoryChoice.value === 'other';
+                otherCategory.style.display = isOther ? 'block' : 'none';
+                otherCategory.required = isOther;
+                otherCategory.disabled = !isOther;
+
+                if (isOther && shouldFocus) {
+                    otherCategory.focus();
+                }
+            }
+
+            categoryChoice.addEventListener('change', function () {
+                toggleOtherCategory(true);
+            });
+            toggleOtherCategory(false);
+        });
+    })();
 </script>
 @endsection

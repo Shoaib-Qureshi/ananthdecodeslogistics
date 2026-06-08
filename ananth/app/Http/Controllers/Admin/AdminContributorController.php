@@ -13,6 +13,7 @@ use App\Models\BlogCategories;
 use App\Models\ContributorPlan;
 use App\Models\ContributorPost;
 use App\Models\User;
+use App\Support\ArticleCategories;
 use App\Support\ContributorPlans;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -173,7 +174,7 @@ class AdminContributorController extends Controller
     public function editPost($id)
     {
         $post = ContributorPost::with(['author', 'category'])->findOrFail($id);
-        $category = $this->contributorCategory();
+        $category = ArticleCategories::selectable();
 
         return view('admin.contributor.edit', compact('post', 'category'));
     }
@@ -202,9 +203,9 @@ class AdminContributorController extends Controller
             'faq_items' => 'nullable|array|max:20',
             'faq_items.*.question' => 'nullable|string|max:255',
             'faq_items.*.answer' => 'nullable|string|max:5000',
-        ]);
+        ] + ArticleCategories::validationRules());
 
-        $category = $this->contributorCategory();
+        $category = ArticleCategories::resolveFromRequest($request);
         $faqPayload = $this->resolveFaqPayload($request);
 
         $imagePath = $post->featured_image;
@@ -295,26 +296,6 @@ class AdminContributorController extends Controller
         $post->delete();
 
         return redirect()->back()->with('success', "Post \"{$title}\" deleted.");
-    }
-
-    private function contributorCategory(): BlogCategories
-    {
-        $slugColumn = Schema::hasColumn('blog_category', 'category_slug')
-            ? 'category_slug'
-            : (Schema::hasColumn('blog_category', 'slug') ? 'slug' : null);
-        $nameColumn = Schema::hasColumn('blog_category', 'category_name')
-            ? 'category_name'
-            : (Schema::hasColumn('blog_category', 'name') ? 'name' : null);
-
-        abort_if(is_null($slugColumn) || is_null($nameColumn), 500, 'Contributor category columns are missing.');
-
-        return BlogCategories::updateOrCreate(
-            [$slugColumn => 'transport-logistics'],
-            [
-                $nameColumn => 'Transport & Logistics',
-                $slugColumn => 'transport-logistics',
-            ]
-        );
     }
 
     private function normalizePlanHighlights(?string $value): array

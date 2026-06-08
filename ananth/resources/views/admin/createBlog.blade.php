@@ -55,12 +55,14 @@
                             </div>
                             <div class="col-md-6">
                                 <h4>Category</h4>
-                                <select name="category_id" required>
+                                <select name="category_choice" class="js-category-choice" required>
                                     <option selected disabled value="">Select Category</option>
                                     @foreach ($category as $item)
-                                        <option value="{{ $item->id }}">{{ $item->category_name ?? $item->name }}</option>
+                                        <option value="{{ $item->category_slug ?? $item->slug }}" {{ old('category_choice') === ($item->category_slug ?? $item->slug) ? 'selected' : '' }}>{{ $item->category_name ?? $item->name }}</option>
                                     @endforeach
+                                    <option value="other" {{ old('category_choice') === 'other' ? 'selected' : '' }}>Other</option>
                                 </select>
+                                <input name="other_category" class="js-other-category mt-2" value="{{ old('other_category') }}" type="text" placeholder="Type category name" autocomplete="off">
                             </div>
                             <div class="col-md-6">
                                 <h4>Thumbnail</h4>
@@ -141,6 +143,31 @@
     @include('admin.adminFooter')
     <script src="/js/ckeditor.js"></script>
     <script>
+        (function () {
+            document.querySelectorAll('.js-category-choice').forEach(function (categoryChoice) {
+                var otherCategory = categoryChoice.parentElement.querySelector('.js-other-category');
+                if (!otherCategory) {
+                    return;
+                }
+
+                function toggleOtherCategory(shouldFocus) {
+                    var isOther = categoryChoice.value === 'other';
+                    otherCategory.style.display = isOther ? 'block' : 'none';
+                    otherCategory.required = isOther;
+                    otherCategory.disabled = !isOther;
+
+                    if (isOther && shouldFocus) {
+                        otherCategory.focus();
+                    }
+                }
+
+                categoryChoice.addEventListener('change', function () {
+                    toggleOtherCategory(true);
+                });
+                toggleOtherCategory(false);
+            });
+        })();
+
         ClassicEditor
             .create(document.querySelector('#ckeditor'), {
                 ckfinder: {

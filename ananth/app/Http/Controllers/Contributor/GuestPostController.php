@@ -6,12 +6,11 @@ use App\Http\Controllers\Concerns\HandlesFaqs;
 use App\Http\Controllers\Concerns\HandlesUserProfileUpdates;
 use App\Http\Controllers\Controller;
 use App\Mail\NewPostAdminNotification;
-use App\Models\BlogCategories;
 use App\Models\ContributorPost;
+use App\Support\ArticleCategories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class GuestPostController extends Controller
@@ -49,7 +48,7 @@ class GuestPostController extends Controller
             return $redirect;
         }
 
-        $category = $this->contributorCategory();
+        $category = ArticleCategories::selectable();
 
         return view('dashboard.posts.create', compact('category'));
     }
@@ -82,9 +81,9 @@ class GuestPostController extends Controller
             'faq_items' => 'nullable|array|max:20',
             'faq_items.*.question' => 'nullable|string|max:255',
             'faq_items.*.answer' => 'nullable|string|max:5000',
-        ]);
+        ] + ArticleCategories::validationRules());
 
-        $category = $this->contributorCategory();
+        $category = ArticleCategories::resolveFromRequest($request);
         $faqPayload = $this->resolveFaqPayload($request);
 
         $slug = ContributorPost::generateUniqueSlug($request->title);
@@ -130,7 +129,7 @@ class GuestPostController extends Controller
         }
 
         $post = ContributorPost::where('user_id', Auth::id())->findOrFail($id);
-        $category = $this->contributorCategory();
+        $category = ArticleCategories::selectable();
 
         return view('dashboard.posts.edit', compact('post', 'category'));
     }
@@ -152,9 +151,9 @@ class GuestPostController extends Controller
             'faq_items' => 'nullable|array|max:20',
             'faq_items.*.question' => 'nullable|string|max:255',
             'faq_items.*.answer' => 'nullable|string|max:5000',
-        ]);
+        ] + ArticleCategories::validationRules());
 
-        $category = $this->contributorCategory();
+        $category = ArticleCategories::resolveFromRequest($request);
         $faqPayload = $this->resolveFaqPayload($request);
 
         $slug = ContributorPost::generateUniqueSlug($request->title, $post->id);
@@ -208,23 +207,4 @@ class GuestPostController extends Controller
             ->with('error', $user->contributorSubmissionRestrictionMessage());
     }
 
-    private function contributorCategory(): BlogCategories
-    {
-        $slugColumn = Schema::hasColumn('blog_category', 'category_slug')
-            ? 'category_slug'
-            : (Schema::hasColumn('blog_category', 'slug') ? 'slug' : null);
-        $nameColumn = Schema::hasColumn('blog_category', 'category_name')
-            ? 'category_name'
-            : (Schema::hasColumn('blog_category', 'name') ? 'name' : null);
-
-        abort_if(is_null($slugColumn) || is_null($nameColumn), 500, 'Contributor category columns are missing.');
-
-        return BlogCategories::updateOrCreate(
-            [$slugColumn => 'transport-logistics'],
-            [
-                $nameColumn => 'Transport & Logistics',
-                $slugColumn => 'transport-logistics',
-            ]
-        );
-    }
 }
