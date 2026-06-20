@@ -37,8 +37,8 @@
                     </tbody>
                 </table>
                 <div class="event-checkout-note">
-                    <span>Secure checkout</span>
-                    Payment opens after organisation details are submitted.
+                    <span>Direct bank transfer</span>
+                    Submit your organisation details to receive our bank account details and payment reference.
                 </div>
             </aside>
             <div class="event-card event-checkout-form-card">
@@ -66,7 +66,7 @@
                         <textarea id="co_billing" name="billing_address" placeholder="Full billing address including city and PIN">{{ old('billing_address') }}</textarea>
                     </label>
                     <button class="event-btn event-btn--primary" type="submit" id="checkout-submit" style="width:100%;justify-content:center">
-                        Pay {{ $currency }} {{ number_format($totals['total'], 2) }}
+                        Continue to Bank Details
                     </button>
                 </form>
             </div>

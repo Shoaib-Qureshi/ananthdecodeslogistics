@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\EventRegistrationConfirmed;
 use App\Mail\EventRegistrationNotInterested;
+use App\Mail\EventSponsorPaymentReceived;
 use App\Models\Event;
 use App\Models\EventAgendaItem;
 use App\Models\EventFaq;
@@ -256,6 +257,34 @@ class EventController extends Controller
         $payments = EventSponsorPayment::with(['event', 'package'])->latest()->paginate(40);
 
         return view('admin.events.payments', compact('payments'));
+    }
+
+    public function markPaymentPaid(Request $request, EventSponsorPayment $payment)
+    {
+        $request->validate([
+            'transfer_reference' => 'nullable|string|max:120',
+        ]);
+
+        if ($payment->status === 'paid') {
+            return back()->with('success', 'This sponsor payment is already marked as paid.');
+        }
+
+        $payment->update([
+            'status' => 'paid',
+            'transfer_reference' => trim((string) $request->input('transfer_reference')) ?: null,
+            'paid_at' => now(),
+        ]);
+
+        try {
+            Mail::to($payment->email)->send(new EventSponsorPaymentReceived($payment->fresh(['event', 'package'])));
+        } catch (\Throwable $exception) {
+            Log::warning('Unable to send sponsor payment confirmation email.', [
+                'payment_id' => $payment->id,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+
+        return back()->with('success', 'Sponsor payment marked as paid and the invoice email has been sent.');
     }
 
     private function syncAgenda(Event $event, array $rows): void

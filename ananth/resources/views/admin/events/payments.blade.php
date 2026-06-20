@@ -17,8 +17,11 @@
             <a class="event-admin-btn" href="{{ route('admin.events.packages') }}">Sponsor Packages</a>
         </div>
         <div class="event-admin-card">
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
             <table class="event-admin-table">
-                <thead><tr><th>Company</th><th>Package</th><th>Amount</th><th>Gateway</th><th>Status</th><th>Created</th></tr></thead>
+                <thead><tr><th>Company</th><th>Package</th><th>Amount</th><th>Reference</th><th>Status</th><th>Created</th><th>Action</th></tr></thead>
                 <tbody>
                 @forelse($payments as $payment)
                     <tr>
@@ -29,12 +32,23 @@
                             {{ $payment->tax_label }}: {{ $payment->currency }} {{ number_format($payment->tax_amount, 2) }}<br>
                             <strong>Total: {{ $payment->currency }} {{ number_format($payment->total_amount, 2) }}</strong>
                         </td>
-                        <td>{{ $payment->razorpay_order_id }}<br>{{ $payment->razorpay_payment_id }}</td>
-                        <td>{{ ucfirst($payment->status) }}</td>
+                        <td>{{ $payment->transfer_reference ?: '—' }}</td>
+                        <td>{{ ucfirst(str_replace('_', ' ', $payment->status)) }}</td>
                         <td>{{ $payment->created_at->format('d M Y H:i') }}</td>
+                        <td>
+                            @if($payment->status === 'paid')
+                                Paid {{ optional($payment->paid_at)->format('d M Y H:i') }}
+                            @else
+                                <form method="POST" action="{{ route('admin.events.payments.markPaid', $payment) }}">
+                                    @csrf
+                                    <input type="text" name="transfer_reference" placeholder="UTR / reference" class="form-control form-control-sm mb-1" maxlength="120">
+                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Mark this sponsor payment as paid and send the invoice email?')">Mark as Paid</button>
+                                </form>
+                            @endif
+                        </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6">No sponsor payments yet.</td></tr>
+                    <tr><td colspan="7">No sponsor payments yet.</td></tr>
                 @endforelse
                 </tbody>
             </table>

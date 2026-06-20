@@ -8,7 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class EventSponsorPaymentAdminNotification extends Mailable
+class EventSponsorBankTransferDetails extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -21,9 +21,10 @@ class EventSponsorPaymentAdminNotification extends Mailable
 
     public function build()
     {
-        return $this->subject('New sponsor request (awaiting transfer) - ' . $this->payment->company)
-            ->replyTo($this->payment->email, $this->payment->contact_name)
-            ->view('emails.events.sponsor-payment-admin', [
+        return $this->subject('Complete your LogiSphere sponsorship via bank transfer')
+            ->view('emails.events.sponsor-bank-transfer', [
+                'payment'   => $this->payment,
+                'bank'      => config('services.bank_transfer', []),
                 'reference' => EventSponsorInvoicePdf::invoiceNumber($this->payment),
             ]);
     }

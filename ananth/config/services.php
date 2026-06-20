@@ -37,4 +37,12 @@ return [
         'company_name' => env('RAZORPAY_COMPANY_NAME', env('APP_NAME')),
     ],
 
+    'bank_transfer' => [
+        'account_name'   => env('BANK_ACCOUNT_NAME', 'ANANTH DECODES LOGISTICS PRIVATE LIMITED'),
+        'account_number' => env('BANK_ACCOUNT_NUMBER', '51412842689'),
+        'ifsc'           => env('BANK_IFSC', 'IDFB0080172'),
+        'bank_name'      => env('BANK_NAME', 'IDFC FIRST Bank'),
+        'branch'         => env('BANK_BRANCH', 'HSR Layout Branch, Ground Floor, Site No. 4 & 5, Bangalore - 560102'),
+    ],
+
 ];

@@ -10,7 +10,7 @@ class EventSponsorPayment extends Model
         'event_id', 'sponsor_package_id', 'company', 'contact_name', 'email', 'phone',
         'billing_address', 'gst_number', 'currency', 'base_amount', 'tax_amount',
         'total_amount', 'tax_percentage', 'tax_label', 'status', 'razorpay_order_id',
-        'razorpay_payment_id', 'razorpay_signature', 'paid_at',
+        'razorpay_payment_id', 'razorpay_signature', 'transfer_reference', 'paid_at',
     ];
 
     protected $casts = [

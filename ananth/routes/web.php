@@ -94,6 +94,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('admin/events/registrations',[AdminEventController::class,'registrations'])->name('admin.events.registrations');
     Route::post('admin/events/registrations/{registration}/status',[AdminEventController::class,'updateRegistrationStatus'])->name('admin.events.registrations.status');
     Route::get('admin/events/sponsor-payments',[AdminEventController::class,'payments'])->name('admin.events.payments');
+    Route::post('admin/events/sponsor-payments/{payment}/mark-paid',[AdminEventController::class,'markPaymentPaid'])->where('payment','[0-9]+')->name('admin.events.payments.markPaid');
     Route::get('admin/manage-milestones',[PageContentController::class,'manageMilestones'])->name('manageMilestones');
     Route::get('admin/add-milestone',[PageContentController::class,'addMilestone'])->name('addMilestone');
     Route::post('admin/save-milestone',[PageContentController::class,'saveMilestone'])->name('saveMilestone');
@@ -243,7 +244,6 @@ Route::get('events/register', [FrontEventController::class, 'register'])->name('
 Route::post('events/register', [FrontEventController::class, 'submitRegistration'])->name('events.register.submit');
 Route::get('events/sponsor-checkout/{package}', [FrontEventController::class, 'sponsorCheckout'])->name('events.sponsor.checkout');
 Route::post('events/sponsor-checkout/{package}', [FrontEventController::class, 'startSponsorCheckout'])->name('events.sponsor.checkout.start');
-Route::post('events/sponsor-payment/verify', [FrontEventController::class, 'verifySponsorPayment'])->name('events.sponsor.verify');
 Route::get('events/sponsor-payment/success', [FrontEventController::class, 'sponsorSuccess'])->name('events.sponsor.success');
 Route::get('events/sponsor-payment/cancel', [FrontEventController::class, 'sponsorCancel'])->name('events.sponsor.cancel');
 

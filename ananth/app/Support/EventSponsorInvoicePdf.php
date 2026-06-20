@@ -25,7 +25,7 @@ class EventSponsorInvoicePdf
 
         $invoiceNo = self::invoiceNumber($payment);
         $invoiceDate = optional($payment->paid_at ?: $payment->created_at)->format('d M Y') ?: now()->format('d M Y');
-        $paymentRef = $payment->razorpay_payment_id ?: $payment->razorpay_order_id ?: 'Pending';
+        $paymentRef = $payment->transfer_reference ?: 'Bank Transfer';
         $currency = $payment->currency ?: 'INR';
         $eventTitle = $payment->event?->publicTitle() ?: 'LogiSphere';
         $eventDate = $payment->event?->formattedDate() ?: 'To be announced';

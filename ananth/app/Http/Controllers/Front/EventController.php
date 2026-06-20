@@ -5,22 +5,19 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use App\Mail\EventRegistrationAdminNotification;
 use App\Mail\EventRegistrationReceived;
+use App\Mail\EventSponsorBankTransferDetails;
 use App\Mail\EventSponsorPaymentAdminNotification;
-use App\Mail\EventSponsorPaymentReceived;
 use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\EventSponsorPackage;
 use App\Models\EventSponsorPayment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
-    private $paymentGatewayError = null;
-
     public function conference()
     {
         $event = $this->event();
@@ -115,10 +112,6 @@ class EventController extends Controller
             'gst_number' => 'nullable|string|max:80',
         ]);
 
-        if (!$this->razorpayConfigured()) {
-            return back()->withErrors(['payment' => 'Payment gateway is not configured yet. Please contact the event team.'])->withInput();
-        }
-
         $totals = $this->totals($event, $package);
         if ($totals['total'] <= 0) {
             return back()->withErrors(['payment' => 'This sponsor package does not have a payable amount in ' . $totals['currency'] . '. Please update the package price in admin.'])->withInput();
@@ -136,51 +129,11 @@ class EventController extends Controller
             'total_amount' => $totals['total'],
             'tax_percentage' => $totals['tax_percentage'],
             'tax_label' => $event->tax_label ?: 'GST',
-            'status' => 'pending',
-        ]);
-
-        $order = $this->createRazorpayOrder($payment);
-        if (!$order) {
-            $payment->update(['status' => 'failed']);
-            return back()->withErrors([
-                'payment' => $this->paymentGatewayError ?: 'Unable to start checkout right now. Please try again shortly.',
-            ])->withInput();
-        }
-
-        return view('events.sponsor-payment', $this->viewData($event) + [
-            'payment' => $payment->fresh(),
-            'package' => $package,
-            'checkout' => $this->checkoutPayload($payment->fresh(), $package, $order),
-        ]);
-    }
-
-    public function verifySponsorPayment(Request $request)
-    {
-        $request->validate([
-            'payment' => 'required|integer',
-            'razorpay_payment_id' => 'required|string|max:255',
-            'razorpay_order_id' => 'required|string|max:255',
-            'razorpay_signature' => 'required|string|max:255',
-        ]);
-
-        $payment = EventSponsorPayment::findOrFail($request->payment);
-        if ($payment->razorpay_order_id !== $request->razorpay_order_id) {
-            return redirect()->route('events.sponsor.cancel', ['payment' => $payment->id])->with('error', 'Payment session mismatch.');
-        }
-
-        if (!$this->validSignature($payment->razorpay_order_id, $request->razorpay_payment_id, $request->razorpay_signature)) {
-            return redirect()->route('events.sponsor.cancel', ['payment' => $payment->id])->with('error', 'Payment verification failed.');
-        }
-
-        $payment->update([
-            'status' => 'paid',
-            'razorpay_payment_id' => $request->razorpay_payment_id,
-            'razorpay_signature' => $request->razorpay_signature,
-            'paid_at' => now(),
+            'status' => 'awaiting_transfer',
         ]);
 
         $payment = $payment->fresh(['event', 'package']);
-        $this->sendMail($payment->email, new EventSponsorPaymentReceived($payment));
+        $this->sendMail($payment->email, new EventSponsorBankTransferDetails($payment));
         $this->sendMail(config('mail.admin_email', 'jana.ananthakrishnan@gmail.com'), new EventSponsorPaymentAdminNotification($payment));
 
         return redirect()->route('events.sponsor.success', ['payment' => $payment->id]);
@@ -189,8 +142,11 @@ class EventController extends Controller
     public function sponsorSuccess(Request $request)
     {
         $payment = EventSponsorPayment::with('package')->findOrFail($request->payment);
-        abort_if($payment->status !== 'paid', 404);
-        return view('events.sponsor-success', $this->viewData($payment->event) + compact('payment'));
+        abort_if($payment->status === 'cancelled', 404);
+        return view('events.sponsor-success', $this->viewData($payment->event) + [
+            'payment' => $payment,
+            'bank' => $this->bankDetails(),
+        ]);
     }
 
     public function sponsorCancel(Request $request)
@@ -235,55 +191,9 @@ class EventController extends Controller
         ];
     }
 
-    private function razorpayConfigured(): bool
+    private function bankDetails(): array
     {
-        return (bool) config('services.razorpay.key') && (bool) config('services.razorpay.secret');
-    }
-
-    private function createRazorpayOrder(EventSponsorPayment $payment): ?array
-    {
-        $response = Http::withBasicAuth(config('services.razorpay.key'), config('services.razorpay.secret'))
-            ->post('https://api.razorpay.com/v1/orders', [
-                'amount' => $this->amountInSubunits((float) $payment->total_amount),
-                'currency' => strtoupper($payment->currency),
-                'receipt' => 'esp_' . $payment->id,
-                'notes' => ['event_sponsor_payment_id' => (string) $payment->id],
-            ]);
-
-        if ($response->failed() || empty($response->json('id'))) {
-            $description = $response->json('error.description') ?: 'Payment gateway rejected this order.';
-            if (stripos($description, 'maximum amount') !== false) {
-                $description .= ' Try switching the event sponsor currency in admin or confirm the allowed transaction limit with Razorpay before collecting this package online.';
-            }
-            $this->paymentGatewayError = $description;
-            Log::error('Sponsor Razorpay order creation failed.', ['payment_id' => $payment->id, 'response' => $response->body()]);
-            return null;
-        }
-
-        $order = $response->json();
-        $payment->update(['razorpay_order_id' => $order['id'], 'status' => 'created']);
-        return $order;
-    }
-
-    private function checkoutPayload(EventSponsorPayment $payment, EventSponsorPackage $package, array $order): array
-    {
-        return [
-            'key' => config('services.razorpay.key'),
-            'amount' => (int) ($order['amount'] ?? $this->amountInSubunits((float) $payment->total_amount)),
-            'currency' => strtoupper($order['currency'] ?? $payment->currency),
-            'name' => config('services.razorpay.company_name', config('app.name')),
-            'description' => 'LogiSphere Sponsorship - ' . $package->name,
-            'image' => asset('img/site/ananth-logo.svg'),
-            'order_id' => $order['id'] ?? $payment->razorpay_order_id,
-            'prefill' => ['name' => $payment->contact_name, 'email' => $payment->email, 'contact' => $payment->phone],
-            'theme' => ['color' => '#2562E9'],
-            'retry' => ['enabled' => true],
-        ];
-    }
-
-    private function amountInSubunits(float $amount): int
-    {
-        return (int) round($amount * 100);
+        return config('services.bank_transfer', []);
     }
 
     private function normalizedPhone(?string $phone, ?string $countryCode): ?string
@@ -299,12 +209,6 @@ class EventController extends Controller
 
         $countryCode = trim((string) $countryCode) ?: '+91';
         return trim($countryCode . ' ' . $phone);
-    }
-
-    private function validSignature(string $orderId, string $paymentId, string $signature): bool
-    {
-        $expected = hash_hmac('sha256', $orderId . '|' . $paymentId, (string) config('services.razorpay.secret'));
-        return hash_equals($expected, $signature);
     }
 
     private function sendMail(string $to, \Illuminate\Mail\Mailable $mailable): void
