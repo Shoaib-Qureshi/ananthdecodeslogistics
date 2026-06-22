@@ -233,6 +233,8 @@
     .event-table--dark{border-color:rgba(255,255,255,.12);background:transparent}
     .event-table--dark th{background:rgba(255,255,255,.06);color:#7dd3fc;border-bottom-color:rgba(255,255,255,.1)}
     .event-table--dark td{border-bottom-color:rgba(255,255,255,.08);color:rgba(255,255,255,.8)}
+    .event-table--dark td:last-child{color:#fff!important}
+    .event-table--dark td:last-child strong{color:#fff!important}
     .event-table--dark tr:last-child td{color:#fff;font-size:1.04rem}
     .event-table--total td{background:rgba(37,98,233,.08);font-weight:800;color:#0f172a!important;font-size:1rem}
     .event-table--dark .event-table--total td{background:rgba(56,189,248,.1);color:#fff!important}
