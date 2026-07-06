@@ -220,6 +220,71 @@ class EventController extends Controller
         return view('admin.events.registrations', compact('registrations'));
     }
 
+    public function exportRegistrations(Request $request)
+    {
+        $request->validate([
+            'type' => 'nullable|string|max:100',
+            'status' => 'nullable|string|max:100',
+        ]);
+
+        $registrations = EventRegistration::with('event')
+            ->when($request->filled('type'), fn ($query) => $query->where('inquiry_type', $request->type))
+            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->status))
+            ->latest()
+            ->get();
+
+        $filename = 'event-registrations-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($registrations) {
+            $output = fopen('php://output', 'w');
+
+            // UTF-8 BOM lets Excel display names and messages correctly.
+            fwrite($output, "\xEF\xBB\xBF");
+            fputcsv($output, [
+                'Registration ID',
+                'Event',
+                'Inquiry Type',
+                'Name',
+                'Email',
+                'Phone',
+                'Company',
+                'Designation',
+                'Message',
+                'Consent',
+                'Status',
+                'Registered At',
+                'Last Updated At',
+            ]);
+
+            foreach ($registrations as $registration) {
+                $interestOptions = $registration->event
+                    ? $registration->event->interestOptionMap()
+                    : [];
+
+                fputcsv($output, array_map([$this, 'excelSafeValue'], [
+                    $registration->id,
+                    optional($registration->event)->name,
+                    $interestOptions[$registration->inquiry_type] ?? Str::headline($registration->inquiry_type),
+                    $registration->name,
+                    $registration->email,
+                    $registration->phone,
+                    $registration->company,
+                    $registration->designation,
+                    $registration->message,
+                    $registration->consent ? 'Yes' : 'No',
+                    Str::headline($registration->status === 'closed' ? 'not_interested' : $registration->status),
+                    optional($registration->created_at)->format('Y-m-d H:i:s'),
+                    optional($registration->updated_at)->format('Y-m-d H:i:s'),
+                ]));
+            }
+
+            fclose($output);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Cache-Control' => 'no-store, no-cache',
+        ]);
+    }
+
     public function updateRegistrationStatus(Request $request, EventRegistration $registration)
     {
         $request->validate(['status' => 'required|in:new,contacted,confirmed,not_interested,closed']);
@@ -257,6 +322,75 @@ class EventController extends Controller
         $payments = EventSponsorPayment::with(['event', 'package'])->latest()->paginate(40);
 
         return view('admin.events.payments', compact('payments'));
+    }
+
+    public function exportSponsorPayments()
+    {
+        $payments = EventSponsorPayment::with(['event', 'package'])->latest()->get();
+        $filename = 'sponsor-payments-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($payments) {
+            $output = fopen('php://output', 'w');
+
+            // UTF-8 BOM lets Excel display company names and addresses correctly.
+            fwrite($output, "\xEF\xBB\xBF");
+            fputcsv($output, [
+                'Payment ID',
+                'Event',
+                'Sponsor Package',
+                'Company',
+                'Contact Name',
+                'Email',
+                'Phone',
+                'Billing Address',
+                'GST Number',
+                'Currency',
+                'Base Amount',
+                'Tax Label',
+                'Tax Percentage',
+                'Tax Amount',
+                'Total Amount',
+                'Status',
+                'Transfer Reference',
+                'Razorpay Order ID',
+                'Razorpay Payment ID',
+                'Paid At',
+                'Created At',
+                'Last Updated At',
+            ]);
+
+            foreach ($payments as $payment) {
+                fputcsv($output, array_map([$this, 'excelSafeValue'], [
+                    $payment->id,
+                    optional($payment->event)->name,
+                    optional($payment->package)->name,
+                    $payment->company,
+                    $payment->contact_name,
+                    $payment->email,
+                    $payment->phone,
+                    $payment->billing_address,
+                    $payment->gst_number,
+                    $payment->currency,
+                    $payment->base_amount,
+                    $payment->tax_label,
+                    $payment->tax_percentage,
+                    $payment->tax_amount,
+                    $payment->total_amount,
+                    Str::headline($payment->status),
+                    $payment->transfer_reference,
+                    $payment->razorpay_order_id,
+                    $payment->razorpay_payment_id,
+                    optional($payment->paid_at)->format('Y-m-d H:i:s'),
+                    optional($payment->created_at)->format('Y-m-d H:i:s'),
+                    optional($payment->updated_at)->format('Y-m-d H:i:s'),
+                ]));
+            }
+
+            fclose($output);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Cache-Control' => 'no-store, no-cache',
+        ]);
     }
 
     public function markPaymentPaid(Request $request, EventSponsorPayment $payment)
@@ -319,6 +453,13 @@ class EventController extends Controller
                 'visible' => !empty($row['visible']),
             ])->save();
         }
+    }
+
+    private function excelSafeValue($value)
+    {
+        $value = (string) ($value ?? '');
+
+        return preg_match('/^[=\-+@]/', $value) ? "'" . $value : $value;
     }
 
     private function syncFaqs(Event $event, array $rows): void

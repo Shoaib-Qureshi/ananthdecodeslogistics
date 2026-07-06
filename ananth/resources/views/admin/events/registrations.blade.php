@@ -15,7 +15,17 @@
         @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
         <div class="event-admin-hero">
             <div><h2>Event Registrations</h2><p>Event interest submissions.</p></div>
-            <a class="event-admin-btn" href="{{ route('events.register') }}" target="_blank">View Form</a>
+            <div class="event-admin-actions">
+                <a class="event-admin-btn primary" href="{{ route('admin.events.registrations.export', request()->only(['type', 'status'])) }}" aria-label="Download all event registrations for Excel">
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <path d="M7 10l5 5 5-5"/>
+                        <path d="M12 15V3"/>
+                    </svg>
+                    Download for Excel
+                </a>
+                <a class="event-admin-btn" href="{{ route('events.register') }}" target="_blank" rel="noopener">View Form</a>
+            </div>
         </div>
         <div class="event-admin-card">
             <table class="event-admin-table">

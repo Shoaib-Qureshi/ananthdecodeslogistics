@@ -92,8 +92,10 @@ Route::middleware(['admin'])->group(function () {
     Route::get('admin/events/sponsor-packages',[AdminEventController::class,'packages'])->name('admin.events.packages');
     Route::post('admin/events/sponsor-packages',[AdminEventController::class,'updatePackages'])->name('admin.events.packages.update');
     Route::get('admin/events/registrations',[AdminEventController::class,'registrations'])->name('admin.events.registrations');
+    Route::get('admin/events/registrations/export',[AdminEventController::class,'exportRegistrations'])->name('admin.events.registrations.export');
     Route::post('admin/events/registrations/{registration}/status',[AdminEventController::class,'updateRegistrationStatus'])->name('admin.events.registrations.status');
     Route::get('admin/events/sponsor-payments',[AdminEventController::class,'payments'])->name('admin.events.payments');
+    Route::get('admin/events/sponsor-payments/export',[AdminEventController::class,'exportSponsorPayments'])->name('admin.events.payments.export');
     Route::post('admin/events/sponsor-payments/{payment}/mark-paid',[AdminEventController::class,'markPaymentPaid'])->where('payment','[0-9]+')->name('admin.events.payments.markPaid');
     Route::get('admin/manage-milestones',[PageContentController::class,'manageMilestones'])->name('manageMilestones');
     Route::get('admin/add-milestone',[PageContentController::class,'addMilestone'])->name('addMilestone');
