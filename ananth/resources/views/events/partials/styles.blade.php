@@ -37,6 +37,17 @@
     .event-kicker-dot{width:8px;height:8px;border-radius:50%;background:#38bdf8;box-shadow:0 0 0 6px rgba(56,189,248,.12);animation:event-pulse 2.4s ease-in-out infinite}
     @keyframes event-pulse{0%,100%{box-shadow:0 0 0 6px rgba(56,189,248,.12)}50%{box-shadow:0 0 0 10px rgba(56,189,248,.22)}}
 
+    /* Countdown urgency block */
+    .event-countdown{width:min(100%,520px);margin-top:24px;border:1px solid rgba(125,211,252,.26);border-radius:14px;background:rgba(255,255,255,.065);padding:13px 14px;backdrop-filter:blur(14px)}
+    .event-countdown__heading{display:flex;align-items:center;gap:8px;margin:0 0 11px;color:#bae6fd;font-size:.68rem;font-weight:900;letter-spacing:.1em;line-height:1;text-transform:uppercase}
+    .event-countdown__dot{display:block;flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#38bdf8;box-shadow:0 0 0 4px rgba(56,189,248,.12)}
+    .event-countdown__units{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+    .event-countdown__units div{min-width:0;border-right:1px solid rgba(255,255,255,.12);text-align:center}
+    .event-countdown__units div:last-child{border-right:0}
+    .event-countdown__units strong{display:block;color:#fff;font-size:clamp(1.25rem,2.8vw,1.75rem);font-variant-numeric:tabular-nums;line-height:1;font-weight:700;letter-spacing:-.02em}
+    .event-countdown__units span{display:block;margin-top:6px;color:rgba(255,255,255,.54);font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+    .event-countdown.is-complete{border-color:rgba(56,189,248,.4)}
+
     /* ── Buttons ────────────────────────────────────────────── */
     .event-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
     .event-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border:1px solid rgba(255,255,255,.24);border-radius:40px;background:transparent;color:#fff!important;padding:0 28px;font-weight:800;font-size:.94rem;text-decoration:none;transition:background .2s,border-color .2s,color .2s,box-shadow .2s;cursor:pointer;position:relative;overflow:hidden}
@@ -330,7 +341,7 @@
     .event-register-venue-map iframe{width:100%;height:100%;border:0;display:block}
     .event-register-venue-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
     @media(max-width:900px){.event-register-layout,.event-checkout-layout,.event-payment-layout{grid-template-columns:1fr}.event-register-panel,.event-checkout-summary{position:relative;top:auto}.event-register-venue-head{display:block}.event-register-venue-actions{margin-top:18px}.event-register-venue-map{height:320px}.event-success-summary{grid-template-columns:1fr}}
-    @media(max-width:640px){.event-form-grid{grid-template-columns:1fr}.event-register-panel{padding:22px}.event-register-form-card,.event-checkout-form-card{padding:22px}.event-register-form-head{display:block;margin:-22px -22px 22px;padding:22px}.event-register-badge{display:inline-flex;margin-top:12px}}
+    @media(max-width:640px){.event-form-grid{grid-template-columns:1fr}.event-register-panel{padding:22px}.event-register-form-card,.event-checkout-form-card{padding:22px}.event-register-form-head{display:block;margin:-22px -22px 22px;padding:22px}.event-register-badge{display:inline-flex;margin-top:12px}.event-countdown{margin-top:22px;padding:12px 9px}.event-countdown__units{gap:3px}.event-countdown__units strong{font-size:1.15rem}.event-countdown__units span{font-size:.55rem;letter-spacing:.06em}}
 
     /* ── Status pages (success / cancel / payment) ───────────── */
     .event-status-card{max-width:640px;margin:0 auto;text-align:center}
@@ -348,7 +359,7 @@
     .event-section > .event-container > *{animation:event-fadein .5s ease both}
     .event-section > .event-container > *:nth-child(2){animation-delay:.08s}
     .event-section > .event-container > *:nth-child(3){animation-delay:.16s}
-    @media(prefers-reduced-motion:reduce){.event-section > .event-container > *{animation:none}.event-kicker-dot{animation:none}}
+    @media(prefers-reduced-motion:reduce){.event-section > .event-container > *{animation:none}.event-kicker-dot{animation:none}.event-countdown__dot{box-shadow:none}}
 
     /* ── Responsive ──────────────────────────────────────────── */
     @media(max-width:900px){

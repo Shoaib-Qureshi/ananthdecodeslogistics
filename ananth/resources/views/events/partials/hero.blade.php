@@ -3,6 +3,7 @@
     $watermark = strtoupper($event->name);
     $showActions = $showActions ?? true;
     $aside = $aside ?? null;
+    $countdownTarget = $event->event_date ? $event->event_date->copy()->startOfDay()->toIso8601String() : null;
 @endphp
 <section class="event-hero" style="--hero-watermark:'{{ $watermark }}'">
     <div class="event-container event-hero__inner">
@@ -16,6 +17,9 @@
             <div class="event-eyebrow">{{ $eyebrow ?? $event->chapter }}</div>
             <h1>{{ $title ?? $event->name }}</h1>
             <p>{{ $subtitle ?? $event->tagline }}</p>
+            @if($countdownTarget)
+                @include('events.partials.countdown')
+            @endif
             @if($showActions)
                 <div class="event-actions">
                     <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Interest</a>
@@ -60,3 +64,55 @@
 
     </div>
 </section>
+
+@if($countdownTarget)
+    <script>
+        (function () {
+            function initCountdown(root) {
+                var target = new Date(root.dataset.countdownTarget).getTime();
+                var label = root.querySelector('[data-countdown-label]');
+                var fields = {
+                    days: root.querySelector('[data-countdown-days]'),
+                    hours: root.querySelector('[data-countdown-hours]'),
+                    minutes: root.querySelector('[data-countdown-minutes]'),
+                    seconds: root.querySelector('[data-countdown-seconds]')
+                };
+
+                function update() {
+                    var remaining = Math.max(0, target - Date.now());
+                    var totalSeconds = Math.floor(remaining / 1000);
+                    var days = Math.floor(totalSeconds / 86400);
+                    var hours = Math.floor((totalSeconds % 86400) / 3600);
+                    var minutes = Math.floor((totalSeconds % 3600) / 60);
+                    var seconds = totalSeconds % 60;
+
+                    fields.days.textContent = String(days).padStart(2, '0');
+                    fields.hours.textContent = String(hours).padStart(2, '0');
+                    fields.minutes.textContent = String(minutes).padStart(2, '0');
+                    fields.seconds.textContent = String(seconds).padStart(2, '0');
+
+                    if (remaining === 0) {
+                        label.textContent = 'Event day is here';
+                        root.classList.add('is-complete');
+                        return false;
+                    }
+                    return true;
+                }
+
+                if (update()) {
+                    window.setInterval(update, 1000);
+                }
+            }
+
+            function startCountdowns() {
+                document.querySelectorAll('[data-event-countdown]').forEach(initCountdown);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', startCountdowns);
+            } else {
+                startCountdowns();
+            }
+        }());
+    </script>
+@endif
