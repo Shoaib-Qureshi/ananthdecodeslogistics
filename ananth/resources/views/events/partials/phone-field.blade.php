@@ -5,6 +5,7 @@
     $label = $label ?? 'Phone Number';
     $value = $value ?? old($fieldName);
     $codeValue = old($codeName, '+91');
+    $required = $required ?? false;
 @endphp
 
 <div class="event-field event-phone-field">
@@ -24,7 +25,8 @@
             </div>
         </div>
         <input type="hidden" name="{{ $codeName }}" class="phone-country-code" value="{{ $codeValue }}">
-        <input type="tel" id="{{ $idPrefix }}_number" name="{{ $fieldName }}" class="phone-number-input" value="{{ $value }}" placeholder="98765 43210" inputmode="tel" autocomplete="tel-national">
+        <input type="tel" id="{{ $idPrefix }}_number" name="{{ $fieldName }}" class="phone-number-input" value="{{ $value }}" placeholder="98765 43210" inputmode="tel" autocomplete="tel-national" maxlength="40" {{ $required ? 'required' : '' }}>
     </div>
+    <div class="field-error js-phone-error" hidden>Phone number is required.</div>
     @error($fieldName)<div class="field-error">{{ $message }}</div>@enderror
 </div>

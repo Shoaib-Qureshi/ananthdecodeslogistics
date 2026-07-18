@@ -87,31 +87,34 @@
                         </div>
 
                         <label for="reg_name">Full Name
-                            <input id="reg_name" name="name" value="{{ old('name') }}" placeholder="Your full name" required autocomplete="name">
+                            <input id="reg_name" name="name" value="{{ old('name') }}" placeholder="Your full name" required maxlength="160" autocomplete="name">
+                            <span class="field-error" id="err_name" hidden></span>
                         </label>
 
                         <label for="reg_email">Work Email
-                            <input id="reg_email" type="email" name="email" value="{{ old('email') }}" placeholder="you@company.com" required autocomplete="email">
+                            <input id="reg_email" type="email" name="email" value="{{ old('email') }}" placeholder="you@company.com" required maxlength="180" autocomplete="email">
+                            <span class="field-error" id="err_email" hidden></span>
                         </label>
 
-                        @include('events.partials.phone-field', ['idPrefix' => 'reg_phone'])
+                        @include('events.partials.phone-field', ['idPrefix' => 'reg_phone', 'required' => true])
 
                         <label for="reg_company">Company / Organisation
-                            <input id="reg_company" name="company" value="{{ old('company') }}" placeholder="Your organisation" autocomplete="organization">
+                            <input id="reg_company" name="company" value="{{ old('company') }}" placeholder="Your organisation" maxlength="180" autocomplete="organization">
                         </label>
 
                         <label for="reg_designation">Designation / Role
-                            <input id="reg_designation" name="designation" value="{{ old('designation') }}" placeholder="e.g. VP Supply Chain">
+                            <input id="reg_designation" name="designation" value="{{ old('designation') }}" placeholder="e.g. VP Supply Chain" maxlength="180">
                         </label>
 
                         <label class="full" for="reg_message">Message (optional)
-                            <textarea id="reg_message" name="message" placeholder="Any specific topics, questions, or context for the team">{{ old('message') }}</textarea>
+                            <textarea id="reg_message" name="message" placeholder="Any specific topics, questions, or context for the team" maxlength="2500">{{ old('message') }}</textarea>
                         </label>
 
                         <label class="event-form-checkbox full">
                             <input type="checkbox" name="consent" value="1" required>
                             <span>I agree to be contacted about LogiSphere.</span>
                         </label>
+                        <span class="field-error full" id="err_consent" hidden></span>
                     </div>
 
                     <button class="event-btn event-btn--primary" type="submit" id="register-submit" style="width:100%;justify-content:center">
@@ -159,20 +162,9 @@
 
 @section('scripts')
 @include('events.partials.phone-script')
+@include('events.partials.form-validation')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var form = document.getElementById('register-form');
-    var btn = document.getElementById('register-submit');
-    if (!form || !btn) return;
-
-    form.addEventListener('submit', function () {
-        if (!form.checkValidity()) return;
-
-        btn.classList.add('event-btn--loading');
-        btn.textContent = '';
-        btn.disabled = true;
-    });
-
     document.querySelectorAll('.js-event-choice').forEach(function (root) {
         var trigger = root.querySelector('.event-choice-trigger');
         var menu = root.querySelector('.event-choice-menu');

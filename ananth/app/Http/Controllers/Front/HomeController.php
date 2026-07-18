@@ -140,7 +140,7 @@ class HomeController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|max:150',
-            'phone' => 'nullable|string|max:30',
+            'phone' => 'required|string|max:30',
             'message' => 'required|string|max:2000'
         ]);
 

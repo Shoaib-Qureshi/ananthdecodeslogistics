@@ -302,7 +302,7 @@ $submitRoute = $submitRoute ?? route('contributor.register.submit');
                                 @error('designation')<div class="field-error">{{ $message }}</div>@enderror
                             </div>
                             <div>
-                                <label class="field-label">Phone Number</label>
+                                <label class="field-label">Phone Number <span style="color:#ef4444">*</span></label>
                                 <div class="phone-field-wrap @error('phone') is-invalid @enderror" id="phoneWrap">
                                     <div class="country-select" id="countrySelect">
                                         <button type="button" class="country-trigger" id="countryTrigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Select country code">
@@ -433,7 +433,7 @@ $submitRoute = $submitRoute ?? route('contributor.register.submit');
             err: 'errPhone',
             wrap: 'phoneWrap',
             validate(v) {
-                if (!v) return null; // phone is optional
+                if (!v) return 'Phone number is required.';
                 const digits = v.replace(/[\s\-\(\)]/g, '');
                 if (!/^\d+$/.test(digits)) return 'Phone number can only contain digits, spaces, hyphens, and parentheses.';
                 if (digits.length < 6) return 'Phone number is too short.';

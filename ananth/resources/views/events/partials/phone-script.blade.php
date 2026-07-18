@@ -122,6 +122,20 @@
 
         select(selected);
         renderList('');
+
+        const numberInput = root.querySelector('.phone-number-input');
+        const errEl = root.parentElement.querySelector('.js-phone-error');
+        if (numberInput && errEl) {
+            numberInput.addEventListener('invalid', function (event) {
+                event.preventDefault();
+                root.classList.add('is-invalid');
+                errEl.hidden = false;
+            });
+            numberInput.addEventListener('input', function () {
+                root.classList.remove('is-invalid');
+                errEl.hidden = true;
+            });
+        }
     }
 
     document.querySelectorAll('.js-country-phone').forEach(setupPhonePicker);

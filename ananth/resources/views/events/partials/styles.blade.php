@@ -162,6 +162,7 @@
     .phone-field-wrap{display:flex;border:1.5px solid #e2e8f0;border-radius:12px;overflow:visible;transition:.15s;background:#fff;position:relative}
     .phone-field-wrap:focus-within{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
     .phone-field-wrap.is-invalid{border-color:#ef4444}
+    .event-form input.is-invalid,.event-form textarea.is-invalid{border-color:#ef4444}
     .country-select{position:relative;flex-shrink:0}
     .country-trigger{display:flex;align-items:center;gap:.35rem;padding:.75rem .65rem .75rem .85rem;background:transparent;border:none;border-right:1.5px solid #e2e8f0;cursor:pointer;font-size:.85rem;color:#0f172a;white-space:nowrap;border-radius:0;outline:none;transition:.15s}
     .country-trigger:hover{background:#f8fbff}

@@ -43,20 +43,20 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <h4>Name*</h4>
-                                    <input type="text" name="name" placeholder="Name *" value="{{ old('name') }}" required>
+                                    <input type="text" name="name" placeholder="Name *" value="{{ old('name') }}" required maxlength="100">
                                 </div>
                                 <div class="col-md-6">
                                     <h4>Email*</h4>
-                                    <input type="email" name="email" placeholder="Email *" value="{{ old('email') }}" required>
+                                    <input type="email" name="email" placeholder="Email *" value="{{ old('email') }}" required maxlength="150">
                                 </div>
                                 <div class="col-md-6">
-                                    <h4>Phone Number</h4>
-                                    <input type="tel" name="phone" placeholder="Phone Number" value="{{ old('phone') }}" pattern="[0-9+()\\-\\s]*">
+                                    <h4>Phone Number*</h4>
+                                    <input type="tel" name="phone" placeholder="Phone Number *" value="{{ old('phone') }}" pattern="[0-9+()\\-\\s]*" required maxlength="30">
                                 </div>
                             </div>
 
                             <h4>Message</h4>
-                            <textarea name="message" placeholder="Type your message here..." required>{{ old('message') }}</textarea>
+                            <textarea name="message" placeholder="Type your message here..." required maxlength="2000">{{ old('message') }}</textarea>
 
                             <!-- Submit Button -->
                             <button type="submit" class="siteBtn">Get in Touch</button>

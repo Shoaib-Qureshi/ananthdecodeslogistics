@@ -50,20 +50,23 @@
                 <form class="event-form" id="checkout-form" method="POST" action="{{ route('events.sponsor.checkout.start', $package) }}" novalidate>
                     @csrf
                     <label for="co_company">Company / Organisation
-                        <input id="co_company" name="company" value="{{ old('company') }}" placeholder="Your company name" required autocomplete="organization">
+                        <input id="co_company" name="company" value="{{ old('company') }}" placeholder="Your company name" required maxlength="180" autocomplete="organization">
+                        <span class="field-error" id="err_company" hidden></span>
                     </label>
                     <label for="co_contact">Contact Name
-                        <input id="co_contact" name="contact_name" value="{{ old('contact_name') }}" placeholder="Full name" required autocomplete="name">
+                        <input id="co_contact" name="contact_name" value="{{ old('contact_name') }}" placeholder="Full name" required maxlength="160" autocomplete="name">
+                        <span class="field-error" id="err_contact_name" hidden></span>
                     </label>
                     <label for="co_email">Email Address
-                        <input id="co_email" type="email" name="email" value="{{ old('email') }}" placeholder="billing@company.com" required autocomplete="email">
+                        <input id="co_email" type="email" name="email" value="{{ old('email') }}" placeholder="billing@company.com" required maxlength="180" autocomplete="email">
+                        <span class="field-error" id="err_email" hidden></span>
                     </label>
-                    @include('events.partials.phone-field', ['idPrefix' => 'co_phone'])
+                    @include('events.partials.phone-field', ['idPrefix' => 'co_phone', 'required' => true])
                     <label for="co_gst">GST Number
-                        <input id="co_gst" name="gst_number" value="{{ old('gst_number') }}" placeholder="22AAAAA0000A1Z5">
+                        <input id="co_gst" name="gst_number" value="{{ old('gst_number') }}" placeholder="22AAAAA0000A1Z5" maxlength="80">
                     </label>
                     <label for="co_billing">Billing Address
-                        <textarea id="co_billing" name="billing_address" placeholder="Full billing address including city and PIN">{{ old('billing_address') }}</textarea>
+                        <textarea id="co_billing" name="billing_address" placeholder="Full billing address including city and PIN" maxlength="2000">{{ old('billing_address') }}</textarea>
                     </label>
                     <button class="event-btn event-btn--primary" type="submit" id="checkout-submit" style="width:100%;justify-content:center">
                         Continue to Bank Details
@@ -77,19 +80,5 @@
 
 @section('scripts')
 @include('events.partials.phone-script')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var form = document.getElementById('checkout-form');
-    var btn = document.getElementById('checkout-submit');
-    if (!form || !btn) return;
-
-    form.addEventListener('submit', function () {
-        if (!form.checkValidity()) return;
-
-        btn.classList.add('event-btn--loading');
-        btn.textContent = '';
-        btn.disabled = true;
-    });
-});
-</script>
+@include('events.partials.form-validation')
 @endsection
