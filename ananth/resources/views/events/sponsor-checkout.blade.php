@@ -47,7 +47,7 @@
                 @if($errors->any())
                     <div class="event-alert event-alert--error" role="alert">{{ $errors->first() }}</div>
                 @endif
-                <form class="event-form" id="checkout-form" method="POST" action="{{ route('events.sponsor.checkout.start', $package) }}" novalidate>
+                <form class="event-form" id="checkout-form" method="POST" action="{{ route('events.sponsor.checkout.start', $package) }}">
                     @csrf
                     <label for="co_company">Company / Organisation
                         <input id="co_company" name="company" value="{{ old('company') }}" placeholder="Your company name" required maxlength="180" autocomplete="organization">

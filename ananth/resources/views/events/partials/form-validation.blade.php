@@ -1,6 +1,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('form.event-form[novalidate]').forEach(function (form) {
+    document.querySelectorAll('form.event-form').forEach(function (form) {
+        form.setAttribute('novalidate', 'novalidate');
         var btn = form.querySelector('button[type="submit"]');
 
         function errorEl(el) { return document.getElementById('err_' + el.name); }

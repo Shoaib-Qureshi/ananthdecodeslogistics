@@ -69,7 +69,7 @@
                     @endif
                 </div>
 
-                <form class="event-form" id="register-form" method="POST" action="{{ route('events.register.submit') }}" novalidate>
+                <form class="event-form" id="register-form" method="POST" action="{{ route('events.register.submit') }}">
                     @csrf
                     <div class="event-form-grid">
                         <div class="event-field event-choice-field full js-event-choice">
