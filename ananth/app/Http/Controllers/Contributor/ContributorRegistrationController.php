@@ -78,7 +78,7 @@ class ContributorRegistrationController extends Controller
                     }
                 },
             ],
-            'phone' => 'required|string|max:30',
+            'phone' => ['required', 'string', 'max:30', 'regex:/^(?=(?:\D*\d){6,15}\D*$)[0-9\s()+\-]+$/'],
             'designation' => 'required|string|max:255',
             'intro' => 'required|string|max:1000',
             'reason_for_joining' => 'required|string|max:2000',

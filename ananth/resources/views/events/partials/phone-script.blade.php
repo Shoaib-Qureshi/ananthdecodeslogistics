@@ -126,12 +126,22 @@
         const numberInput = root.querySelector('.phone-number-input');
         const errEl = root.parentElement.querySelector('.js-phone-error');
         if (numberInput && errEl) {
+            function validatePhone() {
+                const digits = numberInput.value.replace(/\D/g, '');
+                const ok = !numberInput.value || (/^[\d\s()+-]+$/.test(numberInput.value) && digits.length >= 6 && digits.length <= 15);
+                numberInput.setCustomValidity(ok ? '' : 'invalid-phone');
+            }
+            validatePhone();
             numberInput.addEventListener('invalid', function (event) {
                 event.preventDefault();
                 root.classList.add('is-invalid');
+                errEl.textContent = numberInput.validity.valueMissing
+                    ? 'Phone number is required.'
+                    : 'Please enter a valid phone number (6–15 digits).';
                 errEl.hidden = false;
             });
             numberInput.addEventListener('input', function () {
+                validatePhone();
                 root.classList.remove('is-invalid');
                 errEl.hidden = true;
             });

@@ -80,8 +80,8 @@
                                 <svg class="event-choice-chevron" width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>
                             </button>
                             <div class="event-choice-menu" hidden role="listbox" aria-label="Interest Type">
-                                @foreach($interestOptions as $value => $label)
-                                    <button type="button" class="event-choice-option {{ $selectedInterest === $value ? 'is-active' : '' }}" role="option" aria-selected="{{ $selectedInterest === $value ? 'true' : 'false' }}" data-value="{{ $value }}">{{ $label }}</button>
+                                @foreach($interestOptions as $optionValue => $optionLabel)
+                                    <button type="button" class="event-choice-option {{ $selectedInterest === $optionValue ? 'is-active' : '' }}" role="option" aria-selected="{{ $selectedInterest === $optionValue ? 'true' : 'false' }}" data-value="{{ $optionValue }}">{{ $optionLabel }}</button>
                                 @endforeach
                             </div>
                         </div>

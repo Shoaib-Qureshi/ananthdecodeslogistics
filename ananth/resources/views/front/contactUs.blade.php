@@ -51,7 +51,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <h4>Phone Number*</h4>
-                                    <input type="tel" name="phone" placeholder="Phone Number *" value="{{ old('phone') }}" pattern="[0-9+()\\-\\s]*" required maxlength="30">
+                                    <input type="tel" name="phone" placeholder="Phone Number *" value="{{ old('phone') }}" pattern="(?=(?:\D*\d){6,15}\D*$)[0-9\s()+\-]+" title="Please enter a valid phone number (6-15 digits)" required maxlength="30">
                                 </div>
                             </div>
 
