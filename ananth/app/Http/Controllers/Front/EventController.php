@@ -11,6 +11,7 @@ use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\EventSponsorPackage;
 use App\Models\EventSponsorPayment;
+use App\Rules\ValidPhone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -63,7 +64,7 @@ class EventController extends Controller
             'inquiry_type' => ['required', Rule::in(array_keys($event->interestOptionMap()))],
             'name' => 'required|string|max:160',
             'email' => 'required|email|max:180',
-            'phone' => ['required', 'string', 'max:40', 'regex:/^(?=(?:\D*\d){6,15}\D*$)[0-9\s()+\-]+$/'],
+            'phone' => ['required', 'string', 'max:40', new ValidPhone($request->input('phone_country_code'))],
             'phone_country_code' => 'nullable|string|max:8',
             'company' => 'nullable|string|max:180',
             'designation' => 'nullable|string|max:180',
@@ -106,7 +107,7 @@ class EventController extends Controller
             'company' => 'required|string|max:180',
             'contact_name' => 'required|string|max:160',
             'email' => 'required|email|max:180',
-            'phone' => ['required', 'string', 'max:40', 'regex:/^(?=(?:\D*\d){6,15}\D*$)[0-9\s()+\-]+$/'],
+            'phone' => ['required', 'string', 'max:40', new ValidPhone($request->input('phone_country_code'))],
             'phone_country_code' => 'nullable|string|max:8',
             'billing_address' => 'nullable|string|max:2000',
             'gst_number' => 'nullable|string|max:80',

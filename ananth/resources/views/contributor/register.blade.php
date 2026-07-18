@@ -436,6 +436,11 @@ $submitRoute = $submitRoute ?? route('contributor.register.submit');
                 if (!v) return 'Phone number is required.';
                 const digits = v.replace(/[\s\-\(\)]/g, '');
                 if (!/^\d+$/.test(digits)) return 'Phone number can only contain digits, spaces, hyphens, and parentheses.';
+                const code = document.getElementById('phoneCountryCode');
+                if (code && code.value === '+91') {
+                    if (digits.length !== 10) return 'Indian mobile numbers must be exactly 10 digits.';
+                    return null;
+                }
                 if (digits.length < 6) return 'Phone number is too short.';
                 if (digits.length > 15) return 'Phone number is too long (max 15 digits).';
                 return null;

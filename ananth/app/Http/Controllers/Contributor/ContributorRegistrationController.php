@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Contributor;
 
 use App\Http\Controllers\Controller;
 use App\Mail\AdminCreatedContributor;
+use App\Rules\ValidPhone;
 use App\Mail\ContributorApproved;
 use App\Mail\ContributorRejected;
 use App\Mail\NewRegistrationAdminNotification;
@@ -78,7 +79,7 @@ class ContributorRegistrationController extends Controller
                     }
                 },
             ],
-            'phone' => ['required', 'string', 'max:30', 'regex:/^(?=(?:\D*\d){6,15}\D*$)[0-9\s()+\-]+$/'],
+            'phone' => ['required', 'string', 'max:30', new ValidPhone($request->input('phone_country_code'))],
             'designation' => 'required|string|max:255',
             'intro' => 'required|string|max:1000',
             'reason_for_joining' => 'required|string|max:2000',

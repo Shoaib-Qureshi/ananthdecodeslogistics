@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Rules\ValidPhone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -140,7 +141,7 @@ class HomeController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|max:150',
-            'phone' => ['required', 'string', 'max:30', 'regex:/^(?=(?:\D*\d){6,15}\D*$)[0-9\s()+\-]+$/'],
+            'phone' => ['required', 'string', 'max:30', new ValidPhone()],
             'message' => 'required|string|max:2000'
         ]);
 

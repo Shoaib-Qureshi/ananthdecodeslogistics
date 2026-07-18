@@ -87,6 +87,7 @@
             flagEl.textContent = country.code;
             codeEl.textContent = country.dial;
             hiddenCode.value = country.dial;
+            validatePhone();
             close();
         }
 
@@ -120,24 +121,34 @@
             if (!root.contains(event.target)) close();
         });
 
-        select(selected);
-        renderList('');
-
         const numberInput = root.querySelector('.phone-number-input');
         const errEl = root.parentElement.querySelector('.js-phone-error');
-        if (numberInput && errEl) {
-            function validatePhone() {
-                const digits = numberInput.value.replace(/\D/g, '');
-                const ok = !numberInput.value || (/^[\d\s()+-]+$/.test(numberInput.value) && digits.length >= 6 && digits.length <= 15);
-                numberInput.setCustomValidity(ok ? '' : 'invalid-phone');
+
+        function phoneLengthMessage() {
+            return hiddenCode.value === '+91'
+                ? 'Indian mobile numbers must be exactly 10 digits.'
+                : 'Please enter a valid phone number (6–15 digits).';
+        }
+
+        function validatePhone() {
+            if (!numberInput) return;
+            const digits = numberInput.value.replace(/\D/g, '');
+            let ok = true;
+            if (numberInput.value) {
+                if (!/^[\d\s()+-]+$/.test(numberInput.value)) ok = false;
+                else if (hiddenCode.value === '+91') ok = digits.length === 10;
+                else ok = digits.length >= 6 && digits.length <= 15;
             }
-            validatePhone();
+            numberInput.setCustomValidity(ok ? '' : 'invalid-phone');
+        }
+
+        if (numberInput && errEl) {
             numberInput.addEventListener('invalid', function (event) {
                 event.preventDefault();
                 root.classList.add('is-invalid');
                 errEl.textContent = numberInput.validity.valueMissing
                     ? 'Phone number is required.'
-                    : 'Please enter a valid phone number (6–15 digits).';
+                    : phoneLengthMessage();
                 errEl.hidden = false;
             });
             numberInput.addEventListener('input', function () {
@@ -146,6 +157,9 @@
                 errEl.hidden = true;
             });
         }
+
+        select(selected);
+        renderList('');
     }
 
     document.querySelectorAll('.js-country-phone').forEach(setupPhonePicker);
