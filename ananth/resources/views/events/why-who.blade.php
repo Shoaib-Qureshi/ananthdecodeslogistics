@@ -56,6 +56,46 @@
         </div>
     </section>
 
+    @php
+        $delegateLogos = collect($event->delegate_logos ?: [])
+            ->map(fn ($logo) => is_array($logo) ? ($logo['url'] ?? null) : $logo)
+            ->filter(fn ($logo) => is_string($logo) && trim($logo) !== '')
+            ->values();
+    @endphp
+    @if($delegateLogos->isNotEmpty())
+        <section class="event-section event-delegates-section" aria-labelledby="delegate-logos-title">
+            <div class="event-container">
+                <div class="event-delegates-heading">
+                    <div class="event-eyebrow">Delegate Community</div>
+                    <h2 class="event-title" id="delegate-logos-title">The companies in the room.</h2>
+                    <p class="event-lead">A curated community of leaders shaping the next chapter of supply chain and logistics.</p>
+                </div>
+                <div class="event-delegates-viewport" aria-label="Companies attending LogiSphere">
+                    <div class="event-delegates-track">
+                        <div class="event-delegates-set">
+                            @foreach($delegateLogos as $logo)
+                                <div class="event-delegate-logo">
+                                    <img src="{{ $logo }}" alt="Delegate attendee logo" loading="eager">
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="event-delegates-set" aria-hidden="true">
+                            @foreach($delegateLogos as $logo)
+                                <div class="event-delegate-logo">
+                                    <img src="{{ $logo }}" alt="" loading="lazy">
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                <div class="event-delegates-cta">
+                    <span>Join the delegate community</span>
+                    <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Interest</a>
+                </div>
+            </div>
+        </section>
+    @endif
+
     <section class="event-section">
         <div class="event-container">
             <div class="event-eyebrow">Key Industry Sectors</div>

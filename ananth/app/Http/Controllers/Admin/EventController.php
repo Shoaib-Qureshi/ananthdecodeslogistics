@@ -72,6 +72,11 @@ class EventController extends Controller
     public function updateEvent(Request $request, Event $event)
     {
         $request->validate(['hero_image_file' => 'nullable|image|max:4096']);
+        $request->validate([
+            'delegate_logo_files' => 'nullable|array|max:60',
+            'delegate_logo_files.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+            'delegate_logos_keep' => 'nullable|string',
+        ]);
         $validated = $request->validate($this->eventValidationRules());
 
         $payload = $validated['event'];
@@ -86,6 +91,7 @@ class EventController extends Controller
         $payload['sponsor_inclusions']     = $this->lines($request->input('sponsor_inclusions_text'));
         $payload['interest_options']       = $this->interestOptions($request->input('interest_options_text'));
         $payload['registration_steps']     = $this->registrationSteps($request->input('registration_steps_text'));
+        $payload['delegate_logos']         = $this->resolveDelegateLogos($request, $event);
 
         $event->update($payload);
         $this->syncAgenda($event, $request->input('agenda', []));
@@ -123,6 +129,11 @@ class EventController extends Controller
     {
         $event = Event::current();
         $request->validate(['hero_image_file' => 'nullable|image|max:4096']);
+        $request->validate([
+            'delegate_logo_files' => 'nullable|array|max:60',
+            'delegate_logo_files.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+            'delegate_logos_keep' => 'nullable|string',
+        ]);
         $validated = $request->validate($this->eventValidationRules());
 
         $payload = $validated['event'];
@@ -137,6 +148,7 @@ class EventController extends Controller
         $payload['sponsor_inclusions']      = $this->lines($request->input('sponsor_inclusions_text'));
         $payload['interest_options']        = $this->interestOptions($request->input('interest_options_text'));
         $payload['registration_steps']      = $this->registrationSteps($request->input('registration_steps_text'));
+        $payload['delegate_logos']          = $this->resolveDelegateLogos($request, $event);
         $payload['is_active']               = true;
 
         $event->update($payload);
@@ -586,6 +598,78 @@ class EventController extends Controller
             return Storage::disk('public')->url($path);
         }
         return $request->input('event.hero_image') ?: $existingUrl;
+    }
+
+    private function resolveDelegateLogos(Request $request, Event $event): array
+    {
+        $existing = collect($event->delegate_logos ?: [])
+            ->map(fn ($logo) => is_array($logo) ? ($logo['url'] ?? null) : $logo)
+            ->filter(fn ($logo) => is_string($logo) && trim($logo) !== '')
+            ->values();
+
+        if ($request->has('delegate_logos_keep')) {
+            $keep = json_decode((string) $request->input('delegate_logos_keep'), true);
+            $keep = is_array($keep) ? array_values(array_filter($keep, 'is_string')) : [];
+            $existing = $existing->intersect($keep)->values();
+        }
+
+        foreach ($request->file('delegate_logo_files', []) as $file) {
+            $path = $this->storeDelegateLogo($file);
+            $existing->push(Storage::disk('public')->url($path));
+        }
+
+        return $existing->unique()->values()->all();
+    }
+
+    private function storeDelegateLogo($file): string
+    {
+        $source = @imagecreatefromstring(file_get_contents($file->getRealPath()));
+        if (! $source) {
+            return $file->store('events/delegates', 'public');
+        }
+
+        $width = imagesx($source);
+        $height = imagesy($source);
+        $flattened = imagecreatetruecolor($width, $height);
+        $flattenedWhite = imagecolorallocate($flattened, 255, 255, 255);
+        imagefill($flattened, 0, 0, $flattenedWhite);
+        imagealphablending($flattened, true);
+        imagesavealpha($source, true);
+        imagecopy($flattened, $source, 0, 0, 0, 0, $width, $height);
+        $canvasWidth = 720;
+        $canvasHeight = 360;
+        $padding = 48;
+        $scale = min(($canvasWidth - ($padding * 2)) / $width, ($canvasHeight - ($padding * 2)) / $height);
+        $targetWidth = max(1, (int) round($width * $scale));
+        $targetHeight = max(1, (int) round($height * $scale));
+
+        $canvas = imagecreatetruecolor($canvasWidth, $canvasHeight);
+        $white = imagecolorallocate($canvas, 255, 255, 255);
+        imagefill($canvas, 0, 0, $white);
+        imagecopyresampled(
+            $canvas,
+            $flattened,
+            (int) (($canvasWidth - $targetWidth) / 2),
+            (int) (($canvasHeight - $targetHeight) / 2),
+            0,
+            0,
+            $targetWidth,
+            $targetHeight,
+            $width,
+            $height
+        );
+
+        ob_start();
+        imagefilter($canvas, IMG_FILTER_SMOOTH, -3);
+        imagejpeg($canvas, null, 94);
+        $contents = ob_get_clean();
+        imagedestroy($source);
+        imagedestroy($flattened);
+        imagedestroy($canvas);
+
+        $path = 'events/delegates/delegate-' . Str::lower(Str::random(12)) . '.jpg';
+        Storage::disk('public')->put($path, $contents);
+        return $path;
     }
 
     private function lines(?string $text): array

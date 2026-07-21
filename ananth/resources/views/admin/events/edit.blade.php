@@ -100,6 +100,7 @@
                     <a href="#event-basics"><div><strong>Basics</strong><span>Core details</span></div></a>
                     <a href="#event-main-page"><div><strong>Main Event Page</strong><span>/events/conference</span></div></a>
                     <a href="#event-why-page"><div><strong>Why & Who Page</strong><span>/events/why-who</span></div></a>
+                    <a href="#event-delegate-logos"><div><strong>Delegate Logos</strong><span>Attendee carousel</span></div></a>
                     <a href="#event-register-page"><div><strong>Registration Page</strong><span>/events/register</span></div></a>
                     <a href="#event-sponsor-page"><div><strong>Sponsorship Page</strong><span>/events/sponsorship</span></div></a>
                     <a href="#event-settings"><div><strong>Settings & SEO</strong><span>Payment / metadata</span></div></a>
@@ -156,6 +157,43 @@
                     <div class="event-admin-grid">
                         <label>Comparison Rows, one per line: Traditional | LogiSphere <textarea name="comparison_rows_text">{{ old('comparison_rows_text', collect($event->comparison_rows ?: [])->map(fn($row) => ($row['traditional'] ?? '') . ' | ' . ($row['logisphere'] ?? ''))->implode("\n")) }}</textarea><span class="field-help">Use a pipe character to separate the two table columns.</span></label>
                         <label>Attendee Profiles, one per line <textarea name="attendee_profiles_text">{{ old('attendee_profiles_text', implode("\n", $event->attendee_profiles ?: [])) }}</textarea><span class="field-help">Each line appears as one audience bullet.</span></label>
+                    </div>
+                </div>
+            </section>
+
+            @php
+                $delegateLogos = collect($event->delegate_logos ?: [])
+                    ->map(fn ($logo) => is_array($logo) ? ($logo['url'] ?? null) : $logo)
+                    ->filter(fn ($logo) => is_string($logo) && trim($logo) !== '')
+                    ->values();
+            @endphp
+            <section class="event-page-block" id="event-delegate-logos" data-editor-section>
+                <div class="event-page-block__head blue">
+                    <div>
+                        <span class="event-section-kicker">Social proof</span>
+                        <h3>Delegate Logos</h3>
+                        <p>These logos appear in the Delegate Community carousel on /events/why-who. Images are normalized to a crisp 720×360 format when uploaded.</p>
+                    </div>
+                    <div class="event-page-block__tools">
+                        <button type="button" class="event-section-toggle" data-section-toggle aria-label="Expand Delegate Logos" aria-expanded="false"></button>
+                        <a class="event-page-link" href="{{ route('events.why-who') }}#delegate-logos-title" target="_blank">View section</a>
+                    </div>
+                </div>
+                <div class="event-page-block__body">
+                    <label>Upload delegate logos
+                        <input type="file" name="delegate_logo_files[]" accept="image/jpeg,image/png,image/webp" multiple>
+                        <span class="field-help">Select one or more JPG, PNG, or WebP images. Each image is resized onto a clean white 720×360 JPEG canvas.</span>
+                    </label>
+                    <input type="hidden" name="delegate_logos_keep" value='@json($delegateLogos->all())' data-delegate-logos-keep>
+                    <div class="delegate-logo-admin-grid" data-delegate-logo-grid>
+                        @forelse($delegateLogos as $logo)
+                            <div class="delegate-logo-admin-card" data-delegate-logo-card data-logo-url="{{ $logo }}">
+                                <img src="{{ $logo }}" alt="Delegate logo preview" loading="lazy">
+                                <button type="button" data-remove-delegate-logo aria-label="Remove delegate logo">&times;</button>
+                            </div>
+                        @empty
+                            <div class="delegate-logo-admin-empty" data-delegate-logo-empty>No delegate logos added yet.</div>
+                        @endforelse
                     </div>
                 </div>
             </section>
@@ -375,6 +413,23 @@ document.addEventListener('click', function (event) {
         const row = event.target.closest('.event-admin-row');
         const del = row.querySelector('[data-delete-input]');
         if (del) { del.value = '1'; row.style.display = 'none'; } else { row.remove(); }
+    }
+
+    if (event.target.matches('[data-remove-delegate-logo]')) {
+        var logoCard = event.target.closest('[data-delegate-logo-card]');
+        if (logoCard) {
+            logoCard.remove();
+            var keep = document.querySelector('[data-delegate-logos-keep]');
+            if (keep) {
+                keep.value = JSON.stringify(Array.prototype.map.call(document.querySelectorAll('[data-delegate-logo-card]'), function (card) {
+                    return card.dataset.logoUrl;
+                }));
+            }
+            var grid = document.querySelector('[data-delegate-logo-grid]');
+            if (grid && !grid.querySelector('[data-delegate-logo-card]')) {
+                grid.innerHTML = '<div class="delegate-logo-admin-empty" data-delegate-logo-empty>No delegate logos added yet.</div>';
+            }
+        }
     }
 });
 function addRow(templateId, targetSelector) {
