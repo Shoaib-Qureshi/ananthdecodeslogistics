@@ -138,8 +138,12 @@
     .event-partners-heading .event-eyebrow{justify-content:center}
     .event-partners-heading .event-lead{margin-left:auto;margin-right:auto}
     .event-partners-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:960px;margin:0 auto}
-    .event-partner-logo-card{display:flex;align-items:center;justify-content:center;min-height:164px;border:1px solid #dfe7f1;border-radius:16px;background:#fff;padding:24px;box-shadow:0 2px 10px rgba(15,23,42,.035)}
+    .event-partner-logo-card{display:flex;flex-direction:column;overflow:hidden;border:1px solid #dfe7f1;border-radius:16px;background:#fff;box-shadow:0 2px 10px rgba(15,23,42,.035)}
+    .event-partner-logo-card__visual{display:flex;align-items:center;justify-content:center;min-height:150px;padding:18px 22px;background:#fff}
     .event-partner-logo-card img{display:block;width:100%;height:112px;object-fit:contain}
+    .event-partner-logo-card__meta{flex:1;border-top:1px solid #e8eef6;background:#f8fbff;padding:16px 18px;text-align:center}
+    .event-partner-logo-card__meta h3{margin:0;color:#0f172a;font-size:1rem;font-weight:800;line-height:1.35}
+    .event-partner-logo-card__meta p{margin:6px 0 0;color:#475569;font-size:.82rem;font-weight:650;line-height:1.5}
 
     /* ── List ───────────────────────────────────────────────── */
     .event-list{display:grid;gap:12px;margin:20px 0 0;padding:0;list-style:none}
@@ -409,7 +413,7 @@
         .event-grid--3{grid-template-columns:1fr}
         .event-stat{min-width:100%;border-right:0}
         .event-delegates-viewport{margin-left:-12px;margin-right:-12px}.event-delegates-cta{align-items:stretch;flex-direction:column;text-align:center}.event-delegate-logo{width:156px;height:78px}.event-delegate-logo img{width:132px;height:64px}
-        .event-partners-heading{margin-bottom:28px}.event-partners-grid{grid-template-columns:1fr;max-width:420px;gap:12px}.event-partner-logo-card{min-height:142px;padding:18px}.event-partner-logo-card img{height:104px}
+        .event-partners-heading{margin-bottom:28px}.event-partners-grid{grid-template-columns:1fr;max-width:420px;gap:12px}.event-partner-logo-card__visual{min-height:136px;padding:14px 18px}.event-partner-logo-card img{height:104px}
     }
 </style>
 @endonce

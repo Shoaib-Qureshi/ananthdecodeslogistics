@@ -76,6 +76,11 @@ class EventController extends Controller
             'delegate_logo_files' => 'nullable|array|max:60',
             'delegate_logo_files.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
             'delegate_logos_keep' => 'nullable|string',
+            'marketing_partners' => 'nullable|array|max:30',
+            'marketing_partners.*.name' => 'nullable|string|max:160',
+            'marketing_partners.*.role' => 'nullable|string|max:220',
+            'marketing_partners.*.logo' => 'nullable|string|max:1000',
+            'marketing_partners.*.logo_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
         $validated = $request->validate($this->eventValidationRules());
 
@@ -92,6 +97,7 @@ class EventController extends Controller
         $payload['interest_options']       = $this->interestOptions($request->input('interest_options_text'));
         $payload['registration_steps']     = $this->registrationSteps($request->input('registration_steps_text'));
         $payload['delegate_logos']         = $this->resolveDelegateLogos($request, $event);
+        $payload['marketing_partners']     = $this->resolveMarketingPartners($request);
 
         $event->update($payload);
         $this->syncAgenda($event, $request->input('agenda', []));
@@ -133,6 +139,11 @@ class EventController extends Controller
             'delegate_logo_files' => 'nullable|array|max:60',
             'delegate_logo_files.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
             'delegate_logos_keep' => 'nullable|string',
+            'marketing_partners' => 'nullable|array|max:30',
+            'marketing_partners.*.name' => 'nullable|string|max:160',
+            'marketing_partners.*.role' => 'nullable|string|max:220',
+            'marketing_partners.*.logo' => 'nullable|string|max:1000',
+            'marketing_partners.*.logo_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
         $validated = $request->validate($this->eventValidationRules());
 
@@ -149,6 +160,7 @@ class EventController extends Controller
         $payload['interest_options']        = $this->interestOptions($request->input('interest_options_text'));
         $payload['registration_steps']      = $this->registrationSteps($request->input('registration_steps_text'));
         $payload['delegate_logos']          = $this->resolveDelegateLogos($request, $event);
+        $payload['marketing_partners']      = $this->resolveMarketingPartners($request);
         $payload['is_active']               = true;
 
         $event->update($payload);
@@ -623,9 +635,44 @@ class EventController extends Controller
 
     private function storeDelegateLogo($file): string
     {
+        return $this->storeEventLogo($file, 'events/delegates', 'delegate-');
+    }
+
+    private function resolveMarketingPartners(Request $request): array
+    {
+        return collect($request->input('marketing_partners', []))
+            ->map(function ($partner, $index) use ($request) {
+                $name = trim((string) ($partner['name'] ?? ''));
+                $role = trim((string) ($partner['role'] ?? ''));
+                $logo = trim((string) ($partner['logo'] ?? ''));
+
+                if ($request->hasFile("marketing_partners.{$index}.logo_file")) {
+                    $path = $this->storeEventLogo(
+                        $request->file("marketing_partners.{$index}.logo_file"),
+                        'events/marketing-partners',
+                        'partner-'
+                    );
+                    $logo = Storage::disk('public')->url($path);
+                }
+
+                if ($name === '' && $role === '' && $logo === '') {
+                    return null;
+                }
+
+                return compact('name', 'role', 'logo');
+            })
+            ->filter(fn ($partner) => $partner && $partner['name'] !== '' && $partner['logo'] !== '')
+            ->values()
+            ->all();
+    }
+
+    private function storeEventLogo($file, string $directory, string $prefix): string
+    {
         $source = @imagecreatefromstring(file_get_contents($file->getRealPath()));
         if (! $source) {
-            return $file->store('events/delegates', 'public');
+            $path = $file->store($directory, 'public');
+            $this->mirrorEventLogoToPublicWebroot($path, Storage::disk('public')->get($path));
+            return $path;
         }
 
         $width = imagesx($source);
@@ -667,9 +714,37 @@ class EventController extends Controller
         imagedestroy($flattened);
         imagedestroy($canvas);
 
-        $path = 'events/delegates/delegate-' . Str::lower(Str::random(12)) . '.jpg';
+        $path = $directory . '/' . $prefix . Str::lower(Str::random(12)) . '.jpg';
         Storage::disk('public')->put($path, $contents);
+        $this->mirrorEventLogoToPublicWebroot($path, $contents);
         return $path;
+    }
+
+    private function mirrorEventLogoToPublicWebroot(string $path, string $contents): void
+    {
+        $publicWebroot = realpath(base_path('../public_html'));
+        if (! $publicWebroot || ! is_dir($publicWebroot . DIRECTORY_SEPARATOR . 'storage')) {
+            return;
+        }
+
+        try {
+            $target = $publicWebroot . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR
+                . str_replace('/', DIRECTORY_SEPARATOR, $path);
+            $directory = dirname($target);
+
+            if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
+                throw new \RuntimeException('Unable to create the public storage directory.');
+            }
+
+            if (file_put_contents($target, $contents) === false) {
+                throw new \RuntimeException('Unable to mirror the uploaded logo.');
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('Unable to mirror event logo to the public webroot.', [
+                'path' => $path,
+                'error' => $exception->getMessage(),
+            ]);
+        }
     }
 
     private function lines(?string $text): array

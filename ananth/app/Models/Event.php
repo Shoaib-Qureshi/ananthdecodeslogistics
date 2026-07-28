@@ -10,7 +10,7 @@ class Event extends Model
     protected $fillable = [
         'slug', 'name', 'chapter', 'tagline', 'event_date', 'event_time', 'location', 'venue_name', 'venue_address', 'venue_map_embed', 'format', 'hero_image',
         'welcome_note', 'about', 'why_now', 'theme_title', 'theme_points', 'comparison_rows', 'attendee_profiles',
-        'delegate_logos',
+        'delegate_logos', 'marketing_partners',
         'exhibitor_intro', 'exhibitor_benefits', 'exhibitor_profile', 'exhibitor_package_notes',
         'sponsor_intro', 'sponsor_benefits', 'sponsor_inclusions', 'contact_email', 'contact_note', 'interest_options', 'closing_note',
         'why_who_eyebrow', 'why_who_heading', 'why_who_subheading',
@@ -28,6 +28,7 @@ class Event extends Model
         'comparison_rows' => 'array',
         'attendee_profiles' => 'array',
         'delegate_logos' => 'array',
+        'marketing_partners' => 'array',
         'exhibitor_benefits' => 'array',
         'exhibitor_package_notes' => 'array',
         'sponsor_benefits' => 'array',

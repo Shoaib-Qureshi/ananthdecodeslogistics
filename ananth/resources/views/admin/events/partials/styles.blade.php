@@ -77,8 +77,16 @@
     .delegate-logo-admin-card button{position:absolute;top:4px;right:4px;width:25px;height:25px;border:1px solid #fecaca;border-radius:50%;background:#fff;color:#dc2626;font-size:1rem;line-height:1;cursor:pointer}
     .delegate-logo-admin-card button:hover{background:#fef2f2}
     .delegate-logo-admin-empty{padding:22px;border:1px dashed #cbd5e1;border-radius:12px;background:#f8fbff;color:#64748b;text-align:center;font-size:.86rem}
+    .marketing-partner-admin-list{display:grid;gap:12px;margin-bottom:14px}
+    .marketing-partner-admin-row{display:grid;grid-template-columns:180px minmax(0,1fr) auto;gap:16px;align-items:center;border:1px solid #d8e3f0;border-radius:14px;background:#f8fbff;padding:14px}
+    .marketing-partner-admin-preview{display:flex;align-items:center;justify-content:center;aspect-ratio:2/1;overflow:hidden;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#94a3b8;font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+    .marketing-partner-admin-preview img{display:block;width:100%;height:100%;object-fit:contain}
+    .marketing-partner-admin-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .marketing-partner-admin-fields label{margin:0}
+    .marketing-partner-remove{align-self:start}
     @media(prefers-reduced-motion:reduce){.event-admin-btn,.event-page-nav a,.event-section-toggle,.event-section-toggle:before{transition:none}}
     @media(max-width:1100px){.event-admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:900px){.event-admin-grid,.event-admin-grid-3{grid-template-columns:1fr}.event-editor-tools{position:static;display:block}.event-editor-tools__actions,.event-page-nav{margin-top:10px}.event-admin-hero,.event-page-block__head{display:block}.event-admin-actions{margin-top:14px}.event-page-block__tools{justify-content:flex-start;margin-top:14px}.event-page-link{display:inline-flex}}
+    @media(max-width:900px){.event-admin-grid,.event-admin-grid-3,.marketing-partner-admin-fields{grid-template-columns:1fr}.event-editor-tools{position:static;display:block}.event-editor-tools__actions,.event-page-nav{margin-top:10px}.event-admin-hero,.event-page-block__head{display:block}.event-admin-actions{margin-top:14px}.event-page-block__tools{justify-content:flex-start;margin-top:14px}.event-page-link{display:inline-flex}}
+    @media(max-width:700px){.marketing-partner-admin-row{grid-template-columns:1fr}.marketing-partner-admin-preview{max-width:260px}.marketing-partner-remove{justify-self:start}}
     @media(max-width:560px){.event-admin-stats{grid-template-columns:1fr}.event-admin-hero{padding:20px 18px}.event-page-nav a{width:100%}.save-bar{display:block}.save-bar span{display:block;margin-bottom:8px}.save-bar button{width:100%}}
 </style>

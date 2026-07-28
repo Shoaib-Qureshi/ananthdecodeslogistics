@@ -243,7 +243,21 @@
     </section>
     @endif
 
+    @php
+        $marketingPartners = $event->marketing_partners;
+        if ($marketingPartners === null) {
+            $marketingPartners = [
+                ['name' => 'NeuWork Solutions', 'role' => 'Marketing & Execution Partners', 'logo' => '/img/events/marketing-partners/neuwork-solutions.jpg'],
+                ['name' => '360 Degree Media', 'role' => 'Marketing & Media Partners', 'logo' => '/img/events/marketing-partners/360-media-exchange.jpg'],
+                ['name' => 'Leveragez', 'role' => 'Marketing & Delegate Management Partners', 'logo' => '/img/events/marketing-partners/leveragez-marketing.jpg'],
+            ];
+        }
+        $marketingPartners = collect($marketingPartners)
+            ->filter(fn ($partner) => is_array($partner) && !empty($partner['name']) && !empty($partner['logo']))
+            ->values();
+    @endphp
     {{-- Marketing and execution partners --}}
+    @if($marketingPartners->isNotEmpty())
     <section class="event-section event-partners-section" aria-labelledby="marketing-partners-title">
         <div class="event-container">
             <div class="event-partners-heading">
@@ -252,18 +266,21 @@
                 <p class="event-lead">The teams working behind the scenes to bring the LogiSphere experience to life.</p>
             </div>
             <div class="event-partners-grid" role="list" aria-label="Marketing and execution partners">
-                <div class="event-partner-logo-card" role="listitem">
-                    <img src="{{ asset('img/events/marketing-partners/360-media-exchange.jpg') }}" alt="360° Media Exchange" loading="lazy" width="720" height="360">
-                </div>
-                <div class="event-partner-logo-card" role="listitem">
-                    <img src="{{ asset('img/events/marketing-partners/leveragez-marketing.jpg') }}" alt="Leveragez Marketing" loading="lazy" width="720" height="360">
-                </div>
-                <div class="event-partner-logo-card" role="listitem">
-                    <img src="{{ asset('img/events/marketing-partners/neuwork-solutions.jpg') }}" alt="NeuWork Solutions" loading="lazy" width="720" height="360">
-                </div>
+                @foreach($marketingPartners as $partner)
+                    <article class="event-partner-logo-card" role="listitem">
+                        <div class="event-partner-logo-card__visual">
+                            <img src="{{ $partner['logo'] }}" alt="{{ $partner['name'] }} logo" loading="lazy" width="720" height="360">
+                        </div>
+                        <div class="event-partner-logo-card__meta">
+                            <h3>{{ $partner['name'] }}</h3>
+                            @if(!empty($partner['role']))<p>{{ $partner['role'] }}</p>@endif
+                        </div>
+                    </article>
+                @endforeach
             </div>
         </div>
     </section>
+    @endif
 
     {{-- Past events --}}
     @if($pastEvents->isNotEmpty())

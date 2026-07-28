@@ -99,6 +99,7 @@
                 <nav class="event-page-nav" aria-label="Event page content shortcuts">
                     <a href="#event-basics"><div><strong>Basics</strong><span>Core details</span></div></a>
                     <a href="#event-main-page"><div><strong>Main Event Page</strong><span>/events/conference</span></div></a>
+                    <a href="#event-marketing-partners"><div><strong>Event Partners</strong><span>Conference logos</span></div></a>
                     <a href="#event-why-page"><div><strong>Why & Who Page</strong><span>/events/why-who</span></div></a>
                     <a href="#event-delegate-logos"><div><strong>Delegate Logos</strong><span>Attendee carousel</span></div></a>
                     <a href="#event-register-page"><div><strong>Registration Page</strong><span>/events/register</span></div></a>
@@ -132,6 +133,42 @@
                         <label>Theme Title <input name="event[theme_title]" value="{{ old('event.theme_title', $event->theme_title) }}"><span class="field-help">Example: From Visibility to Velocity.</span></label>
                         <label>Theme Points, one per line <textarea name="theme_points_text">{{ old('theme_points_text', implode("\n", $event->theme_points ?: [])) }}</textarea><span class="field-help">Each line becomes a bullet point.</span></label>
                     </div>
+                </div>
+            </section>
+
+            @php
+                $defaultMarketingPartners = [
+                    ['name' => 'NeuWork Solutions', 'role' => 'Marketing & Execution Partners', 'logo' => '/img/events/marketing-partners/neuwork-solutions.jpg'],
+                    ['name' => '360 Degree Media', 'role' => 'Marketing & Media Partners', 'logo' => '/img/events/marketing-partners/360-media-exchange.jpg'],
+                    ['name' => 'Leveragez', 'role' => 'Marketing & Delegate Management Partners', 'logo' => '/img/events/marketing-partners/leveragez-marketing.jpg'],
+                ];
+                $marketingPartners = old('marketing_partners');
+                if ($marketingPartners === null) {
+                    $marketingPartners = $event->marketing_partners ?? $defaultMarketingPartners;
+                }
+                $marketingPartners = collect($marketingPartners)->values();
+            @endphp
+            <section class="event-page-block" id="event-marketing-partners" data-editor-section>
+                <div class="event-page-block__head green">
+                    <div>
+                        <span class="event-section-kicker">Conference page</span>
+                        <h3>Marketing &amp; Execution Partners</h3>
+                        <p>Add, edit, replace, or remove the partner logos and role labels shown after the Venue section.</p>
+                    </div>
+                    <div class="event-page-block__tools">
+                        <button type="button" class="event-section-toggle" data-section-toggle aria-label="Expand Marketing and Execution Partners" aria-expanded="false"></button>
+                        <a class="event-page-link" href="{{ route('events.conference') }}#marketing-partners-title" target="_blank">View section</a>
+                    </div>
+                </div>
+                <div class="event-page-block__body">
+                    <div class="marketing-partner-admin-list" data-marketing-partner-list>
+                        @foreach($marketingPartners as $index => $partner)
+                            @include('admin.events.partials.marketing-partner-row', ['index' => $index, 'partner' => $partner])
+                        @endforeach
+                    </div>
+                    <div class="delegate-logo-admin-empty" data-marketing-partner-empty @if($marketingPartners->isNotEmpty()) hidden @endif>No marketing partners added yet.</div>
+                    <button type="button" class="event-admin-btn primary" data-add-marketing-partner>Add Partner</button>
+                    <span class="field-help">Uploads are resized to a consistent, high-quality 720×360 format. Partner order here is used on the conference page.</span>
                 </div>
             </section>
 
@@ -345,6 +382,7 @@
 
 <template id="agenda-template">@include('admin.events.partials.agenda-row', ['index' => '__INDEX__', 'item' => null])</template>
 <template id="faq-template">@include('admin.events.partials.faq-row', ['index' => '__INDEX__', 'faq' => null])</template>
+<template id="marketing-partner-template">@include('admin.events.partials.marketing-partner-row', ['index' => '__INDEX__', 'partner' => []])</template>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var sections = Array.prototype.slice.call(document.querySelectorAll('[data-editor-section]'));
@@ -409,6 +447,12 @@ document.addEventListener('click', function (event) {
         setSection(event.target.closest('[data-editor-section]'), true, true);
         addRow('faq-template', '[data-faq-list]');
     }
+    if (event.target.matches('[data-add-marketing-partner]')) {
+        setSection(event.target.closest('[data-editor-section]'), true, true);
+        addRow('marketing-partner-template', '[data-marketing-partner-list]');
+        var partnerEmpty = document.querySelector('[data-marketing-partner-empty]');
+        if (partnerEmpty) partnerEmpty.hidden = true;
+    }
     if (event.target.matches('[data-remove-row]')) {
         const row = event.target.closest('.event-admin-row');
         const del = row.querySelector('[data-delete-input]');
@@ -431,6 +475,28 @@ document.addEventListener('click', function (event) {
             }
         }
     }
+    if (event.target.matches('[data-remove-marketing-partner]')) {
+        var partnerRow = event.target.closest('[data-marketing-partner-row]');
+        if (partnerRow) partnerRow.remove();
+        var partnerList = document.querySelector('[data-marketing-partner-list]');
+        var partnerEmpty = document.querySelector('[data-marketing-partner-empty]');
+        if (partnerEmpty && partnerList && !partnerList.querySelector('[data-marketing-partner-row]')) {
+            partnerEmpty.hidden = false;
+        }
+    }
+});
+
+document.addEventListener('change', function (event) {
+    if (!event.target.matches('[data-marketing-partner-file]') || !event.target.files.length) return;
+
+    var row = event.target.closest('[data-marketing-partner-row]');
+    var preview = row ? row.querySelector('[data-marketing-partner-preview]') : null;
+    var placeholder = row ? row.querySelector('[data-marketing-partner-placeholder]') : null;
+    if (!preview) return;
+
+    preview.src = URL.createObjectURL(event.target.files[0]);
+    preview.hidden = false;
+    if (placeholder) placeholder.hidden = true;
 });
 function addRow(templateId, targetSelector) {
     const template = document.getElementById(templateId).innerHTML.replaceAll('__INDEX__', Date.now());
