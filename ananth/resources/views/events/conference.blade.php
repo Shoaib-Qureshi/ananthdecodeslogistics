@@ -260,24 +260,29 @@
     @if($marketingPartners->isNotEmpty())
     <section class="event-section event-partners-section" aria-labelledby="marketing-partners-title">
         <div class="event-container">
-            <div class="event-partners-heading">
-                <div class="event-eyebrow">Event Partners</div>
-                <h2 class="event-title" id="marketing-partners-title">Marketing &amp; Execution Partners</h2>
-                <p class="event-lead">The teams working behind the scenes to bring the LogiSphere experience to life.</p>
-            </div>
-            <div class="event-partners-grid" role="list" aria-label="Marketing and execution partners">
-                @foreach($marketingPartners as $partner)
-                    <article class="event-partner-logo-card" role="listitem">
-                        <div class="event-partner-logo-card__visual">
-                            <img src="{{ $partner['logo'] }}" alt="{{ $partner['name'] }} logo" loading="lazy" width="720" height="360">
+            <h2 class="event-title event-partners-title" id="marketing-partners-title">Partners</h2>
+            @if($marketingPartners->count() > 4)
+                <div class="event-partners-carousel" aria-label="Event partners">
+                    <div class="event-partners-track" style="--partner-scroll-duration:{{ max(48, $marketingPartners->count() * 8) }}s">
+                        <div class="event-partners-set" role="list">
+                            @foreach($marketingPartners as $partner)
+                                @include('events.partials.marketing-partner-card', ['partner' => $partner])
+                            @endforeach
                         </div>
-                        <div class="event-partner-logo-card__meta">
-                            <h3>{{ $partner['name'] }}</h3>
-                            @if(!empty($partner['role']))<p>{{ $partner['role'] }}</p>@endif
+                        <div class="event-partners-set" aria-hidden="true">
+                            @foreach($marketingPartners as $partner)
+                                @include('events.partials.marketing-partner-card', ['partner' => $partner])
+                            @endforeach
                         </div>
-                    </article>
-                @endforeach
-            </div>
+                    </div>
+                </div>
+            @else
+                <div class="event-partners-grid event-partners-grid--{{ $marketingPartners->count() }}" role="list" aria-label="Event partners">
+                    @foreach($marketingPartners as $partner)
+                        @include('events.partials.marketing-partner-card', ['partner' => $partner])
+                    @endforeach
+                </div>
+            @endif
         </div>
     </section>
     @endif
