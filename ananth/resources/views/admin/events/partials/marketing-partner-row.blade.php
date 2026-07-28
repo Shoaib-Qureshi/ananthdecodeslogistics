@@ -1,6 +1,6 @@
 @php
     $partner = is_array($partner ?? null) ? $partner : [];
-    $partnerLogo = trim((string) ($partner['logo'] ?? ''));
+    $partnerLogo = \App\Models\Event::normalizePublicAssetUrl($partner['logo'] ?? '');
 @endphp
 <div class="marketing-partner-admin-row" data-marketing-partner-row>
     <div class="marketing-partner-admin-preview">

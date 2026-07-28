@@ -254,6 +254,10 @@
         }
         $marketingPartners = collect($marketingPartners)
             ->filter(fn ($partner) => is_array($partner) && !empty($partner['name']) && !empty($partner['logo']))
+            ->map(function ($partner) {
+                $partner['logo'] = \App\Models\Event::normalizePublicAssetUrl($partner['logo']);
+                return $partner;
+            })
             ->values();
     @endphp
     {{-- Marketing and execution partners --}}

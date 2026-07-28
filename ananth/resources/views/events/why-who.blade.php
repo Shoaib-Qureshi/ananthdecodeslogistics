@@ -60,6 +60,7 @@
         $delegateLogos = collect($event->delegate_logos ?: [])
             ->map(fn ($logo) => is_array($logo) ? ($logo['url'] ?? null) : $logo)
             ->filter(fn ($logo) => is_string($logo) && trim($logo) !== '')
+            ->map(fn ($logo) => \App\Models\Event::normalizePublicAssetUrl($logo))
             ->values();
     @endphp
     @if($delegateLogos->isNotEmpty())

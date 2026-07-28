@@ -202,6 +202,7 @@
                 $delegateLogos = collect($event->delegate_logos ?: [])
                     ->map(fn ($logo) => is_array($logo) ? ($logo['url'] ?? null) : $logo)
                     ->filter(fn ($logo) => is_string($logo) && trim($logo) !== '')
+                    ->map(fn ($logo) => \App\Models\Event::normalizePublicAssetUrl($logo))
                     ->values();
             @endphp
             <section class="event-page-block" id="event-delegate-logos" data-editor-section>

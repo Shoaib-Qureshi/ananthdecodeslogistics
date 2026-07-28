@@ -149,6 +149,21 @@ class Event extends Model
         return $map;
     }
 
+    public static function normalizePublicAssetUrl(?string $url): string
+    {
+        $url = trim((string) $url);
+        if ($url === '') {
+            return '';
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if (is_string($path) && str_starts_with($path, '/storage/')) {
+            return $path;
+        }
+
+        return $url;
+    }
+
     public static function defaultRegistrationSteps(): array
     {
         return [

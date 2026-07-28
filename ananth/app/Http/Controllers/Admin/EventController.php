@@ -617,17 +617,23 @@ class EventController extends Controller
         $existing = collect($event->delegate_logos ?: [])
             ->map(fn ($logo) => is_array($logo) ? ($logo['url'] ?? null) : $logo)
             ->filter(fn ($logo) => is_string($logo) && trim($logo) !== '')
+            ->map(fn ($logo) => Event::normalizePublicAssetUrl($logo))
             ->values();
 
         if ($request->has('delegate_logos_keep')) {
             $keep = json_decode((string) $request->input('delegate_logos_keep'), true);
-            $keep = is_array($keep) ? array_values(array_filter($keep, 'is_string')) : [];
+            $keep = is_array($keep)
+                ? array_values(array_map(
+                    fn ($logo) => Event::normalizePublicAssetUrl($logo),
+                    array_filter($keep, 'is_string')
+                ))
+                : [];
             $existing = $existing->intersect($keep)->values();
         }
 
         foreach ($request->file('delegate_logo_files', []) as $file) {
             $path = $this->storeDelegateLogo($file);
-            $existing->push(Storage::disk('public')->url($path));
+            $existing->push($this->publicStorageUrl($path));
         }
 
         return $existing->unique()->values()->all();
@@ -644,7 +650,7 @@ class EventController extends Controller
             ->map(function ($partner, $index) use ($request) {
                 $name = trim((string) ($partner['name'] ?? ''));
                 $role = trim((string) ($partner['role'] ?? ''));
-                $logo = trim((string) ($partner['logo'] ?? ''));
+                $logo = Event::normalizePublicAssetUrl($partner['logo'] ?? '');
 
                 if ($request->hasFile("marketing_partners.{$index}.logo_file")) {
                     $path = $this->storeEventLogo(
@@ -652,7 +658,7 @@ class EventController extends Controller
                         'events/marketing-partners',
                         'partner-'
                     );
-                    $logo = Storage::disk('public')->url($path);
+                    $logo = $this->publicStorageUrl($path);
                 }
 
                 if ($name === '' && $role === '' && $logo === '') {
@@ -718,6 +724,11 @@ class EventController extends Controller
         Storage::disk('public')->put($path, $contents);
         $this->mirrorEventLogoToPublicWebroot($path, $contents);
         return $path;
+    }
+
+    private function publicStorageUrl(string $path): string
+    {
+        return '/storage/' . ltrim(str_replace('\\', '/', $path), '/');
     }
 
     private function mirrorEventLogoToPublicWebroot(string $path, string $contents): void
