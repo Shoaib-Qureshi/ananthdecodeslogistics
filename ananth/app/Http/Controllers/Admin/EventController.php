@@ -683,9 +683,15 @@ class EventController extends Controller
 
         $width = imagesx($source);
         $height = imagesy($source);
+        if (function_exists('imagepalettetotruecolor') && ! imageistruecolor($source)) {
+            imagepalettetotruecolor($source);
+        }
+
+        $useDarkCanvas = $this->logoNeedsDarkCanvas($source, $width, $height);
+        $background = $useDarkCanvas ? [15, 23, 42] : [255, 255, 255];
         $flattened = imagecreatetruecolor($width, $height);
-        $flattenedWhite = imagecolorallocate($flattened, 255, 255, 255);
-        imagefill($flattened, 0, 0, $flattenedWhite);
+        $flattenedBackground = imagecolorallocate($flattened, ...$background);
+        imagefill($flattened, 0, 0, $flattenedBackground);
         imagealphablending($flattened, true);
         imagesavealpha($source, true);
         imagecopy($flattened, $source, 0, 0, 0, 0, $width, $height);
@@ -697,8 +703,8 @@ class EventController extends Controller
         $targetHeight = max(1, (int) round($height * $scale));
 
         $canvas = imagecreatetruecolor($canvasWidth, $canvasHeight);
-        $white = imagecolorallocate($canvas, 255, 255, 255);
-        imagefill($canvas, 0, 0, $white);
+        $canvasBackground = imagecolorallocate($canvas, ...$background);
+        imagefill($canvas, 0, 0, $canvasBackground);
         imagecopyresampled(
             $canvas,
             $flattened,
@@ -724,6 +730,44 @@ class EventController extends Controller
         Storage::disk('public')->put($path, $contents);
         $this->mirrorEventLogoToPublicWebroot($path, $contents);
         return $path;
+    }
+
+    private function logoNeedsDarkCanvas($source, int $width, int $height): bool
+    {
+        $step = max(1, (int) floor(max($width, $height) / 500));
+        $transparentPixels = 0;
+        $visiblePixels = 0;
+        $lightPixels = 0;
+
+        for ($y = 0; $y < $height; $y += $step) {
+            for ($x = 0; $x < $width; $x += $step) {
+                $rgba = imagecolorat($source, $x, $y);
+                $alpha = ($rgba >> 24) & 0x7f;
+
+                if ($alpha >= 110) {
+                    $transparentPixels++;
+                    continue;
+                }
+
+                if ($alpha > 96) {
+                    continue;
+                }
+
+                $red = ($rgba >> 16) & 0xff;
+                $green = ($rgba >> 8) & 0xff;
+                $blue = $rgba & 0xff;
+                $luminance = ($red * .2126) + ($green * .7152) + ($blue * .0722);
+                $visiblePixels++;
+
+                if ($luminance >= 190) {
+                    $lightPixels++;
+                }
+            }
+        }
+
+        return $transparentPixels > 0
+            && $visiblePixels > 0
+            && ($lightPixels / $visiblePixels) >= .62;
     }
 
     private function publicStorageUrl(string $path): string

@@ -168,7 +168,7 @@
                     </div>
                     <div class="delegate-logo-admin-empty" data-marketing-partner-empty @if($marketingPartners->isNotEmpty()) hidden @endif>No marketing partners added yet.</div>
                     <button type="button" class="event-admin-btn primary" data-add-marketing-partner>Add Partner</button>
-                    <span class="field-help">Uploads are resized to a consistent, high-quality 720×360 format. Partner order here is used on the conference page.</span>
+                    <span class="field-help">Uploads are resized to a consistent, high-quality 720×360 format. Transparent white logos automatically receive a navy background for contrast. Partner order here is used on the conference page.</span>
                 </div>
             </section>
 
