@@ -71,6 +71,11 @@
     .save-bar button:disabled{cursor:wait;opacity:.78}
     .visible-toggle{display:inline-flex!important;align-items:center;gap:8px;margin:0!important;white-space:nowrap}
     .visible-toggle input{width:auto;margin:0}
+    .registration-status{border:1px solid #d8e3f0;border-radius:14px;padding:16px 18px;margin-bottom:18px;background:#f8fafc}
+    .registration-status.is-open{border-color:#a7f3d0;background:#f0fdf9}
+    .registration-status.is-closed{border-color:#fecaca;background:#fef6f6}
+    .registration-status strong{color:#0f172a;font-size:.95rem}
+    .registration-status .field-help{margin-top:8px}
     .delegate-logo-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px}
     .delegate-logo-admin-card{position:relative;border:1px solid #d8e3f0;border-radius:12px;background:#fff;padding:8px;box-shadow:0 8px 18px rgba(15,23,42,.05)}
     .delegate-logo-admin-card img{display:block;width:100%;aspect-ratio:2/1;object-fit:contain;border-radius:8px;background:#f8fafc}

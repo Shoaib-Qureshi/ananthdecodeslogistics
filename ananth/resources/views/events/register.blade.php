@@ -13,6 +13,7 @@
         $selectedInterest = $fallbackInterest;
     }
     $selectedInterestLabel = $interestOptions[$selectedInterest] ?? 'Delegate';
+    $registrationsOpen = $event->registrationsOpen();
 @endphp
 <main class="event-page">
     @include('events.partials.hero', [
@@ -36,6 +37,7 @@
                     </div>
                 @endif
 
+                @if($registrationsOpen)
                 <ul class="event-register-steps">
                     @foreach($event->registrationSteps() as $index => $step)
                         <li>
@@ -49,13 +51,19 @@
                         </li>
                     @endforeach
                 </ul>
+                @endif
             </aside>
 
             <div class="event-card event-register-form-card">
                 <div class="event-register-form-head">
                     <div>
-                        <h2>{{ $event->registration_form_heading ?: 'Register Interest' }}</h2>
-                        <p>{{ $event->registration_form_subheading ?: 'Tell us how you want to participate in LogiSphere.' }}</p>
+                        @if($registrationsOpen)
+                            <h2>{{ $event->registration_form_heading ?: 'Register Interest' }}</h2>
+                            <p>{{ $event->registration_form_subheading ?: 'Tell us how you want to participate in LogiSphere.' }}</p>
+                        @else
+                            <h2>Registrations Closed</h2>
+                            <p>This event is no longer accepting registrations.</p>
+                        @endif
                     </div>
                     <span class="event-register-badge">{{ $event->formattedDate() }}</span>
                 </div>
@@ -69,6 +77,7 @@
                     @endif
                 </div>
 
+                @if($registrationsOpen)
                 <form class="event-form" id="register-form" method="POST" action="{{ route('events.register.submit') }}">
                     @csrf
                     <div class="event-form-grid">
@@ -121,6 +130,21 @@
                         Submit Interest
                     </button>
                 </form>
+                @else
+                <div class="event-registration-closed">
+                    <p class="event-registration-closed__message">{{ $event->registrationsClosedMessage() }}</p>
+                    @if($event->contact_email)
+                        <p class="event-registration-closed__contact">
+                            For any enquiries, please contact
+                            <a href="mailto:{{ $event->contact_email }}">{{ $event->contact_email }}</a>.
+                        </p>
+                    @endif
+                    <div class="event-registration-closed__actions">
+                        <a class="event-btn event-btn--primary" href="{{ route('events.conference') }}">View event details</a>
+                        <a class="event-btn" href="{{ route('events.faq') }}">Read the FAQ</a>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </section>

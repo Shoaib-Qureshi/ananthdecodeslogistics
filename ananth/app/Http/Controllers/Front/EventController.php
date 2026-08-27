@@ -60,6 +60,11 @@ class EventController extends Controller
     public function submitRegistration(Request $request)
     {
         $event = $this->event();
+
+        if (! $event->registrationsOpen()) {
+            return back()->withErrors(['error' => $event->registrationsClosedMessage()]);
+        }
+
         $validated = $request->validate([
             'inquiry_type' => ['required', Rule::in(array_keys($event->interestOptionMap()))],
             'name' => 'required|string|max:160',

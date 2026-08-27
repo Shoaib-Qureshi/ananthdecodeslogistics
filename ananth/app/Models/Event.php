@@ -18,6 +18,7 @@ class Event extends Model
         'registration_eyebrow', 'registration_heading', 'registration_subheading',
         'registration_panel_eyebrow', 'registration_panel_heading',
         'registration_form_heading', 'registration_form_subheading', 'registration_steps',
+        'registrations_open', 'registrations_closed_message',
         'active_sponsor_currency', 'tax_label', 'tax_percentage', 'is_active',
         'meta_title', 'meta_description', 'canonical_url',
     ];
@@ -37,6 +38,7 @@ class Event extends Model
         'registration_steps' => 'array',
         'tax_percentage' => 'decimal:2',
         'is_active' => 'boolean',
+        'registrations_open' => 'boolean',
     ];
 
     public function agendaItems()
@@ -82,6 +84,17 @@ class Event extends Model
                 'tagline' => 'One Sphere. Infinite Supply Chain Possibilities.',
                 'active_sponsor_currency' => 'INR',
             ]);
+    }
+
+    public function registrationsOpen(): bool
+    {
+        return (bool) $this->registrations_open;
+    }
+
+    public function registrationsClosedMessage(): string
+    {
+        return trim((string) $this->registrations_closed_message)
+            ?: 'Registrations for this event are now closed. Thank you to everyone who took part.';
     }
 
     public function activeCurrency(): string

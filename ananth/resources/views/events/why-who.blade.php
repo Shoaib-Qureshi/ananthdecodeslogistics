@@ -43,7 +43,9 @@
                 <h2 class="event-title">Built for decision-makers and influencers.</h2>
                 <p class="event-lead">Every delegate is vetted for seniority, relevance, and decision-making authority, giving sponsors, exhibitors, and speakers the audience they genuinely want access to.</p>
                 <div class="event-actions">
+                    @if($event->registrationsOpen())
                     <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Interest</a>
+                    @endif
                 </div>
             </div>
             <div class="event-card">
@@ -91,7 +93,9 @@
                 </div>
                 <div class="event-delegates-cta">
                     <span>Join the delegate community</span>
+                    @if($event->registrationsOpen())
                     <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Interest</a>
+                    @endif
                 </div>
             </div>
         </section>

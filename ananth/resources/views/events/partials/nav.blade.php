@@ -2,7 +2,7 @@
     $eventLinks = [
         'Overview'  => route('events.conference'),
         'Why & Who' => route('events.why-who'),
-        'Register'  => route('events.register'),
+        ($event->registrationsOpen() ? 'Register' : 'Registration') => route('events.register'),
         'Sponsor'   => route('events.sponsorship'),
         'FAQ'       => route('events.faq'),
     ];

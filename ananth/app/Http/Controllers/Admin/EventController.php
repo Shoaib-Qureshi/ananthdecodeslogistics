@@ -565,6 +565,8 @@ class EventController extends Controller
             'event.registration_panel_heading' => 'nullable|string|max:180',
             'event.registration_form_heading' => 'nullable|string|max:180',
             'event.registration_form_subheading' => 'nullable|string|max:500',
+            'event.registrations_open'       => 'nullable|boolean',
+            'event.registrations_closed_message' => 'nullable|string|max:1000',
             'event.contact_email'           => 'nullable|email|max:180',
             'event.contact_note'            => 'nullable|string|max:3000',
             'event.closing_note'            => 'nullable|string|max:4000',

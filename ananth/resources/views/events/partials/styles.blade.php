@@ -277,6 +277,14 @@
     .event-alert--success{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
     .event-alert--error{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
 
+    /* ── Registrations closed ───────────────────────────────── */
+    .event-registration-closed{padding:26px 0 4px;text-align:center}
+    .event-registration-closed__message{margin:0;color:#0f172a;font-size:1.02rem;font-weight:500;line-height:1.65}
+    .event-registration-closed__contact{margin:14px 0 0;color:#64748b;font-size:.93rem;line-height:1.6}
+    .event-registration-closed__contact a{color:#1d4ed8;text-decoration:none}
+    .event-registration-closed__contact a:hover{text-decoration:underline}
+    .event-registration-closed__actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:26px}
+
     /* ── Table ──────────────────────────────────────────────── */
     .event-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid #d8e3f0;border-radius:20px;background:#fff}
     .event-table th,.event-table td{padding:14px 18px;border-bottom:1px solid #e5edf7;text-align:left;vertical-align:top;font-size:.92rem}

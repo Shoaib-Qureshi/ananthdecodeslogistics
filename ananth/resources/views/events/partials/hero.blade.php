@@ -22,8 +22,10 @@
             @endif
             @if($showActions)
                 <div class="event-actions">
-                    <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Interest</a>
-                    <a class="event-btn" href="{{ route('events.sponsorship') }}">Sponsor LogiSphere</a>
+                    @if($event->registrationsOpen())
+                        <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Interest</a>
+                    @endif
+                    <a class="event-btn {{ $event->registrationsOpen() ? '' : 'event-btn--primary' }}" href="{{ route('events.sponsorship') }}">Sponsor LogiSphere</a>
                 </div>
             @endif
         </div>
@@ -41,7 +43,9 @@
                     <div><span>Location</span><strong>{{ $event->location ?: 'Bengaluru' }}</strong></div>
                     <div><span>Format</span><strong>{{ $event->event_time ?: $event->format ?: 'A one-day executive conclave' }}</strong></div>
                 </div>
-                <a class="event-hero-upcoming__link" href="{{ route('events.register', ['type' => 'sponsor']) }}">Register sponsor interest</a>
+                @if($event->registrationsOpen())
+                    <a class="event-hero-upcoming__link" href="{{ route('events.register', ['type' => 'sponsor']) }}">Register sponsor interest</a>
+                @endif
             </aside>
         @elseif($hasImage)
             <div class="event-hero__image-wrap">

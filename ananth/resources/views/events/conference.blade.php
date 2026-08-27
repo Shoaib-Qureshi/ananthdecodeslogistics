@@ -219,7 +219,9 @@
                         </p>
                     @endif
                     <div class="event-actions" style="margin-top:28px">
+                        @if($event->registrationsOpen())
                         <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Now</a>
+                        @endif
                         @if($event->venue_map_embed)
                             <a class="event-btn event-btn--light" href="https://maps.google.com/?q={{ urlencode($event->venue_address ?: $event->venue_name ?: $event->location) }}" target="_blank" rel="noopener">Open in Google Maps</a>
                         @endif
@@ -341,7 +343,9 @@
             <h2 class="event-title" style="color:#fff">Infinite possibilities.</h2>
             <p style="color:rgba(255,255,255,.72);font-size:1.08rem;max-width:760px">{!! nl2br(e($event->closing_note)) !!}</p>
             <div class="event-actions" style="margin-top:28px">
+                @if($event->registrationsOpen())
                 <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Interest</a>
+                @endif
                 <a class="event-btn" href="{{ route('events.sponsorship') }}">Partner With Us</a>
             </div>
         </div>

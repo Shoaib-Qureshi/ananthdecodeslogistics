@@ -100,11 +100,13 @@
                         <li>{{ $item }}</li>
                     @endforeach
                 </ul>
+                @if($event->registrationsOpen())
                 <div class="event-actions">
                     <a class="event-btn event-btn--primary"
                        href="{{ route('events.register', ['type' => 'exhibitor']) }}"
                        aria-label="Register exhibitor interest">Register Exhibitor Interest</a>
                 </div>
+                @endif
             </article>
         </div>
     </section>

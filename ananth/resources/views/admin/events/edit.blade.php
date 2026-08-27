@@ -251,6 +251,25 @@
                     </div>
                 </div>
                 <div class="event-page-block__body">
+                    @php $registrationsOpen = (bool) old('event.registrations_open', $event->registrations_open); @endphp
+                    <div class="registration-status {{ $registrationsOpen ? 'is-open' : 'is-closed' }}">
+                        <input type="hidden" name="event[registrations_open]" value="0">
+                        <label class="visible-toggle">
+                            <input type="checkbox" name="event[registrations_open]" value="1" {{ $registrationsOpen ? 'checked' : '' }}>
+                            <strong>Registrations are open</strong>
+                        </label>
+                        <span class="field-help">
+                            Untick to close registrations. The event pages stay online as an archive, but the form on
+                            /events/register is replaced by the message below and any submission is rejected.
+                            This covers delegate, speaker, sponsor and exhibitor enquiries, since they all use this one form.
+                        </span>
+                    </div>
+                    <div class="event-admin-grid">
+                        <label>Registrations Closed Message
+                            <textarea name="event[registrations_closed_message]" maxlength="1000">{{ old('event.registrations_closed_message', $event->registrations_closed_message) }}</textarea>
+                            <span class="field-help">Shown in place of the form once registrations are closed. Leave blank to use the default wording.</span>
+                        </label>
+                    </div>
                     <div class="event-admin-grid-3">
                         <label>Page Eyebrow <input name="event[registration_eyebrow]" value="{{ old('event.registration_eyebrow', $event->registration_eyebrow ?: 'Register') }}"></label>
                         <label>Hero Heading <input name="event[registration_heading]" value="{{ old('event.registration_heading', $event->registration_heading ?: 'Register for LogiSphere') }}"></label>
