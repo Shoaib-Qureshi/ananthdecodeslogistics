@@ -17,15 +17,15 @@
             <div class="event-eyebrow">{{ $eyebrow ?? $event->chapter }}</div>
             <h1>{{ $title ?? $event->name }}</h1>
             <p>{{ $subtitle ?? $event->tagline }}</p>
-            @if($countdownTarget)
+            @if($countdownTarget && $event->registrationsOpen())
                 @include('events.partials.countdown')
             @endif
             @if($showActions)
                 <div class="event-actions">
                     @if($event->registrationsOpen())
                         <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Interest</a>
+                        <a class="event-btn" href="{{ route('events.sponsorship') }}">Sponsor LogiSphere</a>
                     @endif
-                    <a class="event-btn {{ $event->registrationsOpen() ? '' : 'event-btn--primary' }}" href="{{ route('events.sponsorship') }}">Sponsor LogiSphere</a>
                 </div>
             @endif
         </div>
@@ -41,7 +41,9 @@
                 <div class="event-hero-upcoming__meta">
                     <div><span>Date</span><strong>{{ $event->formattedDate() }}</strong></div>
                     <div><span>Location</span><strong>{{ $event->location ?: 'Bengaluru' }}</strong></div>
-                    <div><span>Format</span><strong>{{ $event->event_time ?: $event->format ?: 'A one-day executive conclave' }}</strong></div>
+                    @if($event->registrationsOpen())
+                        <div><span>Format</span><strong>{{ $event->event_time ?: $event->format ?: 'A one-day executive conclave' }}</strong></div>
+                    @endif
                 </div>
                 @if($event->registrationsOpen())
                     <a class="event-hero-upcoming__link" href="{{ route('events.register', ['type' => 'sponsor']) }}">Register sponsor interest</a>
@@ -62,14 +64,16 @@
             <div class="event-facts" aria-label="Event at a glance">
                 <div><span>Date</span><strong>{{ $event->formattedDate() }}</strong></div>
                 <div><span>Location</span><strong>{{ $event->location ?: 'Bengaluru' }}</strong></div>
-                <div><span>Format</span><strong>{{ $event->event_time ?: $event->format ?: 'A one-day executive conclave' }}</strong></div>
+                @if($event->registrationsOpen())
+                    <div><span>Format</span><strong>{{ $event->event_time ?: $event->format ?: 'A one-day executive conclave' }}</strong></div>
+                @endif
             </div>
         @endif
 
     </div>
 </section>
 
-@if($countdownTarget)
+@if($countdownTarget && $event->registrationsOpen())
     <script>
         (function () {
             function initCountdown(root) {

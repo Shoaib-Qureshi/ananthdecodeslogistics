@@ -94,6 +94,7 @@ class EventController extends Controller
     public function sponsorCheckout(EventSponsorPackage $package)
     {
         $event = $this->event();
+        abort_if(! $event->registrationsOpen(), 404);
         abort_if($package->event_id !== $event->id || !$package->visible, 404);
 
         return view('events.sponsor-checkout', $this->viewData($event) + [
@@ -106,6 +107,7 @@ class EventController extends Controller
     public function startSponsorCheckout(Request $request, EventSponsorPackage $package)
     {
         $event = $this->event();
+        abort_if(! $event->registrationsOpen(), 404);
         abort_if($package->event_id !== $event->id || !$package->visible, 404);
 
         $validated = $request->validate([

@@ -165,6 +165,7 @@
     @endif
 
     {{-- Agenda --}}
+    @if($event->registrationsOpen())
     <section class="event-section">
         <div class="event-container">
             <div class="event-eyebrow">Agenda Preview</div>
@@ -192,6 +193,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- Venue --}}
     @if($event->venue_name || $event->venue_address || $event->venue_map_embed)
@@ -345,8 +347,8 @@
             <div class="event-actions" style="margin-top:28px">
                 @if($event->registrationsOpen())
                 <a class="event-btn event-btn--primary" href="{{ route('events.register') }}">Register Interest</a>
-                @endif
                 <a class="event-btn" href="{{ route('events.sponsorship') }}">Partner With Us</a>
+                @endif
             </div>
         </div>
     </section>

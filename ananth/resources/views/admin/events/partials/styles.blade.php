@@ -76,6 +76,13 @@
     .registration-status.is-closed{border-color:#fecaca;background:#fef6f6}
     .registration-status strong{color:#0f172a;font-size:.95rem}
     .registration-status .field-help{margin-top:8px}
+    .switch-row{display:inline-flex!important;align-items:center;gap:12px;margin:0!important;cursor:pointer;user-select:none}
+    .switch-row .switch-input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
+    .switch-track{position:relative;flex:0 0 auto;width:46px;height:26px;border-radius:999px;background:#cbd5e1;transition:background .18s ease}
+    .switch-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(15,23,42,.28);transition:transform .18s ease}
+    .switch-row .switch-input:checked ~ .switch-track{background:#059669}
+    .switch-row .switch-input:checked ~ .switch-track .switch-knob{transform:translateX(20px)}
+    .switch-row .switch-input:focus-visible ~ .switch-track{outline:2px solid #2562E9;outline-offset:2px}
     .delegate-logo-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px}
     .delegate-logo-admin-card{position:relative;border:1px solid #d8e3f0;border-radius:12px;background:#fff;padding:8px;box-shadow:0 8px 18px rgba(15,23,42,.05)}
     .delegate-logo-admin-card img{display:block;width:100%;aspect-ratio:2/1;object-fit:contain;border-radius:8px;background:#f8fafc}

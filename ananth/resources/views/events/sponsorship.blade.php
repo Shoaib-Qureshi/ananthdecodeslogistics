@@ -73,9 +73,11 @@
                                 <li>{{ $benefit }}</li>
                             @endforeach
                         </ul>
+                        @if($event->registrationsOpen())
                         <a class="event-btn event-btn--primary"
                            href="{{ route('events.sponsor.checkout', $package) }}"
                            aria-label="Select {{ $package->name }} package">Select Package</a>
+                        @endif
                     </article>
                 @endforeach
             </div>

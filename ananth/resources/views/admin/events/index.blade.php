@@ -21,6 +21,7 @@
         .ev-badge--inactive{background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
         .ev-badge--future{background:#eff6ff;color:#2562E9;border:1px solid rgba(37,98,233,.2)}
         .ev-badge--past{background:#fef9ec;color:#b45309;border:1px solid #fde68a}
+        .ev-badge--closed{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
         .ev-actions-cell{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
         .ev-btn{display:inline-flex;align-items:center;gap:6px;border-radius:40px;padding:7px 14px;font-size:.78rem;font-weight:800;text-decoration:none;border:1px solid #d8e3f0;color:#475569;background:#fff;cursor:pointer;white-space:nowrap}
         .ev-btn:hover{border-color:#2562E9;color:#2562E9;background:#eff6ff}
@@ -72,10 +73,15 @@
                     <td>{{ $ev->event_date ? $ev->event_date->format('d M Y') : '—' }}</td>
                     <td>{{ $ev->location ?: '—' }}</td>
                     <td>
-                        @if($ev->is_active)
+                        @if($ev->is_active && $ev->registrationsOpen())
                             <span class="ev-badge ev-badge--active">
                                 <svg width="7" height="7" viewBox="0 0 8 8" fill="#059669" aria-hidden="true"><circle cx="4" cy="4" r="4"/></svg>
                                 Active
+                            </span>
+                        @elseif($ev->is_active)
+                            <span class="ev-badge ev-badge--closed" title="This is still the live event; registrations are closed.">
+                                <svg width="7" height="7" viewBox="0 0 8 8" fill="#b91c1c" aria-hidden="true"><circle cx="4" cy="4" r="4"/></svg>
+                                Closed
                             </span>
                         @elseif($ev->event_date && $ev->event_date->isFuture())
                             <span class="ev-badge ev-badge--future">Upcoming</span>

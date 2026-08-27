@@ -252,16 +252,20 @@
                 </div>
                 <div class="event-page-block__body">
                     @php $registrationsOpen = (bool) old('event.registrations_open', $event->registrations_open); @endphp
-                    <div class="registration-status {{ $registrationsOpen ? 'is-open' : 'is-closed' }}">
+                    <div class="registration-status {{ $registrationsOpen ? 'is-open' : 'is-closed' }}" data-registration-status>
                         <input type="hidden" name="event[registrations_open]" value="0">
-                        <label class="visible-toggle">
-                            <input type="checkbox" name="event[registrations_open]" value="1" {{ $registrationsOpen ? 'checked' : '' }}>
-                            <strong>Registrations are open</strong>
+                        <label class="switch-row">
+                            <input type="checkbox" class="switch-input" name="event[registrations_open]" value="1"
+                                   {{ $registrationsOpen ? 'checked' : '' }} data-registration-switch>
+                            <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
+                            <strong data-registration-label>{{ $registrationsOpen ? 'Registrations are open' : 'Registrations are closed' }}</strong>
                         </label>
                         <span class="field-help">
-                            Untick to close registrations. The event pages stay online as an archive, but the form on
-                            /events/register is replaced by the message below and any submission is rejected.
-                            This covers delegate, speaker, sponsor and exhibitor enquiries, since they all use this one form.
+                            Switch off to close registrations. The event pages stay online as an archive, but the
+                            registration form is replaced by the message below and any submission is rejected.
+                            Also hidden while closed: the countdown, the agenda section, the date/format line, and every
+                            Register and Sponsor button. Sponsor checkout is blocked too, so no new sponsor payment can
+                            be started (payments already in progress can still finish).
                         </span>
                     </div>
                     <div class="event-admin-grid">
@@ -405,6 +409,23 @@
 <template id="marketing-partner-template">@include('admin.events.partials.marketing-partner-row', ['index' => '__INDEX__', 'partner' => []])</template>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Registrations switch: reflect the new state before the form is saved
+    var regSwitch = document.querySelector('[data-registration-switch]');
+    if (regSwitch) {
+        var regBlock = document.querySelector('[data-registration-status]');
+        var regLabel = document.querySelector('[data-registration-label]');
+        regSwitch.addEventListener('change', function () {
+            var open = regSwitch.checked;
+            if (regBlock) {
+                regBlock.classList.toggle('is-open', open);
+                regBlock.classList.toggle('is-closed', !open);
+            }
+            if (regLabel) {
+                regLabel.textContent = open ? 'Registrations are open' : 'Registrations are closed';
+            }
+        });
+    }
+
     var sections = Array.prototype.slice.call(document.querySelectorAll('[data-editor-section]'));
     var hasErrors = !!document.querySelector('.alert-danger');
 
