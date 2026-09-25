@@ -113,6 +113,13 @@ class EventController extends Controller
         return back()->with('success', '"' . $event->name . '" is now the active event.');
     }
 
+    public function toggleVisibility(Event $event)
+    {
+        $event->update(['registrations_open' => ! $event->registrationsOpen()]);
+
+        return back()->with('success', '"' . $event->name . '" is now ' . ($event->registrationsOpen() ? 'live on the site.' : 'hidden from the site.'));
+    }
+
     public function destroy(Event $event)
     {
         if ($event->is_active) {

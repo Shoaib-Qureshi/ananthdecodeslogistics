@@ -94,7 +94,15 @@
                     <td>
                         <div class="ev-actions-cell">
                             <a href="{{ route('admin.events.event.edit', $ev) }}" class="ev-btn">Edit</a>
-                            <a href="{{ route('events.conference') }}" target="_blank" class="ev-btn">View</a>
+                            @if($ev->registrationsOpen())
+                                <a href="{{ route('events.conference') }}" target="_blank" class="ev-btn">View</a>
+                            @endif
+                            <form method="POST" action="{{ route('admin.events.event.visibility', $ev) }}" style="display:contents">
+                                @csrf
+                                <button type="submit" class="ev-btn {{ $ev->registrationsOpen() ? 'ev-btn--danger' : 'ev-btn--activate' }}">
+                                    {{ $ev->registrationsOpen() ? 'Hide from site' : 'Show on site' }}
+                                </button>
+                            </form>
                             @if(!$ev->is_active)
                                 <form method="POST" action="{{ route('admin.events.event.activate', $ev) }}" style="display:contents">
                                     @csrf

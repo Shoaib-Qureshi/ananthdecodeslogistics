@@ -85,6 +85,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('admin/events/{event}/edit',[AdminEventController::class,'editEvent'])->where('event','[0-9]+')->name('admin.events.event.edit');
     Route::post('admin/events/{event}/edit',[AdminEventController::class,'updateEvent'])->where('event','[0-9]+')->name('admin.events.event.update');
     Route::post('admin/events/{event}/activate',[AdminEventController::class,'activate'])->where('event','[0-9]+')->name('admin.events.event.activate');
+    Route::post('admin/events/{event}/visibility',[AdminEventController::class,'toggleVisibility'])->where('event','[0-9]+')->name('admin.events.event.visibility');
     Route::delete('admin/events/{event}',[AdminEventController::class,'destroy'])->where('event','[0-9]+')->name('admin.events.event.destroy');
     // Legacy current-event edit
     Route::get('admin/events/logisphere/edit',[AdminEventController::class,'edit'])->name('admin.events.edit');
