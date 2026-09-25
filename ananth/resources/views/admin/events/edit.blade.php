@@ -258,14 +258,12 @@
                             <input type="checkbox" class="switch-input" name="event[registrations_open]" value="1"
                                    {{ $registrationsOpen ? 'checked' : '' }} data-registration-switch>
                             <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
-                            <strong data-registration-label>{{ $registrationsOpen ? 'Registrations are open' : 'Registrations are closed' }}</strong>
+                            <strong data-registration-label>{{ $registrationsOpen ? 'Event is live on the site' : 'Event is hidden from the site' }}</strong>
                         </label>
                         <span class="field-help">
-                            Switch off to close registrations. The event pages stay online as an archive, but the
-                            registration form is replaced by the message below and any submission is rejected.
-                            Also hidden while closed: the countdown, the agenda section, the date/format line, and every
-                            Register and Sponsor button. Sponsor checkout is blocked too, so no new sponsor payment can
-                            be started (payments already in progress can still finish).
+                            Switch off to take the event off the site completely: every /events/ page returns 404,
+                            registrations and sponsor checkout are blocked, and the Events menu disappears from the
+                            header and footer. Switch back on to publish it again.
                         </span>
                     </div>
                     <div class="event-admin-grid">
@@ -421,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 regBlock.classList.toggle('is-closed', !open);
             }
             if (regLabel) {
-                regLabel.textContent = open ? 'Registrations are open' : 'Registrations are closed';
+                regLabel.textContent = open ? 'Event is live on the site' : 'Event is hidden from the site';
             }
         });
     }

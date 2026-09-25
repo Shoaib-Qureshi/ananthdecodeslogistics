@@ -171,7 +171,10 @@ class EventController extends Controller
 
     private function event(): Event
     {
-        return Event::current()->load(['agendaItems', 'faqs']);
+        $event = Event::current();
+        abort_if(! $event->registrationsOpen(), 404);
+
+        return $event->load(['agendaItems', 'faqs']);
     }
 
     private function viewData(Event $event): array

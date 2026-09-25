@@ -79,9 +79,9 @@
                                 Active
                             </span>
                         @elseif($ev->is_active)
-                            <span class="ev-badge ev-badge--closed" title="This is still the live event; registrations are closed.">
+                            <span class="ev-badge ev-badge--closed" title="This is still the selected event, but it is hidden from the public site.">
                                 <svg width="7" height="7" viewBox="0 0 8 8" fill="#b91c1c" aria-hidden="true"><circle cx="4" cy="4" r="4"/></svg>
-                                Closed
+                                Hidden
                             </span>
                         @elseif($ev->event_date && $ev->event_date->isFuture())
                             <span class="ev-badge ev-badge--future">Upcoming</span>

@@ -6,8 +6,10 @@
         'About Us' => '/about-us',
         'Blog' => '/blog',
         'The Expert Desk' => route('contributors.index'),
-        'Events' => '/events/conference',
     ];
+    if (\App\Models\Event::publiclyVisible()) {
+        $exploreLinks['Events'] = '/events/conference';
+    }
     if (\App\Models\SiteSetting::galleryPageVisible()) {
         $exploreLinks['Gallery'] = '/gallery';
     }

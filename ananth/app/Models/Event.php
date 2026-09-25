@@ -86,6 +86,13 @@ class Event extends Model
             ]);
     }
 
+    // ponytail: reuses registrations_open as the whole-event visibility flag.
+    // Rename the column if the two ever need to differ again.
+    public static function publiclyVisible(): bool
+    {
+        return (bool) (static::where('is_active', true)->value('registrations_open') ?? false);
+    }
+
     public function registrationsOpen(): bool
     {
         return (bool) $this->registrations_open;

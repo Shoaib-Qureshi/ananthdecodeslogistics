@@ -149,6 +149,7 @@
 </style>
 
 @php($showGalleryNav = \App\Models\SiteSetting::galleryPageVisible())
+@php($showEventsNav = \App\Models\Event::publiclyVisible())
 
 <nav id="adl-nav" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm border-b border-border shadow-sm" aria-label="Main navigation">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
@@ -198,6 +199,7 @@
                 </li>
 
                 {{-- Events Dropdown --}}
+                @if($showEventsNav)
                 <li class="relative group" role="none">
                     <button class="flex items-center gap-1 px-3 py-2 text-sm font-medium text-body group-hover:text-cta transition-colors duration-200 rounded cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-cta"
                             aria-haspopup="true" aria-expanded="false" role="menuitem">
@@ -215,6 +217,7 @@
                         <li role="none"><a href="/events/faq" class="block px-4 py-2.5 text-sm text-body hover:text-navy hover:bg-cream transition-colors duration-150 cursor-pointer" role="menuitem">FAQ</a></li>
                     </ul>
                 </li>
+                @endif
 
                 @if($showGalleryNav)
                     <li role="none">
@@ -284,6 +287,7 @@
                 <li><a href="{{ route('contributors.index') }}" class="block px-3 py-2.5 text-sm font-medium text-body hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">The Expert Desk</a></li>
 
                 {{-- Events accordion --}}
+                @if($showEventsNav)
                 <li>
                     <button class="adl-mobile-toggle w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-body hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer"
                             aria-expanded="false">
@@ -300,6 +304,7 @@
                         <li><a href="/events/faq" class="block px-3 py-2 text-sm text-muted hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">FAQ</a></li>
                     </ul>
                 </li>
+                @endif
 
                 @if($showGalleryNav)
                     <li><a href="/gallery" class="block px-3 py-2.5 text-sm font-medium text-body hover:text-navy hover:bg-cream rounded-lg transition-colors duration-150 cursor-pointer">Gallery</a></li>
